@@ -72,6 +72,8 @@
 #include "SelectionObject.h"
 #include "SoAxisCrossKit.h"
 #include "SoFCOffscreenRenderer.h"
+#include "SoFCUnifiedSelection.h"
+#include "TaskMeasure.h"
 #include "TextureMapping.h"
 #include "Tools.h"
 #include "Tree.h"
@@ -3420,6 +3422,88 @@ bool StdCmdMeasureDistance::isActive()
 }
 
 //===========================================================================
+// Std_Measure
+//===========================================================================
+
+void measureCallback(void * ud, SoEventCallback * n)
+{
+    Q_UNUSED(ud);
+    const SoEvent* ev = n->getEvent();
+
+    if (ev->isOfType(SoMouseButtonEvent::getClassTypeId())) {
+        const auto mbe = static_cast<const SoMouseButtonEvent*>(ev);
+
+        // Mark all incoming mouse button events as handled, especially, to deactivate the selection node
+        n->getAction()->setHandled();
+
+        if (mbe->getButton() == SoMouseButtonEvent::BUTTON1 && mbe->getState() == SoButtonEvent::DOWN) {
+
+            const Gui::SelectionChanges& presel = Gui::Selection().getPreselection();
+            const char* obName = presel.pObjectName;
+            const char* subName = presel.pSubName;
+            App::DocumentObject* ob = presel.Object.getSubObject();
+
+            // Check that we have a valid preselection
+            if (!*subName) {
+                return;
+            }
+
+            auto sub = ob->getSubObject(subName);
+            std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
+            App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
+            auto info = handler.infoCb(obName, subName);
+            Gui::TaskView::TaskDialog *dlg = Control().activeDialog();
+            TaskMeasure *task = (TaskMeasure*)dlg;
+            task->elementInfo = &info;
+            task->update();
+
+            const SoPickedPoint * point = n->getPickedPoint();
+            if (!point) {
+                Base::Console().Message("No point picked.\n");
+                return;
+            }
+        }
+    }
+    if (ev->isOfType(SoKeyboardEvent::getClassTypeId())){
+        Control().activeDialog()->reject();
+    }
+}
+
+DEF_STD_CMD(StdCmdMeasure)
+
+StdCmdMeasure::StdCmdMeasure()
+  :Command("Std_Measure")
+{
+    sGroup        = "Measure";
+    sMenuText     = QT_TR_NOOP("&Measure");
+    sToolTipText  = QT_TR_NOOP("Measure a feature");
+    sWhatsThis    = "Std_Measure";
+    sStatusTip    = QT_TR_NOOP("Measure a feature");
+    sPixmap       = "view-measurement";
+}
+
+void StdCmdMeasure::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    MDIView* view = getMainWindow()->activeWindow();
+    if (!view || !view->isDerivedFrom(Gui::View3DInventor::getClassTypeId())) {
+        return;
+    }
+    Gui::View3DInventorViewer *viewer = static_cast<Gui::View3DInventor*>(view)->getViewer();
+
+    viewer->addEventCallback(SoEvent::getClassTypeId(),
+        measureCallback);
+
+    TaskMeasure *task = new TaskMeasure();
+    task->eventCallback = measureCallback;
+
+    Gui::Control().showDialog(task);
+    // Gui::Control().showTaskView()
+}
+
+
+//===========================================================================
 // Std_SceneInspector
 //===========================================================================
 
@@ -4064,6 +4148,7 @@ void CreateViewStdCommands()
     rcCmdMgr.addCommand(new StdCmdTreeCollapse());
     rcCmdMgr.addCommand(new StdCmdTreeSelectAllInstances());
     rcCmdMgr.addCommand(new StdCmdMeasureDistance());
+    rcCmdMgr.addCommand(new StdCmdMeasure());
     rcCmdMgr.addCommand(new StdCmdSceneInspector());
     rcCmdMgr.addCommand(new StdCmdTextureMapping());
     rcCmdMgr.addCommand(new StdCmdDemoMode());
