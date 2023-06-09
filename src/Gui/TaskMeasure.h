@@ -26,7 +26,7 @@
 #include "TaskView/TaskView.h"
 #include "Application.h"
 
-#include <qt/QtWidgets/qcolumnview.h>
+#include <qcolumnview.h>
 #include <QString>
 
 namespace Gui {
