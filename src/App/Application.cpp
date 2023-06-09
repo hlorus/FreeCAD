@@ -1539,6 +1539,34 @@ std::map<std::string, std::string> Application::getExportFilters() const
 }
 
 //**************************************************************************
+// measure
+
+void Application::addMeasureHandler(const char* module, std::function<MeasureElementInfo(const char*, const char*)> cb) {
+    MeasureHandler item = {.module = module, .infoCb = cb};
+    _mMeasureHandlers.push_back(item);
+}
+
+bool Application::hasMeasureHandler(const char* module) {
+    for(MeasureHandler handler : _mMeasureHandlers) {
+        if (strcmp(handler.module.c_str(), module)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+MeasureHandler Application::getMeasureHandler(const char* module) {
+    for(MeasureHandler handler : _mMeasureHandlers) {
+        if (!strcmp(handler.module.c_str(), module)) {
+            return handler;
+        }
+    }
+
+    MeasureHandler empty;
+    return empty;
+}
+
+//**************************************************************************
 // signaling
 void Application::slotBeforeChangeDocument(const App::Document& doc, const Property& prop)
 {

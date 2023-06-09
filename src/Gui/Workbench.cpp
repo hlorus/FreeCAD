@@ -794,7 +794,7 @@ ToolBarItem* StdWorkbench::setupToolBars() const
           << "Separator" << "Std_SelectFilter" << "Std_SelBack" << "Std_SelForward"
           << "Std_LinkSelectActions"<< "Separator" << "Std_TreeViewActions" << "Std_ViewIsometric"
           << "Std_ViewFront"<< "Std_ViewTop" << "Std_ViewRight" << "Separator" << "Std_ViewRear"
-          << "Separator" << "Std_ViewBottom"<< "Std_ViewLeft"  << "Separator" << "Std_MeasureDistance";
+          << "Separator" << "Std_ViewBottom"<< "Std_ViewLeft"  << "Separator" << "Std_MeasureDistance" << "Std_Measure";
 
     // Structure
     auto structure = new ToolBarItem( root );

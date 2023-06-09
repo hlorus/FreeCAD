@@ -28,9 +28,13 @@
 
 #include <deque>
 #include <vector>
+#include <functional>
+#include <optional>
+#include <string>
 
 #include <Base/Observer.h>
 #include <Base/Parameter.h>
+#include "Base/Vector3D.h"
 
 // forward declarations
 using PyObject = struct _object;
@@ -68,6 +72,21 @@ enum class MessageOption {
     Error, /**< Print an error message. */
     Throw, /**< Throw an exception. */
 };
+
+// typedef MeasureElementInfo(*ElementInfoCb)();
+
+typedef struct MeasureElementInfo {
+    std::string type;
+    const Base::Vector3d pos;
+    const float length;
+    const float area;
+} MeasureElementInfo;
+
+typedef struct MeasureHandler {
+    std::string module;
+    std::function<MeasureElementInfo(const char*, const char*)> infoCb;
+    // ElementInfoCb infoCb;
+}MeasureHandler;
 
 
 /** The Application
@@ -385,6 +404,17 @@ public:
     std::map<std::string, std::string> getExportFilters() const;
     //@}
 
+    /** @name Methods for the modular measure functionlity */
+    //@{
+
+    void addMeasureHandler(const char* module, std::function<MeasureElementInfo(const char*, const char*)> cb);
+    bool hasMeasureHandler(const char* module);
+    MeasureHandler getMeasureHandler(const char* module);
+
+
+    //@}
+
+
     /** @name Init, Destruct an Access methods */
     //@{
     static void init(int argc, char ** argv);
@@ -535,6 +565,7 @@ private:
     static PyObject* sGetUserMacroPath  (PyObject *self, PyObject *args);
     static PyObject* sGetHelpPath       (PyObject *self, PyObject *args);
     static PyObject* sGetHomePath       (PyObject *self, PyObject *args);
+    // static PyObject* sAddMeasureType    (PyObject *self, PyObject *args);
 
     static PyObject* sLoadFile          (PyObject *self,PyObject *args);
     static PyObject* sOpenDocument      (PyObject *self,PyObject *args, PyObject *kwd);
@@ -633,6 +664,12 @@ private:
 
     static Base::ConsoleObserverStd  *_pConsoleObserverStd;
     static Base::ConsoleObserverFile *_pConsoleObserverFile;
+
+
+
+
+    std::vector<MeasureHandler> _mMeasureHandlers;
+
 };
 
 /// Singleton getter of the Application
