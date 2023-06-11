@@ -91,10 +91,10 @@ static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* sub
      
 
     App::MeasureElementInfo info = {
-        .type = type,
-        .pos = pos,
-        .length = length,
-        .area = area
+        type,
+        pos,
+        length,
+        area
     };
     
     return info;

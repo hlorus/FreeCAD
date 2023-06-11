@@ -73,8 +73,6 @@ enum class MessageOption {
     Throw, /**< Throw an exception. */
 };
 
-// typedef MeasureElementInfo(*ElementInfoCb)();
-
 typedef struct MeasureElementInfo {
     std::string type;
     const Base::Vector3d pos;
@@ -85,7 +83,6 @@ typedef struct MeasureElementInfo {
 typedef struct MeasureHandler {
     std::string module;
     std::function<MeasureElementInfo(const char*, const char*)> infoCb;
-    // ElementInfoCb infoCb;
 }MeasureHandler;
 
 
