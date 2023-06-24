@@ -80,6 +80,14 @@ typedef struct MeasureElementInfo {
     const float area;
 } MeasureElementInfo;
 
+using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;
+using MeasureValidateMethod = std::function<bool(MeasureSelection)>;
+
+typedef struct MeasureType {
+    std::string measureObject;
+    MeasureValidateMethod validatorCb;
+} MeasureType;
+
 typedef struct MeasureHandler {
     std::string module;
     std::function<MeasureElementInfo(const char*, const char*)> infoCb;
@@ -404,6 +412,11 @@ public:
     /** @name Methods for the modular measure functionlity */
     //@{
 
+    // Callback for measurements
+
+    void addMeasureType(const std::string measureObject, MeasureValidateMethod validateCb);
+    const std::vector<MeasureType> getMeasureTypes();
+
     void addMeasureHandler(const char* module, std::function<MeasureElementInfo(const char*, const char*)> cb);
     bool hasMeasureHandler(const char* module);
     MeasureHandler getMeasureHandler(const char* module);
@@ -666,6 +679,7 @@ private:
 
 
     std::vector<MeasureHandler> _mMeasureHandlers;
+    std::vector<MeasureType> _mMeasureTypes;
 
 };
 

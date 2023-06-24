@@ -1567,6 +1567,15 @@ MeasureHandler Application::getMeasureHandler(const char* module) {
     return empty;
 }
 
+void Application::addMeasureType(const std::string measureObject, MeasureValidateMethod validateCb) {
+    MeasureType m = {measureObject, validateCb};
+    _mMeasureTypes.push_back(m);
+}
+
+const std::vector<MeasureType> Application::getMeasureTypes() {
+    return _mMeasureTypes;
+}
+
 //**************************************************************************
 // signaling
 void Application::slotBeforeChangeDocument(const App::Document& doc, const Property& prop)
