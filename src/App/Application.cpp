@@ -99,6 +99,7 @@
 #include "Link.h"
 #include "LinkBaseExtensionPy.h"
 #include "MaterialObject.h"
+#include "Measure.h"
 #include "MeasureDistance.h"
 #include "Origin.h"
 #include "OriginFeature.h"
@@ -2111,6 +2112,7 @@ void Application::initTypes()
     App::VRMLObject                ::init();
     App::Annotation                ::init();
     App::AnnotationLabel           ::init();
+    App::MeasurementBase           ::init();
     App::MeasureDistance           ::init();
     App::MaterialObject            ::init();
     App::MaterialObjectPython      ::init();
