@@ -33,6 +33,7 @@
 #include "PartFeature.h"
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
+#include <MeasureDistancePoints.h>
 
 
 #include <TopAbs.hxx>
@@ -105,7 +106,12 @@ namespace Part {
 
 void Measure::initialize() {
 
-    App::GetApplication().addMeasureHandler("Part", PartMeasureCb);
+    App::Application& app = App::GetApplication();
+    app.addMeasureHandler("Part", PartMeasureCb);
+
+    // Add Measure Types
+    app.addMeasureType("Part::MeasureDistancePoints", Part::MeasureDistancePoints::isValidSelection); 
+
 
 }
 
