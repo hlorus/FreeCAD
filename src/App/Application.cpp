@@ -1543,8 +1543,8 @@ std::map<std::string, std::string> Application::getExportFilters() const
 // measure
 
 void Application::addMeasureHandler(const char* module, std::function<MeasureElementInfo(const char*, const char*)> cb) {
-    MeasureHandler item = {.module = module, .infoCb = cb};
-    _mMeasureHandlers.push_back(item);
+    MeasureHandler* item = new MeasureHandler{module, cb};
+    _mMeasureHandlers.push_back(*item);
 }
 
 bool Application::hasMeasureHandler(const char* module) {
@@ -1568,7 +1568,7 @@ MeasureHandler Application::getMeasureHandler(const char* module) {
 }
 
 void Application::addMeasureType(const std::string measureObject, MeasureValidateMethod validateCb) {
-    MeasureType m = {measureObject, validateCb};
+    MeasureType* m = new MeasureType{measureObject, validateCb};
     _mMeasureTypes.push_back(m);
 }
 
