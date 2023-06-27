@@ -1572,7 +1572,7 @@ void Application::addMeasureType(const std::string measureObject, MeasureValidat
     _mMeasureTypes.push_back(m);
 }
 
-const std::vector<MeasureType> Application::getMeasureTypes() {
+const std::vector<MeasureType*> Application::getMeasureTypes() {
     return _mMeasureTypes;
 }
 
