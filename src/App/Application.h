@@ -81,7 +81,7 @@ typedef struct MeasureElementInfo {
 } MeasureElementInfo;
 
 using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;
-using MeasureValidateMethod = std::function<bool(MeasureSelection)>;
+using MeasureValidateMethod = std::function<bool(const MeasureSelection&)>;
 
 typedef struct MeasureType {
     std::string measureObject;
