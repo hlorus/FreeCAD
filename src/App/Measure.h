@@ -39,7 +39,7 @@ class AppExport MeasurementBase : public DocumentObject
 public:
 
     // Initalize measurement properties from selection
-    virtual void parseSelection(MeasureSelection) = 0;
+    virtual void parseSelection(const MeasureSelection&) = 0;
 
     virtual float result() = 0;
 };

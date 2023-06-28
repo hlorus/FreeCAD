@@ -90,7 +90,7 @@ MeasureDistancePoints::MeasureDistancePoints()
 
 MeasureDistancePoints::~MeasureDistancePoints() = default;
 
-bool MeasureDistancePoints::isValidSelection(App::MeasureSelection selection){
+bool MeasureDistancePoints::isValidSelection(const App::MeasureSelection& selection){
 
     if (selection.size() != 2) {
         return false;
@@ -111,7 +111,7 @@ bool MeasureDistancePoints::isValidSelection(App::MeasureSelection selection){
     return true;
 }
 
-void MeasureDistancePoints::parseSelection(App::MeasureSelection selection) {
+void MeasureDistancePoints::parseSelection(const App::MeasureSelection& selection) {
     // Set properties from selection, method is only invoked when isValid Selection return true
 
     App::Document* doc = App::GetApplication().getActiveDocument();

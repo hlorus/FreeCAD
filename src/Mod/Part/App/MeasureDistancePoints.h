@@ -49,8 +49,8 @@ public:
     App::PropertyDistance Distance;
 
 
-    static bool isValidSelection(App::MeasureSelection selection);
-    void parseSelection(App::MeasureSelection selection);
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection);
 
     App::DocumentObjectExecReturn *execute() override;
 
