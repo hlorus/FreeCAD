@@ -1,0 +1,146 @@
+/***************************************************************************
+ *   Copyright (c) 2008 Werner Mayer <wmayer[at]users.sourceforge.net>     *
+ *                                                                         *
+ *   This file is part of the FreeCAD CAx development system.              *
+ *                                                                         *
+ *   This library is free software; you can redistribute it and/or         *
+ *   modify it under the terms of the GNU Library General Public           *
+ *   License as published by the Free Software Foundation; either          *
+ *   version 2 of the License, or (at your option) any later version.      *
+ *                                                                         *
+ *   This library  is distributed in the hope that it will be useful,      *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU Library General Public License for more details.                  *
+ *                                                                         *
+ *   You should have received a copy of the GNU Library General Public     *
+ *   License along with this library; see the file COPYING.LIB. If not,    *
+ *   write to the Free Software Foundation, Inc., 59 Temple Place,         *
+ *   Suite 330, Boston, MA  02111-1307, USA                                *
+ *                                                                         *
+ ***************************************************************************/
+
+
+#include "PreCompiled.h"
+
+#include <App/PropertyContainer.h>
+#include <App/Application.h>
+#include <App/Document.h>
+#include <tuple>
+
+#include "MeasureLength.h"
+
+
+using namespace App;
+
+PROPERTY_SOURCE(App::MeasureLength, App::MeasurementBase)
+
+
+
+HandlerMap MeasureLength::_mGeometryHandlers = HandlerMap();
+
+MeasureLength::MeasureLength()
+{
+    ADD_PROPERTY_TYPE(Elements,(nullptr), "Measurement", App::Prop_None, "Elements to get the length from");
+
+    ADD_PROPERTY_TYPE(Distance,(0.0)       ,"Measurement",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
+                                            "Distance between the points");
+
+}
+
+MeasureLength::~MeasureLength() = default;
+
+void MeasureLength::addGeometryHandler(const std::string& module, MeasureLengthGeometryHandler callback) {
+    _mGeometryHandlers[module] = callback;
+}
+
+// Todo: Check if a handler is available
+MeasureLengthGeometryHandler MeasureLength::getGeometryHandler(const std::string& module) {
+    return _mGeometryHandlers[module];
+}
+
+bool MeasureLength::hasGeometryHandler(const std::string& module) {
+    return (_mGeometryHandlers.count(module) > 0);
+}
+
+
+bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
+    // Check if all elements in the selection have a valid geometry handler
+    // Note: It might be neccessary to add validator methods on module level
+
+    if (selection.size() != 1) {
+        return false;
+    }
+
+    App::Document* doc = App::GetApplication().getActiveDocument();
+
+    for (const std::tuple<std::string, std::string>& element : selection) {
+        App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
+        
+        const char* className = ob->getSubObject(get<1>(element).c_str())->getTypeId().getName();
+        std::string mod = ob->getClassTypeId().getModuleName(className);
+
+        if (!hasGeometryHandler(mod)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void MeasureLength::parseSelection(const App::MeasureSelection& selection) {
+    // Set properties from selection, method is only invoked when isValid Selection returns true
+
+    App::Document* doc = App::GetApplication().getActiveDocument();
+
+    std::vector<App::DocumentObject*> objects;
+    std::vector<const char*> subElements;
+
+    for (const std::tuple<std::string, std::string>& element : selection) {
+       App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
+       objects.push_back(ob);
+       subElements.push_back(get<1>(element).c_str());
+    }
+
+    Elements.setValues(objects, subElements);
+}
+
+
+App::DocumentObjectExecReturn *MeasureLength::execute()
+{
+    App::DocumentObjectExecReturn* ret;
+
+
+    const std::vector<App::DocumentObject*>& objects = Elements.getValues();
+    const std::vector<std::string>& subElements = Elements.getSubValues();
+
+    float result;
+
+    // Loop through Elements and call the valid geometry handler
+    for (int i=0; i<objects.size(); i++) {
+        App::DocumentObject *object = objects.at(i);
+        std::string subElement = subElements.at(i);
+
+        // Get the Geometry handler based on the module
+        const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
+        const std::string& mod = object->getClassTypeId().getModuleName(className);
+        MeasureLengthGeometryHandler handler = getGeometryHandler(mod);
+
+        std::string obName = object->getNameInDocument();
+        result += handler(&obName, &subElement);
+    }
+
+    Distance.setValue(result);
+
+    return DocumentObject::StdReturn;
+}
+
+void MeasureLength::onChanged(const App::Property* prop)
+{
+    if (prop == &Elements) {
+        if (!isRestoring()) {
+            App::DocumentObjectExecReturn *ret = recompute();
+            delete ret;
+        }
+    }
+    DocumentObject::onChanged(prop);
+}

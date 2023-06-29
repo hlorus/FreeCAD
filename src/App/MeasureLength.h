@@ -21,18 +21,63 @@
  ***************************************************************************/
 
 
-#include "PreCompiled.h"
+#ifndef APP_MEASURELENGTH_H
+#define APP_MEASURELENGTH_H
+
+#include <App/DocumentObject.h>
+#include <App/PropertyGeo.h>
+#include <App/PropertyUnits.h>
+#include <tuple>
 #include "Measure.h"
-#include "MeasureLength.h"
+#include <functional>
+#include <string.h>
+#include <map>
 
-using namespace App;
+namespace App
+{
 
-PROPERTY_SOURCE_ABSTRACT(App::MeasurementBase, App::DocumentObject)
+using MeasureLengthGeometryHandler = std::function<float (std::string*, std::string*)>;
+using HandlerMap = std::map<std::string, MeasureLengthGeometryHandler>;
+
+typedef struct GeometryHandler {
+    std::string module;
+    MeasureLengthGeometryHandler callback;
+} GeometryHandler;
+
+class AppExport MeasureLength : public App::MeasurementBase
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(App::MeasureLength);
+
+public:
+    /// Constructor
+    MeasureLength();
+    ~MeasureLength() override;
+
+    App::PropertyLinkSubList Elements;
+    App::PropertyDistance Distance;
+
+    App::DocumentObjectExecReturn *execute() override;
+
+    // const char* getViewProviderName() const override {
+    //     return "Gui::ViewProviderMeasureDistance";
+    // }
+
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection);
+    float result() {return Distance.getValue();}
+
+    // Register geometry handler
+    static void addGeometryHandler(const std::string& module, MeasureLengthGeometryHandler callback);
+    static MeasureLengthGeometryHandler getGeometryHandler(const std::string& module);
+    static bool hasGeometryHandler(const std::string& module);
+
+private:
+    static HandlerMap _mGeometryHandlers;
+
+    void onChanged(const App::Property* prop) override;
+};
+
+} //namespace App
 
 
-void App::Measure::initialize(){
-    App::Application& app = App::GetApplication();
-
-    app.addMeasureType("App::MeasureLength", App::MeasureLength::isValidSelection);
-
-}
+#endif // APP_MEASURELENGTH_H
