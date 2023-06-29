@@ -34,6 +34,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <MeasureDistancePoints.h>
+#include "App/MeasureLength.h"
 
 
 #include <TopAbs.hxx>
@@ -101,6 +102,20 @@ static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* sub
     return info;
 }
 
+float MeasureLengthHandler(std::string* obName, std::string* subName){
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
+    auto sub = ob->getSubObject(subName->c_str());
+
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    if (sType != TopAbs_EDGE) {
+        return 0.0;
+    }
+
+    return getLength(shape);
+}
+
 namespace Part {
 
 
@@ -112,6 +127,9 @@ void Measure::initialize() {
     // Add Measure Types
     app.addMeasureType("Part::MeasureDistancePoints", Part::MeasureDistancePoints::isValidSelection); 
 
+
+    // Extend MeasureLength
+    App::MeasureLength::addGeometryHandler("Part", MeasureLengthHandler);
 
 }
 

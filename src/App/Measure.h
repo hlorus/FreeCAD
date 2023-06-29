@@ -44,6 +44,12 @@ public:
     virtual float result() = 0;
 };
 
+class AppExport Measure {
+
+public:
+    static void initialize();
+};
+
 } //namespace App
 
 
