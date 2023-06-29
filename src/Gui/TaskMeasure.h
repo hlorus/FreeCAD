@@ -21,13 +21,17 @@
  ***************************************************************************/
 
 #include <Inventor/nodes/SoEventCallback.h>
+#include <tuple>
+#include <string.h>
 
 #include "TaskView/TaskDialog.h"
 #include "TaskView/TaskView.h"
 #include "Application.h"
+#include "App/Measure.h"
 
 #include <qcolumnview.h>
 #include <QString>
+
 
 namespace Gui {
 
@@ -48,11 +52,31 @@ public:
     bool accept();
     bool reject();
 
+    void addElement(const char* mod, const char* obName, const char* subName);
+    bool hasSelection();
+    void clearSelection();    
+
 protected:
+    App::MeasurementBase *_mMeasureObject = nullptr;
+
+    QLabel *labelMeasureType;
+    QLabel *labelResult;
     QLabel *labelType;
     QLabel *labelPosition;
     QLabel *labelLength;
     QLabel *labelArea;
+
+    void removeObject();
+    void updateInfo();
+
+    // Store the active measure module
+    std::string measureModule;
+
+    // Store a list of picked elements and subelements
+    App::MeasureSelection selection;
+
+    // List of measure types
+    std::vector<App::DocumentObject> measureObjects;
 
 };
 

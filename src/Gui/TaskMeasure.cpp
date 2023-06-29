@@ -35,6 +35,9 @@
 #include "MainWindow.h"
 #include "View3DInventor.h"
 #include "View3DInventorViewer.h"
+#include "Application.h"
+#include "App/Document.h"
+
 
 
 using namespace Gui;
@@ -42,18 +45,31 @@ using namespace Gui;
 
 TaskMeasure::TaskMeasure(){
 
+    measureModule = "";
+
     this->setButtonPosition(TaskMeasure::South);
     Gui::TaskView::TaskBox* taskbox = new Gui::TaskView::TaskBox(QPixmap(), QString(), true, nullptr);
+
+    labelMeasureType = new QLabel();
+    labelResult = new QLabel();
 
     labelType = new QLabel();
     labelPosition = new QLabel();
     labelLength = new QLabel();
     labelArea = new QLabel();
 
-    taskbox->groupLayout()->addWidget(labelType);
-    taskbox->groupLayout()->addWidget(labelPosition);
-    taskbox->groupLayout()->addWidget(labelLength);
-    taskbox->groupLayout()->addWidget(labelArea);
+    QBoxLayout *layout = taskbox->groupLayout();
+    layout->addWidget(labelMeasureType);
+    layout->addWidget(labelResult);
+
+    
+    layout->addWidget(labelType);
+    layout->addWidget(labelPosition);
+    layout->addWidget(labelLength);
+    layout->addWidget(labelArea);
+
+    labelMeasureType->setText(QString::asprintf("Measure Type: -"));
+    labelResult->setText(QString::asprintf("Result: -"));
 
     Content.push_back(taskbox);
 }
@@ -62,13 +78,13 @@ TaskMeasure::~TaskMeasure(){
     // automatically deleted in the sub-class
 }
 
-void TaskMeasure::update(){
+void TaskMeasure::updateInfo() {
     labelType->hide();
     labelPosition->hide();
     labelLength->hide();
     labelArea->hide();
 
-    if (elementInfo && elementInfo->type.empty()) {
+    if (!elementInfo || elementInfo->type.empty()) {
         return;
     }
 
@@ -91,6 +107,67 @@ void TaskMeasure::update(){
         labelArea->setText(QString::asprintf("Area: %.3f", elementInfo->area));
         labelArea->show();
     }
+}
+
+
+void TaskMeasure::update(){
+    labelMeasureType->setText(QString::asprintf("Measure Type: -"));
+    labelResult->setText(QString::asprintf("Result: -"));
+
+    // Update element info display
+    updateInfo();
+
+    // Report selection stack
+    Base::Console().Message("Selection: ");
+    for (std::tuple<std::string, std::string> elem : selection) {
+        Base::Console().Message("%s ", std::get<1>(elem));
+    }
+    Base::Console().Message("\n");
+
+
+    // Get valid measure type
+    bool isValid = false;
+    App::MeasureType *measureType;
+
+    for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
+        if (!mType->validatorCb(selection)) {
+            continue;
+        }
+        isValid = true;
+        measureType = mType;
+        break;
+    }
+
+    if (!isValid) {
+
+        // Note: If there's no valid measure type we might just restart the selection,
+        // however this requiers enogh coverage of measuretypes that we can access all of them
+        
+        // std::tuple<std::string, std::string> sel = selection.back();
+        // clearSelection();
+        // addElement(measureModule.c_str(), get<0>(sel).c_str(), get<1>(sel).c_str());
+        return;
+    }
+
+
+    if (!_mMeasureObject || measureType->measureObject != _mMeasureObject->getTypeId().getName()) {
+
+        // Remove existing measurement object
+        removeObject();
+
+        // Create measure object
+        App::Document *doc = App::GetApplication().getActiveDocument();
+        _mMeasureObject = (App::MeasurementBase*)doc->addObject(measureType->measureObject.c_str());
+    }
+    
+    // Set type label
+    labelMeasureType->setText(QString::asprintf("Measure Type: %s", measureType->measureObject.c_str()));
+
+    // Fill measure object's properties from selection
+    _mMeasureObject->parseSelection(selection);
+
+    // Get result
+    labelResult->setText(QString::asprintf("Result: %f", _mMeasureObject->result()));
 
 }
 
@@ -111,9 +188,46 @@ bool TaskMeasure::accept(){
 }
 
 bool TaskMeasure::reject(){
+    removeObject();
+
     close();
     return false;
 }
 
+void TaskMeasure::addElement(const char* mod, const char* obName, const char* subName) {
+    if (strcmp(mod, measureModule.c_str())){
+        clearSelection();
+    }
+
+    measureModule = mod;
+    selection.push_back(std::make_tuple((std::string)obName, (std::string)subName));
+
+    // Update element info
+    App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod);
+    auto info = handler.infoCb(obName, subName);
+    elementInfo = &info;
+
+    update();
+}
+
+void TaskMeasure::removeObject() {
+    if (_mMeasureObject == nullptr) {
+        return;
+    }
+    if (_mMeasureObject->isRemoving() ) {
+        return;
+    }
+    _mMeasureObject->getDocument()->removeObject (_mMeasureObject->getNameInDocument());
+    _mMeasureObject = nullptr;
+}
+
+bool TaskMeasure::hasSelection(){
+    return selection.size() > 0;
+}
+
+void TaskMeasure::clearSelection(){
+    elementInfo = nullptr;
+    selection.clear();
+}
 
 #endif //GUI_TASKMEASURE_H
