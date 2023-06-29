@@ -3441,7 +3441,10 @@ void measureCallback(void * ud, SoEventCallback * n)
             const Gui::SelectionChanges& presel = Gui::Selection().getPreselection();
             const char* obName = presel.pObjectName;
             const char* subName = presel.pSubName;
-            App::DocumentObject* ob = presel.Object.getSubObject();
+            // App::DocumentObject* ob = presel.Object.getSubObject();
+
+            App::Document* doc = App::GetApplication().getActiveDocument();
+            App::DocumentObject* ob = doc->getObject(obName);
 
             // Check that we have a valid preselection
             if (!*subName) {
@@ -3452,9 +3455,13 @@ void measureCallback(void * ud, SoEventCallback * n)
             std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
             App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
             auto info = handler.infoCb(obName, subName);
+
+            // Update TaskDialog with the element info
             Gui::TaskView::TaskDialog *dlg = Control().activeDialog();
             TaskMeasure *task = (TaskMeasure*)dlg;
-            task->elementInfo = &info;
+            // task->elementInfo = &info;
+
+            task->addElement(mod.c_str(), obName, subName);
             task->update();
 
             const SoPickedPoint * point = n->getPickedPoint();
@@ -3465,11 +3472,26 @@ void measureCallback(void * ud, SoEventCallback * n)
         }
     }
     if (ev->isOfType(SoKeyboardEvent::getClassTypeId())){
-        Control().activeDialog()->reject();
+        
+        const auto kbe = static_cast<const SoKeyboardEvent*>(ev);
+        if (kbe->getKey() == SoKeyboardEvent::ESCAPE && kbe->getState() == SoKeyboardEvent::DOWN){
+
+
+            TaskMeasure *dlg = (TaskMeasure*)Control().activeDialog();
+
+            if (dlg->hasSelection()) {
+                dlg->clearSelection();
+                dlg->update();
+            } else {
+                dlg->reject();
+            }
+
+        }
+
     }
 }
 
-DEF_STD_CMD(StdCmdMeasure)
+DEF_STD_CMD_A(StdCmdMeasure)
 
 StdCmdMeasure::StdCmdMeasure()
   :Command("Std_Measure")
@@ -3502,6 +3524,10 @@ void StdCmdMeasure::activated(int iMsg)
     // Gui::Control().showTaskView()
 }
 
+
+bool StdCmdMeasure::isActive(){
+    return true;
+}
 
 //===========================================================================
 // Std_SceneInspector
