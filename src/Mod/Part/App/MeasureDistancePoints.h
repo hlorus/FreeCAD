@@ -54,6 +54,9 @@ public:
 
     App::DocumentObjectExecReturn *execute() override;
 
+    // const char* getViewProviderName() const override {
+    //     return "Gui::ViewProviderMeasureDistance";
+    // }
 
     float result() {return Distance.getValue();}
 
