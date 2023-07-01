@@ -1544,8 +1544,8 @@ std::map<std::string, std::string> Application::getExportFilters() const
 //**************************************************************************
 // measure
 
-void Application::addMeasureHandler(const char* module, MeasureInfoMethod cb) {
-    MeasureHandler* item = new MeasureHandler{module, cb};
+void Application::addMeasureHandler(const char* module, MeasureInfoMethod infoCb, MeasureTypeMethod typeCb) {
+    MeasureHandler* item = new MeasureHandler{module, infoCb, typeCb};
     _mMeasureHandlers.push_back(*item);
 }
 

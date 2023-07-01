@@ -73,6 +73,18 @@ enum class MessageOption {
     Throw, /**< Throw an exception. */
 };
 
+enum MeasureElementType {
+    INVALID,
+    POINT,
+    LINE,
+    CIRCLE,
+    ARC,
+    CURVE, // Has a length but no radius or axis
+    PLANE,
+    CYLINDER,
+    Volume,
+};
+
 typedef struct MeasureElementInfo {
     std::string type;
     const Base::Vector3d pos;
@@ -83,6 +95,7 @@ typedef struct MeasureElementInfo {
 using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;
 using MeasureValidateMethod = std::function<bool(const MeasureSelection&)>;
 using MeasureInfoMethod = std::function<MeasureElementInfo(const char*, const char*)>;
+using MeasureTypeMethod = std::function<App::MeasureElementType (const char*, const char*)>;
 
 typedef struct MeasureType {
     std::string measureObject;
@@ -92,6 +105,7 @@ typedef struct MeasureType {
 typedef struct MeasureHandler {
     std::string module;
     MeasureInfoMethod infoCb;
+    MeasureTypeMethod typeCb;
 }MeasureHandler;
 
 
@@ -418,7 +432,7 @@ public:
     void addMeasureType(const std::string measureObject, MeasureValidateMethod validateCb);
     const std::vector<MeasureType*> getMeasureTypes();
 
-    void addMeasureHandler(const char* module, MeasureInfoMethod cb);
+    void addMeasureHandler(const char* module, MeasureInfoMethod infoCb, MeasureTypeMethod typeCb);
     bool hasMeasureHandler(const char* module);
     MeasureHandler getMeasureHandler(const char* module);
 
