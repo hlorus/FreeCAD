@@ -75,12 +75,27 @@ bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
     App::Document* doc = App::GetApplication().getActiveDocument();
 
     for (const std::tuple<std::string, std::string>& element : selection) {
-        App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
+        const std::string& obName = get<0>(element);
+        App::DocumentObject* ob = doc->getObject(obName.c_str());
         
-        const char* className = ob->getSubObject(get<1>(element).c_str())->getTypeId().getName();
+        const std::string& subName = get<1>(element);
+        const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
         std::string mod = ob->getClassTypeId().getModuleName(className);
 
         if (!hasGeometryHandler(mod)) {
+            return false;
+        }
+
+        App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
+        App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
+
+        if (type == App::MeasureElementType::INVALID) {
+            Base::Console().Message("Element %s has an unsupported type.\n", subName);
+            return false;
+        }
+
+        if (!(type == App::MeasureElementType::LINE || type == App::MeasureElementType::CIRCLE
+              || type == App::MeasureElementType::ARC || type == App::MeasureElementType::CURVE)) {
             return false;
         }
     }

@@ -42,6 +42,8 @@
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepGProp.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <BRepAdaptor_Surface.hxx>
 
 #include <string>
 
@@ -102,6 +104,50 @@ static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* sub
     return info;
 }
 
+App::MeasureElementType PartMeasureTypeCb(const char* obName, const char* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName);
+    auto sub = ob->getSubObject(subName);
+
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
+    TopAbs_ShapeEnum shapeType = shape.ShapeType();
+
+    switch (shapeType) {
+        case TopAbs_VERTEX: {
+            return App::MeasureElementType::POINT;
+        }
+        case TopAbs_EDGE: {
+            const TopoDS_Edge& edge = TopoDS::Edge(shape);
+            BRepAdaptor_Curve curve(edge);
+
+            switch (curve.GetType()) {
+                case GeomAbs_Line: { return App::MeasureElementType::LINE; }
+                case GeomAbs_Circle: { return App::MeasureElementType::CIRCLE; }
+                case GeomAbs_BezierCurve:
+                case GeomAbs_BSplineCurve: {
+                    return App::MeasureElementType::CURVE;
+                }
+                default: { return App::MeasureElementType::INVALID; }
+            }
+        }
+        case TopAbs_FACE: {
+            const TopoDS_Face& face = TopoDS::Face(shape);
+            BRepAdaptor_Surface surface(face);
+
+            switch (surface.GetType()) {
+                case GeomAbs_Cylinder: { return App::MeasureElementType::CYLINDER; }
+                case GeomAbs_Plane: { return App::MeasureElementType::PLANE; }
+                default: { return App::MeasureElementType::INVALID; }
+            }
+        }
+        case TopAbs_SOLID: {
+            return App::MeasureElementType::Volume;
+        }
+        default: {
+            return App::MeasureElementType::INVALID;
+        }
+    }
+}
+
 float MeasureLengthHandler(std::string* obName, std::string* subName){
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
     auto sub = ob->getSubObject(subName->c_str());
@@ -122,7 +168,7 @@ namespace Part {
 void Measure::initialize() {
 
     App::Application& app = App::GetApplication();
-    app.addMeasureHandler("Part", PartMeasureCb);
+    app.addMeasureHandler("Part", PartMeasureCb, PartMeasureTypeCb);
 
     // Add Measure Types
     app.addMeasureType("Part::MeasureDistancePoints", Part::MeasureDistancePoints::isValidSelection); 
