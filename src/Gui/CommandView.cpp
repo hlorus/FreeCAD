@@ -3441,7 +3441,9 @@ void measureCallback(void * ud, SoEventCallback * n)
             } else {
                 dlg->reject();
             }
-
+        } else if (kbe->getKey() == SoKeyboardEvent::ENTER && kbe->getState() == SoKeyboardEvent::DOWN) {
+            TaskMeasure *dlg = (TaskMeasure*)Control().activeDialog();
+            dlg->accept();
         }
     }
 }
