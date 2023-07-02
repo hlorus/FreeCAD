@@ -3430,53 +3430,9 @@ void measureCallback(void * ud, SoEventCallback * n)
     Q_UNUSED(ud);
     const SoEvent* ev = n->getEvent();
 
-    if (ev->isOfType(SoMouseButtonEvent::getClassTypeId())) {
-        const auto mbe = static_cast<const SoMouseButtonEvent*>(ev);
-
-        // Mark all incoming mouse button events as handled, especially, to deactivate the selection node
-        n->getAction()->setHandled();
-
-        if (mbe->getButton() == SoMouseButtonEvent::BUTTON1 && mbe->getState() == SoButtonEvent::DOWN) {
-
-            const Gui::SelectionChanges& presel = Gui::Selection().getPreselection();
-            const char* obName = presel.pObjectName;
-            const char* subName = presel.pSubName;
-            // App::DocumentObject* ob = presel.Object.getSubObject();
-
-            App::Document* doc = App::GetApplication().getActiveDocument();
-            App::DocumentObject* ob = doc->getObject(obName);
-
-            // Check that we have a valid preselection
-            if (!*subName) {
-                return;
-            }
-
-            auto sub = ob->getSubObject(subName);
-            std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
-            App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
-            auto info = handler.infoCb(obName, subName);
-
-            // Update TaskDialog with the element info
-            Gui::TaskView::TaskDialog *dlg = Control().activeDialog();
-            TaskMeasure *task = (TaskMeasure*)dlg;
-            // task->elementInfo = &info;
-
-            task->addElement(mod.c_str(), obName, subName);
-            task->update();
-
-            const SoPickedPoint * point = n->getPickedPoint();
-            if (!point) {
-                Base::Console().Message("No point picked.\n");
-                return;
-            }
-        }
-    }
-    if (ev->isOfType(SoKeyboardEvent::getClassTypeId())){
-        
+    if (ev->isOfType(SoKeyboardEvent::getClassTypeId())){        
         const auto kbe = static_cast<const SoKeyboardEvent*>(ev);
         if (kbe->getKey() == SoKeyboardEvent::ESCAPE && kbe->getState() == SoKeyboardEvent::DOWN){
-
-
             TaskMeasure *dlg = (TaskMeasure*)Control().activeDialog();
 
             if (dlg->hasSelection()) {
@@ -3487,9 +3443,9 @@ void measureCallback(void * ud, SoEventCallback * n)
             }
 
         }
-
     }
 }
+
 
 DEF_STD_CMD_A(StdCmdMeasure)
 

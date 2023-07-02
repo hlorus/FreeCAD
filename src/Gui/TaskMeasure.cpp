@@ -39,11 +39,11 @@
 #include "App/Document.h"
 
 
-
 using namespace Gui;
 
 
 TaskMeasure::TaskMeasure(){
+
 
     measureModule = "";
 
@@ -72,10 +72,12 @@ TaskMeasure::TaskMeasure(){
     labelResult->setText(QString::asprintf("Result: -"));
 
     Content.push_back(taskbox);
+
+    attachSelection();
 }
 
 TaskMeasure::~TaskMeasure(){
-    // automatically deleted in the sub-class
+    detachSelection();
 }
 
 void TaskMeasure::updateInfo() {
@@ -194,7 +196,10 @@ bool TaskMeasure::reject(){
     return false;
 }
 
+
 void TaskMeasure::addElement(const char* mod, const char* obName, const char* subName) {
+
+    // Note: Currently only a selection of elements that belong to the same module is allowed
     if (strcmp(mod, measureModule.c_str())){
         clearSelection();
     }
@@ -228,6 +233,27 @@ bool TaskMeasure::hasSelection(){
 void TaskMeasure::clearSelection(){
     elementInfo = nullptr;
     selection.clear();
+}
+
+void TaskMeasure::onSelectionChanged(const Gui::SelectionChanges& msg)
+{
+
+    if (msg.Type != SelectionChanges::AddSelection && msg.Type != SelectionChanges::RmvSelection
+        && msg.Type != SelectionChanges::SetSelection && msg.Type != SelectionChanges::ClrSelection)
+        return;
+
+
+    // Add Element 
+    if (msg.Type == SelectionChanges::AddSelection || msg.Type == SelectionChanges::SetSelection) {
+
+        App::Document* doc = App::GetApplication().getActiveDocument();
+        App::DocumentObject* ob = doc->getObject(msg.pObjectName);
+        auto sub = ob->getSubObject(msg.pSubName);
+        std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
+
+        addElement(mod.c_str(), msg.pObjectName, msg.pSubName);
+    }
+
 }
 
 #endif //GUI_TASKMEASURE_H
