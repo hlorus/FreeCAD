@@ -28,6 +28,7 @@
 #include "TaskView/TaskView.h"
 #include "Application.h"
 #include "App/Measure.h"
+#include "Selection.h"
 
 #include <qcolumnview.h>
 #include <QString>
@@ -35,7 +36,7 @@
 
 namespace Gui {
 
-class TaskMeasure : public TaskView::TaskDialog {
+class TaskMeasure : public TaskView::TaskDialog, public Gui::SelectionObserver {
 
 public:
 
@@ -77,6 +78,9 @@ protected:
 
     // List of measure types
     std::vector<App::DocumentObject> measureObjects;
+
+    private:
+        void onSelectionChanged(const Gui::SelectionChanges& msg) override;
 
 };
 
