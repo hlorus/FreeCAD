@@ -43,7 +43,7 @@ public:
 
     QColumnView* dialog;
     void(*eventCallback)(void*, SoEventCallback*);
-    App::MeasureElementInfo *elementInfo;
+    App::MeasureElementInfo *elementInfo = nullptr;
 
     TaskMeasure();
     ~TaskMeasure();
@@ -55,7 +55,8 @@ public:
 
     void addElement(const char* mod, const char* obName, const char* subName);
     bool hasSelection();
-    void clearSelection();    
+    void clearSelection();
+    void gatherSelection();
 
 protected:
     App::MeasurementBase *_mMeasureObject = nullptr;

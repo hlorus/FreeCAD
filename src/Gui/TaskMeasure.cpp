@@ -73,6 +73,7 @@ TaskMeasure::TaskMeasure(){
 
     Content.push_back(taskbox);
 
+    gatherSelection();
     attachSelection();
 }
 
@@ -211,6 +212,31 @@ void TaskMeasure::addElement(const char* mod, const char* obName, const char* su
     App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod);
     auto info = handler.infoCb(obName, subName);
     elementInfo = &info;
+
+    update();
+}
+
+void TaskMeasure::gatherSelection() {
+    // Fills the selection stack from the global selection and triggers an update
+
+    if (!Gui::Selection().hasSelection()) {
+        return;
+    }
+
+    App::Document* doc = App::GetApplication().getActiveDocument();
+
+    for (auto sel : Gui::Selection().getSelection()) {
+        const char* obName = sel.pObject->getNameInDocument();
+        App::DocumentObject* ob = doc->getObject(obName);
+        auto sub = ob->getSubObject(sel.SubName);
+        std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
+
+        if (mod != measureModule){
+            clearSelection();
+        }
+        measureModule = mod;
+        selection.push_back(std::tuple<std::string, std::string>(obName, sel.SubName));
+    }
 
     update();
 }
