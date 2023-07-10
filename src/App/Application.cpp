@@ -1551,7 +1551,7 @@ void Application::addMeasureHandler(const char* module, MeasureInfoMethod infoCb
 
 bool Application::hasMeasureHandler(const char* module) {
     for(MeasureHandler handler : _mMeasureHandlers) {
-        if (strcmp(handler.module.c_str(), module)) {
+        if (strcmp(handler.module.c_str(), module) == 0) {
             return true;
         }
     }
