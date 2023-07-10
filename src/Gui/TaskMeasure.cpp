@@ -205,6 +205,11 @@ void TaskMeasure::addElement(const char* mod, const char* obName, const char* su
         clearSelection();
     }
 
+    if (!App::GetApplication().hasMeasureHandler(mod)) {
+        Base::Console().Message("No measure handler available for geometry of module: %s\n", mod);
+        return;
+    }
+
     measureModule = mod;
     selection.push_back(std::make_tuple((std::string)obName, (std::string)subName));
 
