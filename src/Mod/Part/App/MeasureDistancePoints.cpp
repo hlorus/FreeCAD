@@ -123,6 +123,36 @@ void MeasureDistancePoints::parseSelection(const App::MeasureSelection& selectio
 }
 
 
+Base::Vector3f MeasureDistancePoints::getP1() {
+
+    TopoDS_Shape shape;
+    getShape(P1, shape);
+
+    if (shape.IsNull() || shape.ShapeType() != TopAbs_VERTEX) {
+        return Base::Vector3f();
+    }
+
+    gp_XYZ point = BRep_Tool::Pnt(TopoDS::Vertex(shape)).XYZ();
+
+    return Base::Vector3f(point.X(), point.Y(), point.Z());
+}
+
+
+// TODO: Avoid redundancy
+Base::Vector3f MeasureDistancePoints::getP2() {
+    TopoDS_Shape shape;
+    getShape(P2, shape);
+
+    if (shape.IsNull() || shape.ShapeType() != TopAbs_VERTEX) {
+        return Base::Vector3f();
+    }
+
+    gp_XYZ point = BRep_Tool::Pnt(TopoDS::Vertex(shape)).XYZ();
+
+    return Base::Vector3f(point.X(), point.Y(), point.Z());
+}
+
+
 App::DocumentObjectExecReturn *MeasureDistancePoints::execute()
 {
     App::DocumentObjectExecReturn* ret;

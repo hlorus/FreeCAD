@@ -21,74 +21,34 @@
  ***************************************************************************/
 
 
-#ifndef GUI_VIEWPROVIDERMEASUREDISTANCE_H
-#define GUI_VIEWPROVIDERMEASUREDISTANCE_H
+#ifndef GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
+#define GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
 
-#include "ViewProviderDocumentObject.h"
-#include "ViewProviderMeasurementBase.h"
+#include <Gui/ViewProviderDocumentObject.h>
+#include <Gui/ViewProviderMeasurementBase.h>
+#include <Gui/ViewProviderMeasureDistance.h>
+
 #include <QObject>
 
-class SoFontStyle;
 class SoText2;
-class SoBaseColor;
 class SoTranslation;
 class SoCoordinate3;
 class SoIndexedLineSet;
-class SoEventCallback;
-class SoMarkerSet;
 
-namespace Gui
+namespace PartGui
 {
 
-class View3DInventorViewer;
-class ViewProviderPointMarker;
-class PointMarker : public QObject
+
+class PartGuiExport ViewProviderMeasureDistancePoints : public Gui::ViewProviderMeasurementBase
 {
-public:
-    explicit PointMarker(View3DInventorViewer* view);
-    ~PointMarker() override;
-
-    void addPoint(const SbVec3f&);
-    int countPoints() const;
-
-protected:
-    void customEvent(QEvent* e) override;
-
-private:
-    View3DInventorViewer *view;
-    ViewProviderPointMarker *vp;
-    bool previousSelectionEn;
-};
-
-class GuiExport ViewProviderPointMarker : public ViewProviderDocumentObject
-{
-    PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderPointMarker);
-
-public:
-    ViewProviderPointMarker();
-    ~ViewProviderPointMarker() override;
-    bool isPartOfPhysicalObject() const override;
-
-protected:
-    SoCoordinate3    * pCoords;
-    SoMarkerSet      * pMarker;
-    friend class PointMarker;
-};
-
-class GuiExport ViewProviderMeasureDistance : public ViewProviderMeasurementBase
-{
-    PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderMeasureDistance);
+    PROPERTY_HEADER_WITH_OVERRIDE(PartGui::ViewProviderMeasureDistancePoints);
 
 public:
     /// Constructor
-    ViewProviderMeasureDistance();
-    ~ViewProviderMeasureDistance() override;
-    bool isPartOfPhysicalObject() const override;
+    ViewProviderMeasureDistancePoints();
+    ~ViewProviderMeasureDistancePoints() override;
 
-    // Display properties
-    App::PropertyColor          TextColor;
-    App::PropertyColor          LineColor;
-    App::PropertyInteger        FontSize;
+    // // Display properties
     App::PropertyFloat          DistFactor;
     App::PropertyBool           Mirror;
 
@@ -98,24 +58,18 @@ public:
     std::vector<std::string> getDisplayModes() const override;
     void setDisplayMode(const char* ModeName) override;
 
-    static void measureDistanceCallback(void * ud, SoEventCallback * n);
-
 protected:
     void onChanged(const App::Property* prop) override;
 
 private:
-    SoFontStyle      * pFont;
     SoText2          * pLabel;
-    SoBaseColor      * pColor;
-    SoBaseColor      * pTextColor;
     SoTranslation    * pTranslation;
     SoCoordinate3    * pCoords;
     SoIndexedLineSet * pLines;
 
-    static void endMeasureDistanceMode(void * ud, Gui::View3DInventorViewer* view, SoEventCallback * n, PointMarker *pm);
 };
 
-} //namespace Gui
+} //namespace PartGui
 
 
-#endif // GUI_VIEWPROVIDERMEASUREDISTANCE_H
+#endif // GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H

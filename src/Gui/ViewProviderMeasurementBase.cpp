@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (c) 2008 Werner Mayer <wmayer[at]users.sourceforge.net>     *
+ *   Copyright (c) 2004 Jürgen Riegel <juergen.riegel@web.de>              *
  *                                                                         *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
@@ -20,54 +20,32 @@
  *                                                                         *
  ***************************************************************************/
 
-
-#ifndef APP_MEASUREDISTANCEPOINTS_H
-#define APP_MEASUREDISTANCEPOINTS_H
+#include "PreCompiled.h"
 
 #include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
-#include <tuple>
-#include <App/Measure.h>
 
-namespace Part
+#include "ViewProviderMeasurementBase.h"
+
+#include "Base/Console.h"
+
+
+using namespace Gui;
+
+PROPERTY_SOURCE(ViewProviderMeasurementBase, ViewProviderDocumentObject)
+
+ViewProviderMeasurementBase::ViewProviderMeasurementBase()
 {
+    ADD_PROPERTY(TextColor,(1.0f,1.0f,1.0f));
+    ADD_PROPERTY(LineColor,(1.0f,1.0f,1.0f));
+    ADD_PROPERTY(FontSize,(18));
+}
 
-
-class PartExport MeasureDistancePoints : public App::MeasurementBase
+ViewProviderMeasurementBase::~ViewProviderMeasurementBase()
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(Part::MeasureDistancePoints);
+}
 
-public:
-    /// Constructor
-    MeasureDistancePoints();
-    ~MeasureDistancePoints() override;
+void ViewProviderMeasurementBase::attach(App::DocumentObject *pcObj)
+{
+    ViewProviderDocumentObject::attach(pcObj);
+}
 
-    App::PropertyLinkSub P1;
-    App::PropertyLinkSub P2;
-
-    App::PropertyDistance Distance;
-
-    Base::Vector3f getP1();
-    Base::Vector3f getP2();
-
-
-    static bool isValidSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-
-    App::DocumentObjectExecReturn *execute() override;
-
-    const char* getViewProviderName() const override {
-        return "PartGui::ViewProviderMeasureDistancePoints";
-    }
-
-    float result() {return Distance.getValue();}
-
-protected:
-    void onChanged(const App::Property* prop) override;
-};
-
-} //namespace Part
-
-
-#endif // APP_MEASUREDISTANCEPOINTS_H

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (c) 2008 Werner Mayer <wmayer[at]users.sourceforge.net>     *
+ *   Copyright (c) 2004 Jürgen Riegel <juergen.riegel@web.de>              *
  *                                                                         *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
@@ -20,54 +20,52 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef GUI_VIEWPROVIDER_MEASUREMENTBASE_H
+#define GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 
-#ifndef APP_MEASUREDISTANCEPOINTS_H
-#define APP_MEASUREDISTANCEPOINTS_H
+#include "ViewProviderDocumentObject.h"
+#include "App/PropertyContainer.h"
 
-#include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
-#include <tuple>
-#include <App/Measure.h>
 
-namespace Part
+class SbVec2s;
+class SoFontStyle;
+class SoBaseColor;
+
+namespace Gui {
+
+class View3DInventorViewer;
+
+class GuiExport ViewProviderMeasurementBase:public ViewProviderDocumentObject
 {
-
-
-class PartExport MeasureDistancePoints : public App::MeasurementBase
-{
-    PROPERTY_HEADER_WITH_OVERRIDE(Part::MeasureDistancePoints);
+    PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderMeasurementBase);
 
 public:
-    /// Constructor
-    MeasureDistancePoints();
-    ~MeasureDistancePoints() override;
+    /// constructor.
+    ViewProviderMeasurementBase();
 
-    App::PropertyLinkSub P1;
-    App::PropertyLinkSub P2;
+    /// destructor.
+    ~ViewProviderMeasurementBase() override;
 
-    App::PropertyDistance Distance;
+    // Display properties
+    App::PropertyColor          TextColor;
+    App::PropertyColor          LineColor;
+    App::PropertyInteger        FontSize;
 
-    Base::Vector3f getP1();
-    Base::Vector3f getP2();
-
-
-    static bool isValidSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-
-    App::DocumentObjectExecReturn *execute() override;
-
-    const char* getViewProviderName() const override {
-        return "PartGui::ViewProviderMeasureDistancePoints";
-    }
-
-    float result() {return Distance.getValue();}
+    /**
+     * Attaches the document object to this view provider.
+     */
+    void attach(App::DocumentObject *pcObj) override;
 
 protected:
-    void onChanged(const App::Property* prop) override;
+    bool _mShowTree = true;
+
+    SoFontStyle      * pFont;
+    SoBaseColor      * pColor;
+    SoBaseColor      * pTextColor;
+
 };
 
-} //namespace Part
+} // namespace Gui
 
+#endif // GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 
-#endif // APP_MEASUREDISTANCEPOINTS_H
