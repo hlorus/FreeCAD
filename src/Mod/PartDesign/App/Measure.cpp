@@ -24,8 +24,9 @@
 #include "PreCompiled.h"
 
 #include <App/Application.h>
-#include "Measure.h"
 #include "Base/Console.h"
+#include "Measure.h"
+#include <App/MeasureLength.h>
 
 namespace PartDesign {
 
@@ -34,7 +35,9 @@ void Measure::initialize() {
     const App::MeasureHandler& handler = app.getMeasureHandler("Part");
     
     app.addMeasureHandler("PartDesign", handler.infoCb, handler.typeCb);
-}
 
+    App::MeasureLength::addGeometryHandler("PartDesign",
+                                           App::MeasureLength::getGeometryHandler("Part"));
+}
 }
 
