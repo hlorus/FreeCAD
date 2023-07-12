@@ -279,7 +279,7 @@ void TaskMeasure::onSelectionChanged(const Gui::SelectionChanges& msg)
 
         App::Document* doc = App::GetApplication().getActiveDocument();
         App::DocumentObject* ob = doc->getObject(msg.pObjectName);
-        auto sub = ob->getSubObject(msg.pSubName);
+        App::DocumentObject* sub = ob->getSubObject(msg.pSubName);
         std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
 
         addElement(mod.c_str(), msg.pObjectName, msg.pSubName);
