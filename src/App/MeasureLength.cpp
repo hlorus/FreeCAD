@@ -37,8 +37,6 @@ PROPERTY_SOURCE(App::MeasureLength, App::MeasurementBase)
 
 
 
-HandlerMap MeasureLength::_mGeometryHandlers = HandlerMap();
-
 MeasureLength::MeasureLength()
 {
     ADD_PROPERTY_TYPE(Elements,(nullptr), "Measurement", App::Prop_None, "Elements to get the length from");
@@ -49,19 +47,6 @@ MeasureLength::MeasureLength()
 }
 
 MeasureLength::~MeasureLength() = default;
-
-void MeasureLength::addGeometryHandler(const std::string& module, MeasureLengthGeometryHandler callback) {
-    _mGeometryHandlers[module] = callback;
-}
-
-// Todo: Check if a handler is available
-MeasureLengthGeometryHandler MeasureLength::getGeometryHandler(const std::string& module) {
-    return _mGeometryHandlers[module];
-}
-
-bool MeasureLength::hasGeometryHandler(const std::string& module) {
-    return (_mGeometryHandlers.count(module) > 0);
-}
 
 
 bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
@@ -138,7 +123,7 @@ App::DocumentObjectExecReturn *MeasureLength::execute()
         // Get the Geometry handler based on the module
         const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
         const std::string& mod = object->getClassTypeId().getModuleName(className);
-        MeasureLengthGeometryHandler handler = getGeometryHandler(mod);
+        auto handler = getGeometryHandler(mod);
 
         std::string obName = object->getNameInDocument();
         result += handler(&obName, &subElement);

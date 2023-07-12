@@ -44,6 +44,40 @@ public:
     virtual float result() = 0;
 };
 
+
+
+
+template <typename T>
+class AppExport MeasurementBaseExtendable : public MeasurementBase
+{
+
+    using GeometryHandler = std::function<T (std::string*, std::string*)>;
+    using HandlerMap = std::map<std::string, GeometryHandler>;
+
+
+public: 
+
+    static void addGeometryHandler(const std::string& module, GeometryHandler callback) {
+        _mGeometryHandlers[module] = callback;
+    }
+
+    static GeometryHandler getGeometryHandler(const std::string& module) {
+        return _mGeometryHandlers[module];
+    }
+
+    static bool hasGeometryHandler(const std::string& module) {
+        return (_mGeometryHandlers.count(module) > 0);
+    }
+
+private:
+    static HandlerMap _mGeometryHandlers;
+};
+
+template <typename T>
+typename MeasurementBaseExtendable<T>::HandlerMap MeasurementBaseExtendable<T>::_mGeometryHandlers = MeasurementBaseExtendable<T>::HandlerMap();
+
+
+
 class AppExport Measure {
 
 public:
