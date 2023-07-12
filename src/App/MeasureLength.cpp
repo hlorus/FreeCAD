@@ -109,16 +109,13 @@ void MeasureLength::parseSelection(const App::MeasureSelection& selection) {
 
 App::DocumentObjectExecReturn *MeasureLength::execute()
 {
-    App::DocumentObjectExecReturn* ret;
-
-
     const std::vector<App::DocumentObject*>& objects = Elements.getValues();
     const std::vector<std::string>& subElements = Elements.getSubValues();
 
     float result;
 
     // Loop through Elements and call the valid geometry handler
-    for (int i=0; i<objects.size(); i++) {
+    for (std::vector<App::DocumentObject*>::size_type i=0; i<objects.size(); i++) {
         App::DocumentObject *object = objects.at(i);
         std::string subElement = subElements.at(i);
 
@@ -126,6 +123,9 @@ App::DocumentObjectExecReturn *MeasureLength::execute()
         const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
         const std::string& mod = object->getClassTypeId().getModuleName(className);
         auto handler = getGeometryHandler(mod);
+        if (!handler) {
+            return new App::DocumentObjectExecReturn("No geometry handler available for submitted element type");
+        }
 
         std::string obName = object->getNameInDocument();
         result += handler(&obName, &subElement);
