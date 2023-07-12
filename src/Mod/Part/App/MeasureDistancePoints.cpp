@@ -81,7 +81,12 @@ App::DocumentObjectExecReturn* getShape(const App::PropertyLinkSub& link,
 MeasureDistancePoints::MeasureDistancePoints()
 {
     ADD_PROPERTY_TYPE(P1,(nullptr),"Measurement",App::Prop_None,"First point of measurement");
+    P1.setScope(App::LinkScope::Global);
+    P1.setAllowExternal(true);
+
     ADD_PROPERTY_TYPE(P2,(nullptr),"Measurement",App::Prop_None,"Second point of measurement");
+    P2.setScope(App::LinkScope::Global);
+    P2.setAllowExternal(true);
 
     ADD_PROPERTY_TYPE(Distance,(0.0)       ,"Measurement",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                                             "Distance between the points");
