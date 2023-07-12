@@ -62,6 +62,11 @@ public:
     }
 
     static GeometryHandler getGeometryHandler(const std::string& module) {
+
+        if (!hasGeometryHandler(module)) {
+            return GeometryHandler();
+        }
+
         return _mGeometryHandlers[module];
     }
 
