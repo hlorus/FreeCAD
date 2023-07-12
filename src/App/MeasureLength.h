@@ -36,15 +36,8 @@
 namespace App
 {
 
-using MeasureLengthGeometryHandler = std::function<float (std::string*, std::string*)>;
-using HandlerMap = std::map<std::string, MeasureLengthGeometryHandler>;
 
-typedef struct GeometryHandler {
-    std::string module;
-    MeasureLengthGeometryHandler callback;
-} GeometryHandler;
-
-class AppExport MeasureLength : public App::MeasurementBase
+class AppExport MeasureLength : public App::MeasurementBaseExtendable<float>
 {
     PROPERTY_HEADER_WITH_OVERRIDE(App::MeasureLength);
 
@@ -66,13 +59,7 @@ public:
     void parseSelection(const App::MeasureSelection& selection);
     float result() {return Distance.getValue();}
 
-    // Register geometry handler
-    static void addGeometryHandler(const std::string& module, MeasureLengthGeometryHandler callback);
-    static MeasureLengthGeometryHandler getGeometryHandler(const std::string& module);
-    static bool hasGeometryHandler(const std::string& module);
-
 private:
-    static HandlerMap _mGeometryHandlers;
 
     void onChanged(const App::Property* prop) override;
 };
