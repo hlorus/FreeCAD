@@ -123,6 +123,8 @@ SET(Module_SRCS
     AppPartDesignPy.cpp
     PreCompiled.cpp
     PreCompiled.h
+    Measure.cpp
+    Measure.h
 )
 SOURCE_GROUP("Module" FILES ${Module_SRCS})
 
