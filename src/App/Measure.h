@@ -27,7 +27,7 @@
 #include "DocumentObject.h"
 #include "PropertyContainer.h"
 #include "Application.h"
-
+#include <Base/Quantity.h>
 
 namespace App
 {
@@ -41,7 +41,7 @@ public:
     // Initalize measurement properties from selection
     virtual void parseSelection(const MeasureSelection&) = 0;
 
-    virtual float result() = 0;
+    virtual Base::Quantity result() = 0;
 };
 
 
