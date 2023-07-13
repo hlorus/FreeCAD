@@ -61,7 +61,7 @@ public:
         return "PartGui::ViewProviderMeasureDistancePoints";
     }
 
-    float result() {return Distance.getValue();}
+    Base::Quantity result() {return Distance.getQuantityValue();}
 
 protected:
     void onChanged(const App::Property* prop) override;

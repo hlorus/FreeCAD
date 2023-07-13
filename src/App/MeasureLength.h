@@ -57,7 +57,7 @@ public:
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection);
-    float result() {return Distance.getValue();}
+    Base::Quantity result() {return Distance.getQuantityValue();}
 
 private:
 

@@ -69,7 +69,7 @@ public:
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection);
-    float result() {return Angle.getValue();}
+    Base::Quantity result() {return Angle.getQuantityValue();}
 
     bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
 

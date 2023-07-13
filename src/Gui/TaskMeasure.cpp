@@ -170,7 +170,7 @@ void TaskMeasure::update(){
     _mMeasureObject->parseSelection(selection);
 
     // Get result
-    labelResult->setText(QString::asprintf("Result: %f", _mMeasureObject->result()));
+    labelResult->setText(QString::asprintf("Result: ") + _mMeasureObject->result().getUserString());
 
 }
 
