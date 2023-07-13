@@ -27,6 +27,7 @@
 #include "Base/Console.h"
 #include "Measure.h"
 #include <App/MeasureLength.h>
+#include <App/MeasureAngle.h>
 
 namespace PartDesign {
 
@@ -38,6 +39,9 @@ void Measure::initialize() {
 
     App::MeasureLength::addGeometryHandler("PartDesign",
                                            App::MeasureLength::getGeometryHandler("Part"));
+
+    App::MeasureAngle::addGeometryHandler("PartDesign",
+                                           App::MeasureAngle::getGeometryHandler("Part"));
 }
 }
 

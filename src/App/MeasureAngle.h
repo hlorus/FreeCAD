@@ -21,20 +21,64 @@
  ***************************************************************************/
 
 
-#include "PreCompiled.h"
+#ifndef APP_MEASUREANGLE_H
+#define APP_MEASUREANGLE_H
+
+#include <App/DocumentObject.h>
+#include <App/PropertyGeo.h>
+#include <App/PropertyUnits.h>
+#include <tuple>
 #include "Measure.h"
-#include "MeasureAngle.h"
-#include "MeasureLength.h"
+#include <functional>
+#include <string.h>
+#include <map>
 
-using namespace App;
-
-PROPERTY_SOURCE_ABSTRACT(App::MeasurementBase, App::DocumentObject)
+#include <Base/Vector3D.h>
 
 
-void App::Measure::initialize(){
-    App::Application& app = App::GetApplication();
 
-    app.addMeasureType("App::MeasureLength", App::MeasureLength::isValidSelection);
-    app.addMeasureType("App::MeasureAngle", App::MeasureAngle::isValidSelection);
 
-}
+namespace App
+{
+
+
+typedef struct MeasureAngleInfo {
+    bool valid;
+    Base::Vector3d vector;
+} MeasureAngleInfo;
+
+
+class AppExport MeasureAngle : public App::MeasurementBaseExtendable<MeasureAngleInfo>
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(App::MeasureAngle);
+
+public:
+    /// Constructor
+    MeasureAngle();
+    ~MeasureAngle() override;
+
+    App::PropertyLinkSub Element1;
+    App::PropertyLinkSub Element2;
+    App::PropertyDistance Angle;
+
+    App::DocumentObjectExecReturn *execute() override;
+
+    // const char* getViewProviderName() const override {
+    //     return "Gui::ViewProviderMeasureDistance";
+    // }
+
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection);
+    float result() {return Angle.getValue();}
+
+    bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
+
+private:
+
+    void onChanged(const App::Property* prop) override;
+};
+
+} //namespace App
+
+
+#endif // APP_MEASUREANGLE_H

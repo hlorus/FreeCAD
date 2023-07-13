@@ -162,6 +162,7 @@ SET(Document_CPP_SRCS
     Measure.cpp
     MeasureDistance.cpp
     MeasureLength.cpp
+    MeasureAngle.cpp
     Placement.cpp
     OriginFeature.cpp
     Range.cpp
@@ -208,6 +209,7 @@ SET(Document_HPP_SRCS
     Measure.h
     MeasureDistance.h
     MeasureLength.h
+    MeasureAngle.h
     Placement.h
     OriginFeature.h
     Range.h

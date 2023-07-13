@@ -102,6 +102,7 @@
 #include "Measure.h"
 #include "MeasureDistance.h"
 #include "MeasureLength.h"
+#include "MeasureAngle.h"
 #include "Measure.h"
 #include "Origin.h"
 #include "OriginFeature.h"
@@ -2126,6 +2127,7 @@ void Application::initTypes()
     App::MeasurementBase           ::init();
     App::MeasureDistance           ::init();
     App::MeasureLength             ::init();
+    App::MeasureAngle              ::init();
     App::MaterialObject            ::init();
     App::MaterialObjectPython      ::init();
     App::TextDocument              ::init();
