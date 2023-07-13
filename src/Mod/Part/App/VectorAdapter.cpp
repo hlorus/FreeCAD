@@ -42,15 +42,6 @@
 #include <BRep_Tool.hxx>
 
 
-/*convert a vertex to vector*/
-gp_Vec convert(const TopoDS_Vertex &vertex)
-{
-  gp_Pnt point = BRep_Tool::Pnt(vertex);
-  gp_Vec out(point.X(), point.Y(), point.Z());
-  return out;
-}
-
-
 namespace Part {
 
 
@@ -145,6 +136,17 @@ VectorAdapter::operator gp_Lin() const
   tempOrigin.SetXYZ(origin.XYZ());
   return gp_Lin(tempOrigin, gp_Dir(vector));
 }
+
+
+/*convert a vertex to vector*/
+gp_Vec VectorAdapter::convert(const TopoDS_Vertex &vertex)
+{
+  gp_Pnt point = BRep_Tool::Pnt(vertex);
+  gp_Vec out(point.X(), point.Y(), point.Z());
+  return out;
+}
+
+
 
 }
 

@@ -30,7 +30,7 @@
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <gp_Lin.hxx>
-
+#include <Base/Vector3D.h>
 
 namespace Part
 {
@@ -70,7 +70,14 @@ public:
   operator gp_Lin() const;//explicit bombs
   gp_Vec getPickPoint() const {return origin;}
 
-private:
+  operator Base::Vector3d() const {
+      return Base::Vector3d(vector.X(), vector.Y(), vector.Z());
+   }
+
+
+    static gp_Vec convert(const TopoDS_Vertex& vertex);
+
+  private:
   void projectOriginOntoVector(const gp_Vec &pickedPointIn);
   bool status;
   gp_Vec vector;

@@ -26,7 +26,9 @@
 #include <App/Application.h>
 #include <Mod/Part/PartGlobal.h>
 #include "Measure.h"
+
 #include "Base/Console.h"
+#include <Base/Vector3D.h>
 #include "App/Document.h"
 #include "App/DocumentObject.h"
 #include "PrimitiveFeature.h"
@@ -35,7 +37,8 @@
 #include <TopoDS_Vertex.hxx>
 #include <MeasureDistancePoints.h>
 #include "App/MeasureLength.h"
-
+#include "App/MeasureAngle.h"
+#include "VectorAdapter.h"
 
 #include <TopAbs.hxx>
 #include "Base/Vector3D.h"
@@ -44,6 +47,7 @@
 #include <BRepGProp.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <TopExp.hxx>
 
 #include <string>
 
@@ -148,9 +152,75 @@ App::MeasureElementType PartMeasureTypeCb(const char* obName, const char* subNam
     }
 }
 
+
+
+bool getShapeFromStrings(TopoDS_Shape &shapeOut, const std::string &doc, const std::string &object, const std::string &sub, Base::Matrix4D *mat)
+{
+  App::Document *docPointer = App::GetApplication().getDocument(doc.c_str());
+  if (!docPointer)
+    return false;
+  App::DocumentObject *objectPointer = docPointer->getObject(object.c_str());
+  if (!objectPointer)
+    return false;
+  shapeOut = Part::Feature::getShape(objectPointer,sub.c_str(),true,mat);
+  if (shapeOut.IsNull())
+    return false;
+  return true;
+}
+
+
+
+Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obName, const std::string* subName)
+{
+    Base::Matrix4D mat;
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    TopAbs_ShapeEnum shapeType = shape.ShapeType();
+
+
+    if (shapeType == TopAbs_EDGE)
+    {
+      TopoDS_Shape edgeShape;
+      if (!getShapeFromStrings(edgeShape, ob->getDocument()->getName(), ob->getNameInDocument(), *subName, &mat))
+        return Part::VectorAdapter();
+      TopoDS_Edge edge = TopoDS::Edge(edgeShape);
+      // make edge orientation so that end of edge closest to pick is head of vector.
+      TopoDS_Vertex firstVertex = TopExp::FirstVertex(edge, Standard_True);
+      TopoDS_Vertex lastVertex = TopExp::LastVertex(edge, Standard_True);
+      if (firstVertex.IsNull() || lastVertex.IsNull())
+        return Part::VectorAdapter();
+      gp_Vec firstPoint = Part::VectorAdapter::convert(firstVertex);
+      gp_Vec lastPoint = Part::VectorAdapter::convert(lastVertex);
+      Base::Vector3d v(0.0, 0.0, 0.0); //v(current.x,current.y,current.z);
+      v = mat*v;
+      gp_Vec pickPoint(v.x, v.y, v.z);
+      double firstDistance = (firstPoint - pickPoint).Magnitude();
+      double lastDistance = (lastPoint - pickPoint).Magnitude();
+      if (lastDistance > firstDistance)
+      {
+        if (edge.Orientation() == TopAbs_FORWARD)
+          edge.Orientation(TopAbs_REVERSED);
+        else
+          edge.Orientation(TopAbs_FORWARD);
+      }
+      return Part::VectorAdapter(edge, pickPoint);
+    }
+    if (shapeType == TopAbs_FACE)
+    {
+      TopoDS_Shape faceShape;
+      if (!getShapeFromStrings(faceShape, ob->getDocument()->getName(), ob->getNameInDocument(), *subName, &mat))
+        return Part::VectorAdapter();
+
+      TopoDS_Face face = TopoDS::Face(faceShape);
+      Base::Vector3d v(0.0, 0.0, 0.0); //v(current.x, current.y, current.z);
+      v = mat*v;
+      gp_Vec pickPoint(v.x, v.y, v.z);
+      return Part::VectorAdapter(face, pickPoint);
+    }
+}
+
+
 float MeasureLengthHandler(std::string* obName, std::string* subName){
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
-    auto sub = ob->getSubObject(subName->c_str());
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
     TopAbs_ShapeEnum sType = shape.ShapeType();
@@ -161,6 +231,21 @@ float MeasureLengthHandler(std::string* obName, std::string* subName){
 
     return getLength(shape);
 }
+
+
+
+
+App::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    Part::VectorAdapter v = buildAdapter(ob, obName, subName);
+
+    App::MeasureAngleInfo info = {v.isValid(), (Base::Vector3d)v};
+    return info;
+}
+
 
 namespace Part {
 
@@ -177,6 +262,8 @@ void Measure::initialize() {
     // Extend MeasureLength
     App::MeasureLength::addGeometryHandler("Part", MeasureLengthHandler);
 
+    // Extend MeasureAngle
+    App::MeasureAngle::addGeometryHandler("Part", MeasureAngleHandler);
 }
 
 }

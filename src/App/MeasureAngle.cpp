@@ -27,33 +27,37 @@
 #include <App/Application.h>
 #include <App/Document.h>
 #include <tuple>
+#include <Base/Tools.h>
 
-#include "MeasureLength.h"
+#include "MeasureAngle.h"
 
 
 using namespace App;
 
-PROPERTY_SOURCE(App::MeasureLength, App::MeasurementBase)
+PROPERTY_SOURCE(App::MeasureAngle, App::MeasurementBase)
 
 
-
-MeasureLength::MeasureLength()
+MeasureAngle::MeasureAngle()
 {
-    ADD_PROPERTY_TYPE(Elements,(nullptr), "Measurement", App::Prop_None, "Elements to get the length from");
-    Elements.setScope(App::LinkScope::Global);
-    Elements.setAllowExternal(true);
+    ADD_PROPERTY_TYPE(Element1,(nullptr), "Measurement", App::Prop_None, "First element of the measurement");
+    Element1.setScope(App::LinkScope::Global);
+    Element1.setAllowExternal(true);
 
-    ADD_PROPERTY_TYPE(Distance,(0.0)       ,"Measurement",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
-                                            "Distance between the points");
+    ADD_PROPERTY_TYPE(Element2,(nullptr), "Measurement", App::Prop_None, "Second element of the measurement");
+    Element2.setScope(App::LinkScope::Global);
+    Element2.setAllowExternal(true);
 
+    ADD_PROPERTY_TYPE(Angle,(0.0)       ,"Measurement",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
+                                            "Angle between the two elements");
+    Angle.setUnit(Base::Unit::Angle);
 }
 
-MeasureLength::~MeasureLength() = default;
+MeasureAngle::~MeasureAngle() = default;
 
 
-bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
+bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.size() != 1) {
+    if (selection.size() != 2) {
         return false;
     }
 
@@ -78,64 +82,80 @@ bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
             return false;
         }
 
-        if (!(type == App::MeasureElementType::LINE || type == App::MeasureElementType::CIRCLE
-              || type == App::MeasureElementType::ARC || type == App::MeasureElementType::CURVE)) {
+        if (!(type == App::MeasureElementType::LINE || type == App::MeasureElementType::PLANE)) {
             return false;
         }
     }
     return true;
 }
 
-void MeasureLength::parseSelection(const App::MeasureSelection& selection) {
-    // Set properties from selection, method is only invoked when isValid Selection returns true
+
+void MeasureAngle::parseSelection(const App::MeasureSelection& selection) {
+
+    assert(selection.size() >= 2);
 
     App::Document* doc = App::GetApplication().getActiveDocument();
 
-    std::vector<App::DocumentObject*> objects;
-    std::vector<const char*> subElements;
+    App::DocumentObject* ob1 = doc->getObject(get<0>(selection.at(0)).c_str());
+    const std::vector<std::string> elems1 = {get<1>(selection.at(0))};
+    Element1.setValue(ob1, elems1);
 
-    for (const std::tuple<std::string, std::string>& element : selection) {
-       App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
-       objects.push_back(ob);
-       subElements.push_back(get<1>(element).c_str());
-    }
-
-    Elements.setValues(objects, subElements);
+    App::DocumentObject* ob2 = doc->getObject(get<0>(selection.at(1)).c_str());
+    const std::vector<std::string> elems2 = {get<1>(selection.at(1))};
+    Element2.setValue(ob2, elems2);
 }
 
 
-App::DocumentObjectExecReturn *MeasureLength::execute()
-{
-    const std::vector<App::DocumentObject*>& objects = Elements.getValues();
-    const std::vector<std::string>& subElements = Elements.getSubValues();
+bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut) {
+    const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
+    std::string mod = ob.getClassTypeId().getModuleName(className);
 
-    float result;
-
-    // Loop through Elements and call the valid geometry handler
-    for (std::vector<App::DocumentObject*>::size_type i=0; i<objects.size(); i++) {
-        App::DocumentObject *object = objects.at(i);
-        std::string subElement = subElements.at(i);
-
-        // Get the Geometry handler based on the module
-        const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
-        const std::string& mod = object->getClassTypeId().getModuleName(className);
-        auto handler = getGeometryHandler(mod);
-        if (!handler) {
-            return new App::DocumentObjectExecReturn("No geometry handler available for submitted element type");
-        }
-
-        std::string obName = object->getNameInDocument();
-        result += handler(&obName, &subElement);
+    if (!hasGeometryHandler(mod)) {
+        return false;
     }
 
-    Distance.setValue(result);
+    auto handler = getGeometryHandler(mod);
+
+    std::string obName = static_cast<std::string>(ob.getNameInDocument());
+    App::MeasureAngleInfo info = handler(&obName, &subName);
+
+    vecOut = info.vector;
+    return true;
+}
+
+
+App::DocumentObjectExecReturn *MeasureAngle::execute()
+{
+
+    App::DocumentObject* ob1 = Element1.getValue();
+    std::vector<std::string> subs1 = Element1.getSubValues();
+
+    App::DocumentObject* ob2 = Element2.getValue();
+    std::vector<std::string> subs2 = Element2.getSubValues();
+
+    if (!ob1 || !ob1->isValid() || !ob2 || !ob2->isValid()) {
+        return new App::DocumentObjectExecReturn("Submitted object(s) is not valid");
+    }
+
+    if (subs1.size() < 1 || subs2.size() < 1) {
+        return new App::DocumentObjectExecReturn("No geometry element picked");
+    }
+
+    Base::Vector3d vec1;
+    getVec(*ob1, subs1.at(0), vec1);
+
+    Base::Vector3d vec2;
+    getVec(*ob2, subs2.at(0), vec2);
+
+    Angle.setValue(Base::toDegrees(vec1.GetAngle(vec2)));
 
     return DocumentObject::StdReturn;
 }
 
-void MeasureLength::onChanged(const App::Property* prop)
+void MeasureAngle::onChanged(const App::Property* prop)
 {
-    if (prop == &Elements) {
+
+    if (prop == &Element1 || prop == &Element2) {
         if (!isRestoring()) {
             App::DocumentObjectExecReturn *ret = recompute();
             delete ret;
