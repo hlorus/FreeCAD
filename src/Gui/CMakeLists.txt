@@ -938,7 +938,7 @@ SET(Viewprovider_SRCS
     ViewProviderGeometryObject.h
     ViewProviderImagePlane.h
     ViewProviderInventorObject.h
-    ViewProviderMeasurementBase.cpp
+    ViewProviderMeasurementBase.h
     ViewProviderMeasureDistance.h
     ViewProviderPythonFeature.h
     ViewProviderVRMLObject.h
