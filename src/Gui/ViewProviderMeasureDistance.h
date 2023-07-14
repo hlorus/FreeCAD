@@ -25,7 +25,6 @@
 #define GUI_VIEWPROVIDERMEASUREDISTANCE_H
 
 #include "ViewProviderDocumentObject.h"
-#include "ViewProviderMeasurementBase.h"
 #include <QObject>
 
 class SoFontStyle;
@@ -75,7 +74,7 @@ protected:
     friend class PointMarker;
 };
 
-class GuiExport ViewProviderMeasureDistance : public ViewProviderMeasurementBase
+class GuiExport ViewProviderMeasureDistance : public ViewProviderDocumentObject
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderMeasureDistance);
 
