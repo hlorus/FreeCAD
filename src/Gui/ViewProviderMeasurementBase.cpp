@@ -22,14 +22,20 @@
 
 #include "PreCompiled.h"
 
-#include <App/DocumentObject.h>
+#ifndef _PreComp_
+# include <boost_signals2.hpp>
+# include <boost/signals2/connection.hpp>
+#endif
 
+#include <App/DocumentObject.h>
 #include "ViewProviderMeasurementBase.h"
 
 #include "Base/Console.h"
 
 
 using namespace Gui;
+namespace bp = boost::placeholders;
+
 
 PROPERTY_SOURCE(ViewProviderMeasurementBase, ViewProviderDocumentObject)
 
@@ -44,8 +50,20 @@ ViewProviderMeasurementBase::~ViewProviderMeasurementBase()
 {
 }
 
+
+void ViewProviderMeasurementBase::onGuiUpdate(const App::MeasurementBase* measureObject) {
+    updateView();
+}
+
 void ViewProviderMeasurementBase::attach(App::DocumentObject *pcObj)
 {
     ViewProviderDocumentObject::attach(pcObj);
+
+    auto bnd = boost::bind(&ViewProviderMeasurementBase::onGuiUpdate, this, bp::_1);
+
+    App::MeasurementBase* feature = dynamic_cast<App::MeasurementBase*>(pcObject);
+    if (feature) {
+        feature->signalGuiUpdate.connect(bnd);
+    }
 }
 

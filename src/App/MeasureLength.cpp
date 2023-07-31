@@ -130,6 +130,7 @@ App::DocumentObjectExecReturn *MeasureLength::execute()
 
     Distance.setValue(result);
 
+    signalGuiUpdate(this);
     return DocumentObject::StdReturn;
 }
 

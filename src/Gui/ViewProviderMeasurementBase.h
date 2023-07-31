@@ -23,6 +23,7 @@
 #ifndef GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 #define GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 
+#include <App/Measure.h>
 #include "ViewProviderDocumentObject.h"
 #include "App/PropertyContainer.h"
 
@@ -55,6 +56,7 @@ public:
      * Attaches the document object to this view provider.
      */
     void attach(App::DocumentObject *pcObj) override;
+    void onGuiUpdate(const App::MeasurementBase* measureObject);
 
 protected:
     bool _mShowTree = true;
