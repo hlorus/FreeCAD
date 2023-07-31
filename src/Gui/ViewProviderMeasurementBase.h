@@ -31,6 +31,9 @@
 class SbVec2s;
 class SoFontStyle;
 class SoBaseColor;
+class SoText2;
+class SoTranslation;
+class SoPickStyle;
 
 namespace Gui {
 
@@ -58,9 +61,23 @@ public:
     void attach(App::DocumentObject *pcObj) override;
     void onGuiUpdate(const App::MeasurementBase* measureObject);
 
+    bool useNewSelectionModel() const override {return true;}
+    std::vector<std::string> getDisplayModes() const override;
+    void setDisplayMode(const char* ModeName) override;
+
 protected:
+    void onChanged(const App::Property* prop) override;
+    void setLabelValue(const Base::Quantity& value);
+    void setLabelTranslation(const SbVec3f& position);
+
+    SoPickStyle* getSoPickStyle();
+    SoDrawStyle* getSoLineStylePrimary();
+    SoSeparator* getSoSeparatorText();
+
     bool _mShowTree = true;
 
+    SoText2          * pLabel;
+    SoTranslation    * pTranslation;
     SoFontStyle      * pFont;
     SoBaseColor      * pColor;
     SoBaseColor      * pTextColor;

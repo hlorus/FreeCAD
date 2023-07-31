@@ -30,8 +30,7 @@
 
 #include <QObject>
 
-class SoText2;
-class SoTranslation;
+
 class SoCoordinate3;
 class SoIndexedLineSet;
 
@@ -54,16 +53,11 @@ public:
 
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;
-    bool useNewSelectionModel() const override {return true;}
-    std::vector<std::string> getDisplayModes() const override;
-    void setDisplayMode(const char* ModeName) override;
 
 protected:
     void onChanged(const App::Property* prop) override;
 
 private:
-    SoText2          * pLabel;
-    SoTranslation    * pTranslation;
     SoCoordinate3    * pCoords;
     SoIndexedLineSet * pLines;
 
