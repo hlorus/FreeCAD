@@ -63,21 +63,6 @@ ViewProviderMeasureDistancePoints::ViewProviderMeasureDistancePoints()
     ADD_PROPERTY(DistFactor,(1.0));
     ADD_PROPERTY(Mirror,(false));
 
-    pFont = new SoFontStyle();
-    pFont->ref();
-    pLabel = new SoText2();
-    pLabel->ref();
-    pColor = new SoBaseColor();
-    pColor->ref();
-    pTextColor = new SoBaseColor();
-    pTextColor->ref();
-    pTranslation = new SoTranslation();
-    pTranslation->ref();
-
-    TextColor.touch();
-    FontSize.touch();
-    LineColor.touch();
-
     static const SbVec3f verts[4] =
     {
         SbVec3f(0,0,0), SbVec3f(0,0,0),
@@ -106,11 +91,6 @@ ViewProviderMeasureDistancePoints::ViewProviderMeasureDistancePoints()
 
 ViewProviderMeasureDistancePoints::~ViewProviderMeasureDistancePoints()
 {
-    pFont->unref();
-    pLabel->unref();
-    pColor->unref();
-    pTextColor->unref();
-    pTranslation->unref();
     pCoords->unref();
     pLines->unref();
 }
@@ -120,47 +100,20 @@ void ViewProviderMeasureDistancePoints::onChanged(const App::Property* prop)
     if (prop == &Mirror || prop == &DistFactor) {
         updateData(prop);
     }
-    else if (prop == &TextColor) {
-        const App::Color& c = TextColor.getValue();
-        pTextColor->rgb.setValue(c.r,c.g,c.b);
-    }
-    else if (prop == &LineColor) {
-        const App::Color& c = LineColor.getValue();
-        pColor->rgb.setValue(c.r,c.g,c.b);
-    }
-    else if (prop == &FontSize) {
-        pFont->size = FontSize.getValue();
-    }
     else {
         ViewProviderDocumentObject::onChanged(prop);
     }
 }
 
-std::vector<std::string> ViewProviderMeasureDistancePoints::getDisplayModes() const
-{
-    // add modes
-    std::vector<std::string> StrList;
-    StrList.emplace_back("Base");
-    return StrList;
-}
-
-void ViewProviderMeasureDistancePoints::setDisplayMode(const char* ModeName)
-{
-    if (strcmp(ModeName, "Base") == 0)
-        setDisplayMaskMode("Base");
-    ViewProviderDocumentObject::setDisplayMode(ModeName);
-}
 
 void ViewProviderMeasureDistancePoints::attach(App::DocumentObject* pcObject)
 {
     ViewProviderMeasurementBase::attach(pcObject);
 
-    auto ps = new SoPickStyle();
-    ps->style = SoPickStyle::UNPICKABLE;
+    auto ps = getSoPickStyle();
 
     auto lineSep = new SoSeparator();
-    auto style = new SoDrawStyle();
-    style->lineWidth = 2.0f;
+    auto style = getSoLineStylePrimary();
     lineSep->addChild(ps);
     lineSep->addChild(style);
     lineSep->addChild(pColor);
@@ -172,11 +125,7 @@ void ViewProviderMeasureDistancePoints::attach(App::DocumentObject* pcObject)
     points->numPoints=2;
     lineSep->addChild(points);
 
-    auto textsep = new SoSeparator();
-    textsep->addChild(pTranslation);
-    textsep->addChild(pTextColor);
-    textsep->addChild(pFont);
-    textsep->addChild(pLabel);
+    auto textsep = getSoSeparatorText();
 
     auto sep = new SoAnnotation();
     sep->addChild(lineSep);
@@ -224,9 +173,8 @@ void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
         }
 
         SbVec3f pos = (pCoords->point[2]+pCoords->point[3])/2.0f;
-        pTranslation->translation.setValue(pos);
-
-        pLabel->string.setValue((Base::Quantity(dif.length(), Base::Unit::Length)).getUserString().toUtf8().constData());
+        setLabelTranslation(pos);
+        setLabelValue(Base::Quantity(dif.length(), Base::Unit::Length));
     }
 
     ViewProviderDocumentObject::updateData(prop);

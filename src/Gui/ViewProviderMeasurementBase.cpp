@@ -25,7 +25,21 @@
 #ifndef _PreComp_
 # include <boost_signals2.hpp>
 # include <boost/signals2/connection.hpp>
+
+# include <Inventor/nodes/SoAnnotation.h>
+# include <Inventor/nodes/SoBaseColor.h>
+# include <Inventor/nodes/SoCoordinate3.h>
+# include <Inventor/nodes/SoDrawStyle.h>
+# include <Inventor/nodes/SoFontStyle.h>
+# include <Inventor/nodes/SoIndexedLineSet.h>
+# include <Inventor/nodes/SoMarkerSet.h>
+# include <Inventor/nodes/SoPickStyle.h>
+# include <Inventor/nodes/SoText2.h>
+# include <Inventor/nodes/SoTranslation.h>
 #endif
+
+
+
 
 #include <App/DocumentObject.h>
 #include "ViewProviderMeasurementBase.h"
@@ -44,10 +58,92 @@ ViewProviderMeasurementBase::ViewProviderMeasurementBase()
     ADD_PROPERTY(TextColor,(1.0f,1.0f,1.0f));
     ADD_PROPERTY(LineColor,(1.0f,1.0f,1.0f));
     ADD_PROPERTY(FontSize,(18));
+
+    pFont = new SoFontStyle();
+    pFont->ref();
+    pLabel = new SoText2();
+    pLabel->ref();
+    pColor = new SoBaseColor();
+    pColor->ref();
+    pTextColor = new SoBaseColor();
+    pTextColor->ref();
+    pTranslation = new SoTranslation();
+    pTranslation->ref();
+
+    TextColor.touch();
+    FontSize.touch();
+    LineColor.touch();
 }
 
 ViewProviderMeasurementBase::~ViewProviderMeasurementBase()
 {
+    pFont->unref();
+    pLabel->unref();
+    pColor->unref();
+    pTextColor->unref();
+    pTranslation->unref();
+}
+
+std::vector<std::string> ViewProviderMeasurementBase::getDisplayModes() const
+{
+    // add modes
+    std::vector<std::string> StrList;
+    StrList.emplace_back("Base");
+    return StrList;
+}
+
+void ViewProviderMeasurementBase::setDisplayMode(const char* ModeName)
+{
+    if (strcmp(ModeName, "Base") == 0)
+        setDisplayMaskMode("Base");
+    ViewProviderDocumentObject::setDisplayMode(ModeName);
+}
+
+
+void ViewProviderMeasurementBase::onChanged(const App::Property* prop)
+{
+    if (prop == &TextColor) {
+        const App::Color& c = TextColor.getValue();
+        pTextColor->rgb.setValue(c.r,c.g,c.b);
+    }
+    else if (prop == &LineColor) {
+        const App::Color& c = LineColor.getValue();
+        pColor->rgb.setValue(c.r,c.g,c.b);
+    }
+    else if (prop == &FontSize) {
+        pFont->size = FontSize.getValue();
+    }
+}
+
+
+void ViewProviderMeasurementBase::setLabelValue(const Base::Quantity& value) {
+    pLabel->string.setValue(value.getUserString().toUtf8().constData());
+}
+
+void ViewProviderMeasurementBase::setLabelTranslation(const SbVec3f& position) {
+    pTranslation->translation.setValue(position);
+}
+
+
+SoPickStyle* ViewProviderMeasurementBase::getSoPickStyle() {
+    auto ps = new SoPickStyle();
+    ps->style = SoPickStyle::UNPICKABLE;
+    return ps;
+}
+
+SoDrawStyle* ViewProviderMeasurementBase::getSoLineStylePrimary() {
+    auto style = new SoDrawStyle();
+    style->lineWidth = 2.0f;
+    return style;
+}
+
+SoSeparator* ViewProviderMeasurementBase::getSoSeparatorText() {
+    auto textsep = new SoSeparator();
+    textsep->addChild(pTranslation);
+    textsep->addChild(pTextColor);
+    textsep->addChild(pFont);
+    textsep->addChild(pLabel);
+    return textsep;
 }
 
 
