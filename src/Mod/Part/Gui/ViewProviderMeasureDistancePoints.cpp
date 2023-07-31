@@ -153,7 +153,7 @@ void ViewProviderMeasureDistancePoints::setDisplayMode(const char* ModeName)
 
 void ViewProviderMeasureDistancePoints::attach(App::DocumentObject* pcObject)
 {
-    ViewProviderDocumentObject::attach(pcObject);
+    ViewProviderMeasurementBase::attach(pcObject);
 
     auto ps = new SoPickStyle();
     ps->style = SoPickStyle::UNPICKABLE;

@@ -38,6 +38,8 @@ class AppExport MeasurementBase : public DocumentObject
 
 public:
 
+    boost::signals2::signal<void (const MeasurementBase*)> signalGuiUpdate;
+
     // Initalize measurement properties from selection
     virtual void parseSelection(const MeasureSelection&) = 0;
 
