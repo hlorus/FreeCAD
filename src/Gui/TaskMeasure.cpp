@@ -24,17 +24,17 @@
 #define GUI_TASKMEASURE_H
 
 #include "PreCompiled.h"
+
 #ifndef _PreComp_
+# include <QApplication>
+# include <QKeyEvent>
 #endif
 
-#include <Inventor/events/SoEvent.h>
 
 #include "TaskMeasure.h"
 
 #include "Control.h"
 #include "MainWindow.h"
-#include "View3DInventor.h"
-#include "View3DInventorViewer.h"
 #include "Application.h"
 #include "App/Document.h"
 
@@ -44,6 +44,8 @@ using namespace Gui;
 
 TaskMeasure::TaskMeasure(){
 
+
+    qApp->installEventFilter(this);
 
     measureModule = "";
 
@@ -79,6 +81,7 @@ TaskMeasure::TaskMeasure(){
 
 TaskMeasure::~TaskMeasure(){
     detachSelection();
+    qApp->removeEventFilter(this);
 }
 
 void TaskMeasure::updateInfo() {
@@ -175,13 +178,6 @@ void TaskMeasure::update(){
 }
 
 void TaskMeasure::close(){
-
-    MDIView* view = getMainWindow()->activeWindow();
-    Gui::View3DInventorViewer *viewer = static_cast<Gui::View3DInventor*>(view)->getViewer();
-    
-    viewer->setEditing(false);
-    viewer->removeEventCallback(SoEvent::getClassTypeId(), eventCallback);
-    
     Control().closeDialog();
 }
 
@@ -286,5 +282,31 @@ void TaskMeasure::onSelectionChanged(const Gui::SelectionChanges& msg)
     }
 
 }
+
+bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {
+
+    if (event->type() == QEvent::KeyPress) {
+        auto keyEvent = static_cast<QKeyEvent*>(event);
+
+        if (keyEvent->key() == Qt::Key_Escape) {
+
+            if (this->hasSelection()) {
+                this->clearSelection();
+                this->update();
+            } else {
+                this->reject();
+            }
+
+            return true;
+        }
+        else if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+            this->accept();
+            return true;
+        }
+    }
+
+    return TaskDialog::eventFilter(obj, event);
+}
+
 
 #endif //GUI_TASKMEASURE_H
