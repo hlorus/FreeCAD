@@ -3425,29 +3425,6 @@ bool StdCmdMeasureDistance::isActive()
 // Std_Measure
 //===========================================================================
 
-void measureCallback(void * ud, SoEventCallback * n)
-{
-    Q_UNUSED(ud);
-    const SoEvent* ev = n->getEvent();
-
-    if (ev->isOfType(SoKeyboardEvent::getClassTypeId())){        
-        const auto kbe = static_cast<const SoKeyboardEvent*>(ev);
-        if (kbe->getKey() == SoKeyboardEvent::ESCAPE && kbe->getState() == SoKeyboardEvent::DOWN){
-            TaskMeasure *dlg = (TaskMeasure*)Control().activeDialog();
-
-            if (dlg->hasSelection()) {
-                dlg->clearSelection();
-                dlg->update();
-            } else {
-                dlg->reject();
-            }
-        } else if (kbe->getKey() == SoKeyboardEvent::ENTER && kbe->getState() == SoKeyboardEvent::DOWN) {
-            TaskMeasure *dlg = (TaskMeasure*)Control().activeDialog();
-            dlg->accept();
-        }
-    }
-}
-
 
 DEF_STD_CMD_A(StdCmdMeasure)
 
@@ -3466,20 +3443,8 @@ void StdCmdMeasure::activated(int iMsg)
 {
     Q_UNUSED(iMsg);
 
-    MDIView* view = getMainWindow()->activeWindow();
-    if (!view || !view->isDerivedFrom(Gui::View3DInventor::getClassTypeId())) {
-        return;
-    }
-    Gui::View3DInventorViewer *viewer = static_cast<Gui::View3DInventor*>(view)->getViewer();
-
-    viewer->addEventCallback(SoEvent::getClassTypeId(),
-        measureCallback);
-
     TaskMeasure *task = new TaskMeasure();
-    task->eventCallback = measureCallback;
-
     Gui::Control().showDialog(task);
-    // Gui::Control().showTaskView()
 }
 
 

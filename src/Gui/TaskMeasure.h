@@ -20,7 +20,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <Inventor/nodes/SoEventCallback.h>
 #include <tuple>
 #include <string.h>
 
@@ -42,7 +41,6 @@ public:
 
 
     QColumnView* dialog;
-    void(*eventCallback)(void*, SoEventCallback*);
     App::MeasureElementInfo *elementInfo = nullptr;
 
     TaskMeasure();
@@ -57,6 +55,7 @@ public:
     bool hasSelection();
     void clearSelection();
     void gatherSelection();
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 protected:
     App::MeasurementBase *_mMeasureObject = nullptr;
