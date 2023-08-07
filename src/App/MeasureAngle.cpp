@@ -149,7 +149,6 @@ App::DocumentObjectExecReturn *MeasureAngle::execute()
 
     Angle.setValue(Base::toDegrees(vec1.GetAngle(vec2)));
 
-    signalGuiUpdate(this);
     return DocumentObject::StdReturn;
 }
 

@@ -135,7 +135,11 @@ void ViewProviderMeasureDistancePoints::attach(App::DocumentObject* pcObject)
 
 void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
 {
-    if (prop->getTypeId() == App::PropertyLinkSub::getClassTypeId() ||
+
+    if (prop == &static_cast<Part::MeasureDistancePoints*>(getObject())->Distance) {
+        updateView();
+    }
+    else if (prop->getTypeId() == App::PropertyLinkSub::getClassTypeId() ||
         prop == &Mirror || prop == &DistFactor) {
         if (strcmp(prop->getName(),"P1") == 0) {
             Base::Vector3f v = static_cast<Part::MeasureDistancePoints*>(getObject())->getP1();
@@ -175,6 +179,8 @@ void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
         SbVec3f pos = (pCoords->point[2]+pCoords->point[3])/2.0f;
         setLabelTranslation(pos);
         setLabelValue(Base::Quantity(dif.length(), Base::Unit::Length));
+
+        updateView();
     }
 
     ViewProviderDocumentObject::updateData(prop);
