@@ -185,7 +185,6 @@ App::DocumentObjectExecReturn *MeasureDistancePoints::execute()
 
     Distance.setValue(p1.Distance(p2));
 
-    signalGuiUpdate(this);
     return DocumentObject::StdReturn;
 }
 
