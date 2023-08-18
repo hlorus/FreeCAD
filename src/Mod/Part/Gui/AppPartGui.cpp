@@ -209,7 +209,6 @@ PyMOD_INIT_FUNC(PartGui)
     PartGui::ViewProviderMeasureDistancePoints      ::init();
     PartGui::DimensionLinear                        ::initClass();
     PartGui::DimensionAngular                       ::initClass();
-    PartGui::ArcEngine                              ::initClass();
 
     PartGui::Workbench                              ::init();
 

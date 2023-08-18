@@ -171,26 +171,6 @@ private:
   ~DimensionAngular() override;
 };
 
-/*used for generating points for arc display*/
-class ArcEngine : public SoEngine
-{
-    SO_ENGINE_HEADER(ArcEngine);
-public:
-    ArcEngine();
-    static void initClass();
-
-    SoSFFloat radius;
-    SoSFFloat angle;
-    SoSFFloat deviation;
-
-    SoEngineOutput points;
-    SoEngineOutput pointCount;
-protected:
-    void evaluate() override;
-private:
-    ~ArcEngine() override = default;
-    void defaultValues(); //some non error values if something goes wrong.
-};
 
 /*! a widget with buttons and icons for a controlled selection process*/
 class SteppedSelection : public QWidget
