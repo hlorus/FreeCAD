@@ -60,15 +60,22 @@ TaskMeasure::TaskMeasure(){
     labelLength = new QLabel();
     labelArea = new QLabel();
 
+
+
+    // Element info layout
+    QVBoxLayout* layoutElement = new QVBoxLayout();
+    layoutElement->addWidget(labelType);
+    layoutElement->addWidget(labelPosition);
+    layoutElement->addWidget(labelLength);
+    layoutElement->addWidget(labelArea);
+
+    // Main layout
     QBoxLayout *layout = taskbox->groupLayout();
     layout->addWidget(labelMeasureType);
     layout->addWidget(labelResult);
+    layout->addSpacing(10);
+    layout->addLayout(layoutElement);
 
-    
-    layout->addWidget(labelType);
-    layout->addWidget(labelPosition);
-    layout->addWidget(labelLength);
-    layout->addWidget(labelArea);
 
     labelMeasureType->setText(QString::asprintf("Measure Type: -"));
     labelResult->setText(QString::asprintf("Result: -"));
