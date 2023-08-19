@@ -1570,9 +1570,8 @@ MeasureHandler Application::getMeasureHandler(const char* module) {
     return empty;
 }
 
-void Application::addMeasureType(const std::string measureObject, MeasureValidateMethod validateCb) {
-    MeasureType* m = new MeasureType{measureObject, validateCb};
-    _mMeasureTypes.push_back(m);
+void Application::addMeasureType(MeasureType* measureType) {
+    _mMeasureTypes.push_back(measureType);
 }
 
 const std::vector<MeasureType*> Application::getMeasureTypes() {

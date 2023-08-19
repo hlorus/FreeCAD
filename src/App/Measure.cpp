@@ -34,7 +34,7 @@ PROPERTY_SOURCE_ABSTRACT(App::MeasurementBase, App::DocumentObject)
 void App::Measure::initialize(){
     App::Application& app = App::GetApplication();
 
-    app.addMeasureType("App::MeasureLength", App::MeasureLength::isValidSelection);
-    app.addMeasureType("App::MeasureAngle", App::MeasureAngle::isValidSelection);
+    app.addMeasureType(new MeasureType{"LENGTH", "Length", "App::MeasureLength", App::MeasureLength::isValidSelection});
+    app.addMeasureType(new MeasureType{"ANGLE", "Angle", "App::MeasureAngle", App::MeasureAngle::isValidSelection});
 
 }

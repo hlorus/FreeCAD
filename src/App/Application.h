@@ -98,6 +98,8 @@ using MeasureInfoMethod = std::function<MeasureElementInfo(const char*, const ch
 using MeasureTypeMethod = std::function<App::MeasureElementType (const char*, const char*)>;
 
 typedef struct MeasureType {
+    std::string identifier;
+    std::string label;
     std::string measureObject;
     MeasureValidateMethod validatorCb;
 } MeasureType;
@@ -429,7 +431,7 @@ public:
 
     // Callback for measurements
 
-    void addMeasureType(const std::string measureObject, MeasureValidateMethod validateCb);
+    void addMeasureType(MeasureType* measureType);
     const std::vector<MeasureType*> getMeasureTypes();
 
     void addMeasureHandler(const char* module, MeasureInfoMethod infoCb, MeasureTypeMethod typeCb);
