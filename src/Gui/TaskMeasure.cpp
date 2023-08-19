@@ -52,7 +52,6 @@ TaskMeasure::TaskMeasure(){
     this->setButtonPosition(TaskMeasure::South);
     Gui::TaskView::TaskBox* taskbox = new Gui::TaskView::TaskBox(QPixmap(), QString(), true, nullptr);
 
-    labelMeasureType = new QLabel();
     labelResult = new QLabel();
 
     labelType = new QLabel();
@@ -60,7 +59,23 @@ TaskMeasure::TaskMeasure(){
     labelLength = new QLabel();
     labelArea = new QLabel();
 
+    // Create mode dropdown and add all registered measuretypes
+    modeSwitch = new QComboBox();
+    modeSwitch->addItem(QString::fromLatin1("Auto"));
 
+    for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
+        modeSwitch->addItem(QString::fromLatin1(mType->label.c_str()));
+    }
+
+    // Connect dropdown's change signal to our onModeChange slot
+    connect(modeSwitch, qOverload<int>(&QComboBox::currentIndexChanged), this, &TaskMeasure::onModeChanged);
+
+    // Mode picker layout
+    QHBoxLayout *rowMeasureType = new QHBoxLayout();
+    QLabel *labelMeasureType = new QLabel();
+    labelMeasureType->setText(QString::fromLatin1("Mode:"));
+    rowMeasureType->addWidget(labelMeasureType);
+    rowMeasureType->addWidget(modeSwitch);
 
     // Element info layout
     QVBoxLayout* layoutElement = new QVBoxLayout();
@@ -71,7 +86,7 @@ TaskMeasure::TaskMeasure(){
 
     // Main layout
     QBoxLayout *layout = taskbox->groupLayout();
-    layout->addWidget(labelMeasureType);
+    layout->addLayout(rowMeasureType);
     layout->addWidget(labelResult);
     layout->addSpacing(10);
     layout->addLayout(layoutElement);
@@ -125,7 +140,6 @@ void TaskMeasure::updateInfo() {
 
 
 void TaskMeasure::update(){
-    labelMeasureType->setText(QString::asprintf("Measure Type: -"));
     labelResult->setText(QString::asprintf("Result: -"));
 
     // Update element info display
@@ -144,11 +158,19 @@ void TaskMeasure::update(){
     App::MeasureType *measureType;
 
     for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
+        // If the measure mode is explicitly set we only check matching measure types
+        if (explicitMode && mType->label.c_str() != modeSwitch->currentText().toLatin1()) {
+            continue;
+        }
+        
         if (!mType->validatorCb(selection)) {
             continue;
         }
+
         isValid = true;
         measureType = mType;
+        setModeSilent(mType);
+
         break;
     }
 
@@ -173,9 +195,6 @@ void TaskMeasure::update(){
         App::Document *doc = App::GetApplication().getActiveDocument();
         _mMeasureObject = (App::MeasurementBase*)doc->addObject(measureType->measureObject.c_str());
     }
-    
-    // Set type label
-    labelMeasureType->setText(QString::asprintf("Measure Type: %s", measureType->measureObject.c_str()));
 
     // Fill measure object's properties from selection
     _mMeasureObject->parseSelection(selection);
@@ -199,6 +218,17 @@ bool TaskMeasure::reject(){
 
     close();
     return false;
+}
+
+void TaskMeasure::reset() {
+    // Reset tool state
+    this->clearSelection();
+
+    // Should the explicit mode also be reset? 
+    // setModeSilent(nullptr);
+    // explicitMode = false;
+
+    this->update();
 }
 
 
@@ -302,8 +332,7 @@ bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {
         if (keyEvent->key() == Qt::Key_Escape) {
 
             if (this->hasSelection()) {
-                this->clearSelection();
-                this->update();
+                this->reset();
             } else {
                 this->reject();
             }
@@ -319,5 +348,30 @@ bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {
     return TaskDialog::eventFilter(obj, event);
 }
 
+void TaskMeasure::onModeChanged(int index) {
+    explicitMode = (index != 0);
+    this->update();
+}
+
+void TaskMeasure::setModeSilent(App::MeasureType* mode) {
+    modeSwitch->blockSignals(true);
+    
+    if (mode == nullptr) {
+        modeSwitch->setCurrentIndex(0);
+    }
+    else {
+        modeSwitch->setCurrentText(QString::fromLatin1(mode->label.c_str()));
+    }
+    modeSwitch->blockSignals(false);
+}
+
+App::MeasureType* TaskMeasure::getMeasureType() {
+    for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()) {
+        if (mType->label.c_str() == modeSwitch->currentText().toLatin1()) {
+            return mType;
+        }
+    }
+    return nullptr;
+}
 
 #endif //GUI_TASKMEASURE_H
