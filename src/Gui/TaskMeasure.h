@@ -31,6 +31,7 @@
 
 #include <qcolumnview.h>
 #include <QString>
+#include <QComboBox>
 
 
 namespace Gui {
@@ -50,6 +51,7 @@ public:
     void close();
     bool accept();
     bool reject();
+    void reset();
 
     void addElement(const char* mod, const char* obName, const char* subName);
     bool hasSelection();
@@ -60,15 +62,18 @@ public:
 protected:
     App::MeasurementBase *_mMeasureObject = nullptr;
 
-    QLabel *labelMeasureType;
     QLabel *labelResult;
     QLabel *labelType;
     QLabel *labelPosition;
     QLabel *labelLength;
     QLabel *labelArea;
+    QComboBox* modeSwitch;
 
     void removeObject();
     void updateInfo();
+    void onModeChanged(int index);
+    void setModeSilent(App::MeasureType* mode);
+    App::MeasureType* getMeasureType();
 
     // Store the active measure module
     std::string measureModule;
@@ -79,8 +84,11 @@ protected:
     // List of measure types
     std::vector<App::DocumentObject> measureObjects;
 
-    private:
-        void onSelectionChanged(const Gui::SelectionChanges& msg) override;
+    // Stores if the mode is explicitly set by the user or implicitly through the selection
+    bool explicitMode = false;
+
+private:
+    void onSelectionChanged(const Gui::SelectionChanges& msg) override;
 
 };
 
