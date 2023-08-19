@@ -41,7 +41,7 @@ public:
 
 
     QColumnView* dialog;
-    App::MeasureElementInfo *elementInfo = nullptr;
+    App::MeasureElementInfo elementInfo;
 
     TaskMeasure();
     ~TaskMeasure();
