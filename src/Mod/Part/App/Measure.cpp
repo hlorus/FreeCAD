@@ -256,7 +256,13 @@ void Measure::initialize() {
     app.addMeasureHandler("Part", PartMeasureCb, PartMeasureTypeCb);
 
     // Add Measure Types
-    app.addMeasureType("Part::MeasureDistancePoints", Part::MeasureDistancePoints::isValidSelection); 
+    app.addMeasureType(
+        new App::MeasureType {
+        "DISTANCEPOINTS",
+        "Distance Points",
+        "Part::MeasureDistancePoints",
+        Part::MeasureDistancePoints::isValidSelection
+    });
 
 
     // Extend MeasureLength
