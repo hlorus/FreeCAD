@@ -87,9 +87,9 @@ enum MeasureElementType {
 
 typedef struct MeasureElementInfo {
     std::string type;
-    const Base::Vector3d pos;
-    const float length;
-    const float area;
+    Base::Vector3d pos;
+    float length;
+    float area;
 } MeasureElementInfo;
 
 using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;

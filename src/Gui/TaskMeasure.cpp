@@ -97,27 +97,28 @@ void TaskMeasure::updateInfo() {
     labelLength->hide();
     labelArea->hide();
 
-    if (!elementInfo || elementInfo->type.empty()) {
+    if (elementInfo.type.empty()) {
         return;
     }
 
-    labelType->setText(QString::fromUtf8(elementInfo->type.c_str()));
+
+    labelType->setText(QString::fromUtf8(elementInfo.type.c_str()));
     labelType->show();
 
-    if (!elementInfo->pos.IsNull()) {
+    if (!elementInfo.pos.IsNull()) {
         labelPosition->setText(
-            QString::asprintf("Position X: %.3lf Y: %.3lf Z: %.3lf", elementInfo->pos.x, elementInfo->pos.y, elementInfo->pos.z)
+            QString::asprintf("Position X: %.3lf Y: %.3lf Z: %.3lf", elementInfo.pos.x, elementInfo.pos.y, elementInfo.pos.z)
         );
         labelPosition->show();
     }
 
-    if (elementInfo->length > 0.0) {
-        labelLength->setText(QString::asprintf("Length: %.3f", elementInfo->length));
+    if (elementInfo.length > 0.0) {
+        labelLength->setText(QString::asprintf("Length: %.3f", elementInfo.length));
         labelLength->show();
     }
 
-    if (elementInfo->area > 0.0) {
-        labelArea->setText(QString::asprintf("Area: %.3f", elementInfo->area));
+    if (elementInfo.area > 0.0) {
+        labelArea->setText(QString::asprintf("Area: %.3f", elementInfo.area));
         labelArea->show();
     }
 }
@@ -219,7 +220,10 @@ void TaskMeasure::addElement(const char* mod, const char* obName, const char* su
     // Update element info
     App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod);
     auto info = handler.infoCb(obName, subName);
-    elementInfo = &info;
+    elementInfo.type = info.type;
+    elementInfo.pos = info.pos;
+    elementInfo.length = info.length;
+    elementInfo.area = info.area;
 
     update();
 }
@@ -265,7 +269,7 @@ bool TaskMeasure::hasSelection(){
 }
 
 void TaskMeasure::clearSelection(){
-    elementInfo = nullptr;
+    elementInfo.type.clear();
     selection.clear();
 }
 
