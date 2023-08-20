@@ -68,6 +68,7 @@ public:
     // }
 
     static bool isValidSelection(const App::MeasureSelection& selection);
+    static bool isPrioritizedSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection);
     Base::Quantity result() {return Angle.getQuantityValue();}
 

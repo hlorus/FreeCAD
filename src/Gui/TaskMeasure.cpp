@@ -172,11 +172,17 @@ void TaskMeasure::update(){
             continue;
         }
 
-        isValid = true;
-        measureType = mType;
-        setModeSilent(mType);
+        // Check if the measurement type prioritizes the given selection
+        bool isPriority = (mType->prioritizeCb != nullptr && mType->prioritizeCb(selection));
 
-        break;
+        if (!isValid || isPriority) {
+            isValid = true;
+            measureType = mType;
+
+        }
+
+
+        // break;
     }
 
     if (!isValid) {
@@ -190,6 +196,8 @@ void TaskMeasure::update(){
         return;
     }
 
+    // Update tool mode display
+    setModeSilent(measureType);
 
     if (!_mMeasureObject || measureType->measureObject != _mMeasureObject->getTypeId().getName()) {
 

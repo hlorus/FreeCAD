@@ -89,6 +89,14 @@ bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection){
     return true;
 }
 
+bool MeasureAngle::isPrioritizedSelection(const App::MeasureSelection& selection) {
+    if (selection.size() == 2) {
+        return true;
+    }
+    
+    return false;
+}
+
 
 void MeasureAngle::parseSelection(const App::MeasureSelection& selection) {
 
