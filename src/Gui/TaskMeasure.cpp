@@ -52,7 +52,7 @@ TaskMeasure::TaskMeasure(){
     this->setButtonPosition(TaskMeasure::South);
     Gui::TaskView::TaskBox* taskbox = new Gui::TaskView::TaskBox(QPixmap(), QString(), true, nullptr);
 
-    labelResult = new QLabel();
+
 
     labelType = new QLabel();
     labelPosition = new QLabel();
@@ -84,16 +84,26 @@ TaskMeasure::TaskMeasure(){
     layoutElement->addWidget(labelLength);
     layoutElement->addWidget(labelArea);
 
+    // Result layout
+    QHBoxLayout* rowMeasureResult = new QHBoxLayout();
+
+    labelResult = new QLabel();
+    valueResult = new QLineEdit();
+    valueResult->setReadOnly(true);
+    rowMeasureResult->addWidget(labelResult);
+    rowMeasureResult->addWidget(valueResult);
+
+    labelResult->setText(QString::asprintf("Result:"));
+
+
     // Main layout
     QBoxLayout *layout = taskbox->groupLayout();
     layout->addLayout(rowMeasureType);
-    layout->addWidget(labelResult);
+    layout->addLayout(rowMeasureResult);
     layout->addSpacing(10);
     layout->addLayout(layoutElement);
 
 
-    labelMeasureType->setText(QString::asprintf("Measure Type: -"));
-    labelResult->setText(QString::asprintf("Result: -"));
 
     Content.push_back(taskbox);
 
@@ -140,7 +150,7 @@ void TaskMeasure::updateInfo() {
 
 
 void TaskMeasure::update(){
-    labelResult->setText(QString::asprintf("Result: -"));
+    valueResult->setText(QString::asprintf("-"));
 
     // Update element info display
     updateInfo();
@@ -200,7 +210,7 @@ void TaskMeasure::update(){
     _mMeasureObject->parseSelection(selection);
 
     // Get result
-    labelResult->setText(QString::asprintf("Result: ") + _mMeasureObject->result().getUserString());
+    valueResult->setText(_mMeasureObject->result().getUserString());
 
 }
 
