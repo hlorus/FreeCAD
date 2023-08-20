@@ -261,7 +261,8 @@ void Measure::initialize() {
         "DISTANCEPOINTS",
         "Distance Points",
         "Part::MeasureDistancePoints",
-        Part::MeasureDistancePoints::isValidSelection
+        Part::MeasureDistancePoints::isValidSelection,
+        nullptr,
     });
 
 

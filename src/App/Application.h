@@ -94,6 +94,7 @@ typedef struct MeasureElementInfo {
 
 using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;
 using MeasureValidateMethod = std::function<bool(const MeasureSelection&)>;
+using MeasurePrioritizeMethod = std::function<bool(const MeasureSelection&)>;
 using MeasureInfoMethod = std::function<MeasureElementInfo(const char*, const char*)>;
 using MeasureTypeMethod = std::function<App::MeasureElementType (const char*, const char*)>;
 
@@ -101,7 +102,13 @@ typedef struct MeasureType {
     std::string identifier;
     std::string label;
     std::string measureObject;
+
+    // Checks if the measurement works with a given selection
     MeasureValidateMethod validatorCb;
+
+    // Allows to prioritize this over other measurement types when the measurement type is picked implicitly from the selection.
+    // Gets called only when validatorCb returned true for the given selection
+    MeasurePrioritizeMethod prioritizeCb;
 } MeasureType;
 
 typedef struct MeasureHandler {

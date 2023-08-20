@@ -53,7 +53,7 @@ MeasureLength::~MeasureLength() = default;
 
 bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.size() != 1) {
+    if (selection.size() < 1) {
         return false;
     }
 
