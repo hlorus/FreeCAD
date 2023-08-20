@@ -38,6 +38,7 @@
 #include "Application.h"
 #include "App/Document.h"
 
+#include <QFormLayout>
 
 using namespace Gui;
 
@@ -70,12 +71,6 @@ TaskMeasure::TaskMeasure(){
     // Connect dropdown's change signal to our onModeChange slot
     connect(modeSwitch, qOverload<int>(&QComboBox::currentIndexChanged), this, &TaskMeasure::onModeChanged);
 
-    // Mode picker layout
-    QHBoxLayout *rowMeasureType = new QHBoxLayout();
-    QLabel *labelMeasureType = new QLabel();
-    labelMeasureType->setText(QString::fromLatin1("Mode:"));
-    rowMeasureType->addWidget(labelMeasureType);
-    rowMeasureType->addWidget(modeSwitch);
 
     // Element info layout
     QVBoxLayout* layoutElement = new QVBoxLayout();
@@ -84,29 +79,29 @@ TaskMeasure::TaskMeasure(){
     layoutElement->addWidget(labelLength);
     layoutElement->addWidget(labelArea);
 
-    // Result layout
-    QHBoxLayout* rowMeasureResult = new QHBoxLayout();
 
-    labelResult = new QLabel();
+    // Result widget
     valueResult = new QLineEdit();
     valueResult->setReadOnly(true);
-    rowMeasureResult->addWidget(labelResult);
-    rowMeasureResult->addWidget(valueResult);
-
-    labelResult->setText(QString::asprintf("Result:"));
-
 
     // Main layout
     QBoxLayout *layout = taskbox->groupLayout();
-    layout->addLayout(rowMeasureType);
-    layout->addLayout(rowMeasureResult);
+
+    QFormLayout* formLayout = new QFormLayout();
+    formLayout->setHorizontalSpacing(10);
+    // Note: How can the split between columns be kept in the middle?
+    // formLayout->setFieldGrowthPolicy(QFormLayout::FieldGrowthPolicy::ExpandingFieldsGrow);
+    formLayout->setFormAlignment(Qt::AlignCenter);
+
+    formLayout->addRow(QString::fromLatin1("Mode:"), modeSwitch);
+    formLayout->addRow(QString::fromLatin1("Result:"), valueResult);
+    layout->addLayout(formLayout);
+
     layout->addSpacing(10);
     layout->addLayout(layoutElement);
 
 
-
     Content.push_back(taskbox);
-
     gatherSelection();
     attachSelection();
 }
