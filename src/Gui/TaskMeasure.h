@@ -32,6 +32,7 @@
 #include <qcolumnview.h>
 #include <QString>
 #include <QComboBox>
+#include <QLineEdit>
 
 
 namespace Gui {
@@ -62,7 +63,8 @@ public:
 protected:
     App::MeasurementBase *_mMeasureObject = nullptr;
 
-    QLabel *labelResult;
+    QLineEdit* valueResult;
+    QLabel* labelResult;
     QLabel *labelType;
     QLabel *labelPosition;
     QLabel *labelLength;
