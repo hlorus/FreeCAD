@@ -39,6 +39,7 @@
 #include "App/Document.h"
 
 #include <QFormLayout>
+#include <QPushButton>
 
 using namespace Gui;
 
@@ -109,6 +110,13 @@ TaskMeasure::TaskMeasure(){
 TaskMeasure::~TaskMeasure(){
     detachSelection();
     qApp->removeEventFilter(this);
+}
+
+
+void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
+
+    QPushButton* btn = box->button(QDialogButtonBox::Ok);
+    btn->setText(tr("Annotate"));
 }
 
 void TaskMeasure::updateInfo() {
