@@ -76,13 +76,12 @@ void ArcEngine::evaluate()
   float deviationAngle(acos((radius.getValue() - deviation.getValue()) / radius.getValue()));
   std::vector<SbVec3f> tempPoints;
   int segmentCount;
-  if (deviationAngle >= angle.getValue())
+  if (deviationAngle >= angle.getValue()) {
     segmentCount = 1;
-  else
-  {
+  }
+  else {
     segmentCount = static_cast<int>(angle.getValue() / deviationAngle) + 1;
-    if (segmentCount < 2)
-    {
+    if (segmentCount < 2) {
       defaultValues();
       return;
     }

@@ -164,20 +164,24 @@ App::DocumentObjectExecReturn *MeasureDistancePoints::execute()
 
     TopoDS_Shape S1;
     ret = getShape(P1, S1);
-        if (ret)
+        if (ret) {
             return ret;
+        }
 
     TopoDS_Shape S2;
     ret = getShape(P2, S2);
-        if (ret)
+        if (ret) {
             return ret;
+        }
 
     // check for expected type
-    if (S1.IsNull() || S2.IsNull())
+    if (S1.IsNull() || S2.IsNull()) {
         return new App::DocumentObjectExecReturn("Linked shapes are empty.");
+    }
 
-    if (S1.ShapeType() != TopAbs_VERTEX || S2.ShapeType() != TopAbs_VERTEX)
+    if (S1.ShapeType() != TopAbs_VERTEX || S2.ShapeType() != TopAbs_VERTEX) {
         return new App::DocumentObjectExecReturn("Linked shape is not a vertex.");
+    }
 
 
     gp_Pnt p1 = BRep_Tool::Pnt(TopoDS::Vertex(S1));

@@ -328,8 +328,10 @@ void TaskMeasure::onSelectionChanged(const Gui::SelectionChanges& msg)
 {
 
     if (msg.Type != SelectionChanges::AddSelection && msg.Type != SelectionChanges::RmvSelection
-        && msg.Type != SelectionChanges::SetSelection && msg.Type != SelectionChanges::ClrSelection)
+        && msg.Type != SelectionChanges::SetSelection && msg.Type != SelectionChanges::ClrSelection) {
+
         return;
+        }
 
 
     // Add Element 

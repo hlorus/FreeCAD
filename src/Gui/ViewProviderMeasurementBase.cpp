@@ -94,8 +94,9 @@ std::vector<std::string> ViewProviderMeasurementBase::getDisplayModes() const
 
 void ViewProviderMeasurementBase::setDisplayMode(const char* ModeName)
 {
-    if (strcmp(ModeName, "Base") == 0)
+    if (strcmp(ModeName, "Base") == 0) {
         setDisplayMaskMode("Base");
+    }
     ViewProviderDocumentObject::setDisplayMode(ModeName);
 }
 

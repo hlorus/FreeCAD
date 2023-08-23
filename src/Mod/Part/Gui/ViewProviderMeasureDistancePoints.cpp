@@ -155,8 +155,9 @@ void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
         SbVec3f dif = pt1-pt2;
 
         float length = fabs(dif.length())*DistFactor.getValue();
-        if (Mirror.getValue())
+        if (Mirror.getValue()) {
             length = -length;
+        }
 
 
         if (dif.sqrLength() < 10.0e-6f) {
@@ -165,13 +166,16 @@ void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
         }
         else {
             SbVec3f dir = dif.cross(SbVec3f(1.0f,0.0f,0.0f));
-            if (dir.sqrLength() < 10.0e-6f)
+            if (dir.sqrLength() < 10.0e-6f) {
                 dir = dif.cross(SbVec3f(0.0f,1.0f,0.0f));
-            if (dir.sqrLength() < 10.0e-6f)
+            }
+            if (dir.sqrLength() < 10.0e-6f) {
                 dir = dif.cross(SbVec3f(0.0f,0.0f,1.0f));
+            }
             dir.normalize();
-            if (dir.dot(SbVec3f(0.0f,0.0f,1.0f)) < 0.0f)
+            if (dir.dot(SbVec3f(0.0f,0.0f,1.0f)) < 0.0f) {
                 length = -length;
+            }
             pCoords->point.set1Value(2, pt1 + length*dir);
             pCoords->point.set1Value(3, pt2 + length*dir);
         }
