@@ -42,10 +42,10 @@ namespace App
 {
 
 
-typedef struct MeasureAngleInfo {
+struct MeasureAngleInfo {
     bool valid;
     Base::Vector3d vector;
-} MeasureAngleInfo;
+};
 
 
 class AppExport MeasureAngle : public App::MeasurementBaseExtendable<MeasureAngleInfo>
