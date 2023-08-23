@@ -184,14 +184,14 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obN
     {
       TopoDS_Shape edgeShape;
       if (!getShapeFromStrings(edgeShape, ob->getDocument()->getName(), ob->getNameInDocument(), *subName, &mat)) {
-        return Part::VectorAdapter();
+        return {};
       }
       TopoDS_Edge edge = TopoDS::Edge(edgeShape);
       // make edge orientation so that end of edge closest to pick is head of vector.
       TopoDS_Vertex firstVertex = TopExp::FirstVertex(edge, Standard_True);
       TopoDS_Vertex lastVertex = TopExp::LastVertex(edge, Standard_True);
       if (firstVertex.IsNull() || lastVertex.IsNull()) {
-        return Part::VectorAdapter();
+        return {};
       }
       gp_Vec firstPoint = Part::VectorAdapter::convert(firstVertex);
       gp_Vec lastPoint = Part::VectorAdapter::convert(lastVertex);
@@ -209,20 +209,20 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obN
           edge.Orientation(TopAbs_FORWARD);
         }
       }
-      return Part::VectorAdapter(edge, pickPoint);
+      return {edge, pickPoint};
     }
     if (shapeType == TopAbs_FACE)
     {
       TopoDS_Shape faceShape;
       if (!getShapeFromStrings(faceShape, ob->getDocument()->getName(), ob->getNameInDocument(), *subName, &mat)) {
-        return Part::VectorAdapter();
+        return {};
       }
 
       TopoDS_Face face = TopoDS::Face(faceShape);
       Base::Vector3d v(0.0, 0.0, 0.0); //v(current.x, current.y, current.z);
       v = mat*v;
       gp_Vec pickPoint(v.x, v.y, v.z);
-      return Part::VectorAdapter(face, pickPoint);
+      return {face, pickPoint};
     }
 }
 
