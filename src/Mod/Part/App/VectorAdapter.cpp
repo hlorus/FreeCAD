@@ -59,8 +59,9 @@ VectorAdapter::VectorAdapter(const TopoDS_Face &faceIn, const gp_Vec &pickedPoin
     gp_Dir direction = eSurface->Axis().Direction();
     vector = direction;
     vector.Normalize();
-    if (faceIn.Orientation() == TopAbs_REVERSED)
+    if (faceIn.Orientation() == TopAbs_REVERSED) {
       vector.Reverse();
+    }
     if (surface->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)) ||
       surface->IsKind(STANDARD_TYPE(Geom_SphericalSurface))
     )
@@ -68,8 +69,9 @@ VectorAdapter::VectorAdapter(const TopoDS_Face &faceIn, const gp_Vec &pickedPoin
       origin = eSurface->Axis().Location().XYZ();
       projectOriginOntoVector(pickedPointIn);
     }
-    else
+    else {
       origin = pickedPointIn + vector;
+    }
     status = true;
   }
 }
@@ -80,8 +82,9 @@ VectorAdapter::VectorAdapter(const TopoDS_Edge &edgeIn, const gp_Vec &pickedPoin
   TopoDS_Vertex firstVertex = TopExp::FirstVertex(edgeIn, Standard_True);
   TopoDS_Vertex lastVertex = TopExp::LastVertex(edgeIn, Standard_True);
   vector = convert(lastVertex) - convert(firstVertex);
-  if (vector.Magnitude() < Precision::Confusion())
+  if (vector.Magnitude() < Precision::Confusion()) {
     return;
+  }
   vector.Normalize();
 
   status = true;
@@ -125,8 +128,9 @@ void VectorAdapter::projectOriginOntoVector(const gp_Vec &pickedPointIn)
   Handle(Geom_Curve) heapLine = new Geom_Line(origin.XYZ(), vector.XYZ());
   gp_Pnt tempPoint(pickedPointIn.XYZ());
   GeomAPI_ProjectPointOnCurve projection(tempPoint, heapLine);
-  if (projection.NbPoints() < 1)
+  if (projection.NbPoints() < 1) {
     return;
+  }
   origin.SetXYZ(projection.Point(1).XYZ());
 }
 
