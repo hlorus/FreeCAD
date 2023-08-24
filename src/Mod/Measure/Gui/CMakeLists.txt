@@ -20,13 +20,16 @@ SET(MeasureGui_SRCS
     # DlgMeasurePreferencesImp.cpp
     # DlgMeasurePreferencesImp.h
     AppMeasureGui.cpp
-    # Command.cpp
+    Command.cpp
     PreCompiled.cpp
     PreCompiled.h
     # Workbench.cpp
     # Workbench.h
 )
 
+set(MeasureGui_Scripts
+    ../InitGui.py
+)
 
 if(FREECAD_USE_PCH)
     add_definitions(-D_PreComp_)
@@ -34,7 +37,7 @@ if(FREECAD_USE_PCH)
     ADD_MSVC_PRECOMPILED_HEADER(MeasureGui PreCompiled.h PreCompiled.cpp PCH_SRCS)
 endif(FREECAD_USE_PCH)
 
-add_library(MeasureGui SHARED ${MeasureGui_SRCS}) #  ${MeasureGuiIcon_SVG}
+add_library(MeasureGui SHARED ${MeasureGui_SRCS} ${MeasureGui_Scripts}) #  ${MeasureGuiIcon_SVG}
 target_link_libraries(MeasureGui ${MeasureGui_LIBS})
 
 SET_BIN_DIR(MeasureGui MeasureGui /Mod/Measure)

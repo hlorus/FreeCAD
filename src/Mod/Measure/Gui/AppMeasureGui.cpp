@@ -65,8 +65,15 @@ PyMOD_INIT_FUNC(MeasureGui)
         PyErr_SetString(PyExc_ImportError, "Cannot load Gui module in console application.");
         PyMOD_Return(nullptr);
     }
-
-    Base::Interpreter().runString("import MeasureGui");
+    
+    // load dependent module
+    try {
+        Base::Interpreter().loadModule("Measure");
+    }
+    catch(const Base::Exception& e) {
+        PyErr_SetString(PyExc_ImportError, e.what());
+        PyMOD_Return(nullptr);
+    }
 
     // instantiating the commands
     CreateMeasureCommands();
