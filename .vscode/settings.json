@@ -6,8 +6,7 @@
     "tuple": "cpp"
   },
   "editor.formatOnType": true,
-  "cmake.preferredGenerators": ["Ninja", "NMake Makefiles"],
-  "cmake.cmakePath": "${workspaceFolder}/.conda/freecad/bin/cmake",
+  "cmake.cmakePath": "/usr/bin/cmake",
   "cmake.configureSettings": {
     "BUILD_WITH_CONDA:BOOL": "ON",
     "BUILD_FEM_NETGEN:BOOL": "ON",
