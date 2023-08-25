@@ -32,9 +32,9 @@
 #include "MeasureAngle.h"
 
 
-using namespace App;
+using namespace Measure;
 
-PROPERTY_SOURCE(App::MeasureAngle, App::MeasurementBase)
+PROPERTY_SOURCE(Measure::MeasureAngle, App::MeasurementBase)
 
 
 MeasureAngle::MeasureAngle()
@@ -125,7 +125,7 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
     auto handler = getGeometryHandler(mod);
 
     std::string obName = static_cast<std::string>(ob.getNameInDocument());
-    App::MeasureAngleInfo info = handler(&obName, &subName);
+    Measure::MeasureAngleInfo info = handler(&obName, &subName);
 
     vecOut = info.vector;
     return true;

@@ -27,11 +27,12 @@
 #include "Base/Console.h"
 #include "Measure.h"
 #include <App/MeasureLength.h>
-#include <App/MeasureAngle.h>
+#include <Mod/Measure/App/MeasureAngle.h>
 
-namespace PartDesign {
 
-void Measure::initialize() {
+using namespace Measure;
+
+void PartDesign::Measure::initialize() {
     App::Application& app = App::GetApplication();
     const App::MeasureHandler& handler = app.getMeasureHandler("Part");
     
@@ -40,8 +41,7 @@ void Measure::initialize() {
     App::MeasureLength::addGeometryHandler("PartDesign",
                                            App::MeasureLength::getGeometryHandler("Part"));
 
-    App::MeasureAngle::addGeometryHandler("PartDesign",
-                                           App::MeasureAngle::getGeometryHandler("Part"));
-}
+    MeasureAngle::addGeometryHandler("PartDesign",
+                                           MeasureAngle::getGeometryHandler("Part"));
 }
 
