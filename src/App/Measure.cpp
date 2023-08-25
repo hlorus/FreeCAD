@@ -23,7 +23,6 @@
 
 #include "PreCompiled.h"
 #include "Measure.h"
-#include "MeasureAngle.h"
 #include "MeasureLength.h"
 
 using namespace App;
@@ -35,6 +34,5 @@ void App::Measure::initialize(){
     App::Application& app = App::GetApplication();
 
     app.addMeasureType(new MeasureType{"LENGTH", "Length", "App::MeasureLength", App::MeasureLength::isValidSelection, nullptr});
-    app.addMeasureType(new MeasureType{"ANGLE", "Angle", "App::MeasureAngle", App::MeasureAngle::isValidSelection, App::MeasureAngle::isPrioritizedSelection});
 
 }

@@ -28,17 +28,17 @@
 #include <App/PropertyGeo.h>
 #include <App/PropertyUnits.h>
 #include <tuple>
-#include "Measure.h"
+#include <App/Measure.h>
 #include <functional>
 #include <string.h>
 #include <map>
 
 #include <Base/Vector3D.h>
 
+#include <Mod/Measure/MeasureGlobal.h>
 
 
-
-namespace App
+namespace Measure
 {
 
 
@@ -48,9 +48,9 @@ struct MeasureAngleInfo {
 };
 
 
-class AppExport MeasureAngle : public App::MeasurementBaseExtendable<MeasureAngleInfo>
+class MeasureExport MeasureAngle : public App::MeasurementBaseExtendable<MeasureAngleInfo>
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(App::MeasureAngle);
+    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureAngle);
 
 public:
     /// Constructor
@@ -79,7 +79,7 @@ private:
     void onChanged(const App::Property* prop) override;
 };
 
-} //namespace App
+} //namespace Measure
 
 
 #endif // APP_MEASUREANGLE_H

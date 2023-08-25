@@ -33,8 +33,7 @@
 #include "App/DocumentObject.h"
 
 #include "MeasureDistancePoints.h"
-#include "App/MeasureLength.h"
-#include "App/MeasureAngle.h"
+#include "MeasureAngle.h"
 
 #include <string>
 
@@ -50,12 +49,21 @@ void Measure::initialize() {
     // Add Measure Types
     app.addMeasureType(
         new App::MeasureType {
-        "DISTANCEPOINTS",
-        "Distance Points",
-        "Measure::MeasureDistancePoints",
-        MeasureDistancePoints::isValidSelection,
-        nullptr,
-    });
+            "DISTANCEPOINTS",
+            "Distance Points",
+            "Measure::MeasureDistancePoints",
+            MeasureDistancePoints::isValidSelection,
+            nullptr,
+        });
+
+    app.addMeasureType(
+        new App::MeasureType {
+            "ANGLE",
+            "Angle",
+            "Measure::MeasureAngle",
+            MeasureAngle::isValidSelection,
+            MeasureAngle::isPrioritizedSelection,
+        });
 
 
 }
