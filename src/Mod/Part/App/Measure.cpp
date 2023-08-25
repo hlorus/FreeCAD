@@ -35,7 +35,6 @@
 #include "PartFeature.h"
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
-#include <MeasureDistancePoints.h>
 #include "App/MeasureLength.h"
 #include "App/MeasureAngle.h"
 #include "VectorAdapter.h"
@@ -262,16 +261,6 @@ void Measure::initialize() {
 
     App::Application& app = App::GetApplication();
     app.addMeasureHandler("Part", PartMeasureCb, PartMeasureTypeCb);
-
-    // Add Measure Types
-    app.addMeasureType(
-        new App::MeasureType {
-        "DISTANCEPOINTS",
-        "Distance Points",
-        "Part::MeasureDistancePoints",
-        Part::MeasureDistancePoints::isValidSelection,
-        nullptr,
-    });
 
 
     // Extend MeasureLength

@@ -43,7 +43,7 @@
 #include <App/MeasureDistance.h>
 #include <Base/Console.h>
 #include <Base/Quantity.h>
-#include "Mod/Part/App/MeasureDistancePoints.h"
+#include "Mod/Measure/App/MeasureDistancePoints.h"
 
 #include "ViewProviderMeasureDistancePoints.h"
 #include "Gui/Application.h"
@@ -53,9 +53,9 @@
 
 
 using namespace Gui;
-using namespace PartGui;
+using namespace MeasureGui;
 
-PROPERTY_SOURCE(PartGui::ViewProviderMeasureDistancePoints, Gui::ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistancePoints, Gui::ViewProviderDocumentObject)
 
 
 ViewProviderMeasureDistancePoints::ViewProviderMeasureDistancePoints()
@@ -136,17 +136,17 @@ void ViewProviderMeasureDistancePoints::attach(App::DocumentObject* pcObject)
 void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
 {
 
-    if (prop == &static_cast<Part::MeasureDistancePoints*>(getObject())->Distance) {
+    if (prop == &static_cast<Measure::MeasureDistancePoints*>(getObject())->Distance) {
         updateView();
     }
     else if (prop->getTypeId() == App::PropertyLinkSub::getClassTypeId() ||
         prop == &Mirror || prop == &DistFactor) {
         if (strcmp(prop->getName(),"P1") == 0) {
-            Base::Vector3f v = static_cast<Part::MeasureDistancePoints*>(getObject())->getP1();
+            Base::Vector3f v = static_cast<Measure::MeasureDistancePoints*>(getObject())->getP1();
             pCoords->point.set1Value(0, SbVec3f(v.x,v.y,v.z));
         }
         else if (strcmp(prop->getName(),"P2") == 0) {
-            Base::Vector3f v = static_cast<Part::MeasureDistancePoints*>(getObject())->getP2();
+            Base::Vector3f v = static_cast<Measure::MeasureDistancePoints*>(getObject())->getP2();
             pCoords->point.set1Value(1, SbVec3f(v.x,v.y,v.z));
         }
 

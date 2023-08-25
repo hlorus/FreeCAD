@@ -25,8 +25,10 @@
 #include <Base/Console.h>
 #include <Base/Interpreter.h>
 
+#include "Measure.h"
 #include "Measurement.h"
 #include "MeasurementPy.h"
+#include "MeasureDistancePoints.h"
 
 
 namespace Measure {
@@ -63,8 +65,11 @@ PyMOD_INIT_FUNC(Measure)
     PyObject* mod = Measure::initModule();
     // Add Types to module
     Base::Interpreter().addType(&Measure::MeasurementPy      ::Type,mod,"Measurement");
-    Base::Console().Log("Loading Inspection module... done\n");
     Measure::Measurement         ::init();
+    Measure::MeasureDistancePoints::init();
+    Measure::Measure             ::initialize();
+    
+    Base::Console().Log("Loading Measure module... done\n");
     PyMOD_Return(mod);
 }
 
