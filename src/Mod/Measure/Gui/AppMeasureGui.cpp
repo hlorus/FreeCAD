@@ -28,6 +28,8 @@
 #include <Base/PyObjectBase.h>
 #include <Gui/Application.h>
 
+#include "ViewProviderMeasureDistancePoints.h"
+
 
 
 // use a different name to CreateCommand()
@@ -74,6 +76,8 @@ PyMOD_INIT_FUNC(MeasureGui)
         PyErr_SetString(PyExc_ImportError, e.what());
         PyMOD_Return(nullptr);
     }
+
+    MeasureGui::ViewProviderMeasureDistancePoints      ::init();
 
     // instantiating the commands
     CreateMeasureCommands();

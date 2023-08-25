@@ -98,7 +98,6 @@
 #include "ImportStep.h"
 #include "LinePy.h"
 #include "LineSegmentPy.h"
-#include "MeasureDistancePoints.h"
 #include "OffsetCurvePy.h"
 #include "OffsetSurfacePy.h"
 #include "ParabolaPy.h"
@@ -542,7 +541,6 @@ PyMOD_INIT_FUNC(Part)
     Part::Geom2dOffsetCurve       ::init();
     Part::Geom2dTrimmedCurve      ::init();
 
-    Part::MeasureDistancePoints::init();
 
     IGESControl_Controller::Init();
     STEPControl_Controller::Init();

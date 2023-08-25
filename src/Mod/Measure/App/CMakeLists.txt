@@ -34,6 +34,10 @@ SET(MeasureModule_SRCS
     AppMeasure.cpp
     Measurement.cpp
     Measurement.h
+    MeasureDistancePoints.cpp
+    MeasureDistancePoints.h
+    Measure.cpp
+    Measure.h
     PreCompiled.cpp
     PreCompiled.h
 )

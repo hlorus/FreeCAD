@@ -542,8 +542,6 @@ SET(Part_SRCS
     edgecluster.h
     Measure.cpp
     Measure.h
-    MeasureDistancePoints.cpp
-    MeasureDistancePoints.h
     modelRefine.cpp
     modelRefine.h
     Tools.cpp

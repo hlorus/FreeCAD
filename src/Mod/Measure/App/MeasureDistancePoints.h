@@ -21,49 +21,55 @@
  ***************************************************************************/
 
 
-#ifndef GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
-#define GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
+#ifndef APP_MEASUREDISTANCEPOINTS_H
+#define APP_MEASUREDISTANCEPOINTS_H
 
-#include <Gui/ViewProviderDocumentObject.h>
-#include <Gui/ViewProviderMeasurementBase.h>
-#include <Gui/ViewProviderMeasureDistance.h>
+#include <App/DocumentObject.h>
+#include <App/PropertyGeo.h>
+#include <App/PropertyUnits.h>
+#include <tuple>
+#include <App/Measure.h>
 
-#include <QObject>
+#include <Mod/Measure/MeasureGlobal.h>
 
-
-class SoCoordinate3;
-class SoIndexedLineSet;
-
-namespace PartGui
+namespace Measure
 {
 
 
-class PartGuiExport ViewProviderMeasureDistancePoints : public Gui::ViewProviderMeasurementBase
+class MeasureExport MeasureDistancePoints : public App::MeasurementBase
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(PartGui::ViewProviderMeasureDistancePoints);
+    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureDistancePoints);
 
 public:
     /// Constructor
-    ViewProviderMeasureDistancePoints();
-    ~ViewProviderMeasureDistancePoints() override;
+    MeasureDistancePoints();
+    ~MeasureDistancePoints() override;
 
-    // // Display properties
-    App::PropertyFloat          DistFactor;
-    App::PropertyBool           Mirror;
+    App::PropertyLinkSub P1;
+    App::PropertyLinkSub P2;
 
-    void attach(App::DocumentObject *) override;
-    void updateData(const App::Property*) override;
+    App::PropertyDistance Distance;
+
+    Base::Vector3f getP1();
+    Base::Vector3f getP2();
+
+
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection);
+
+    App::DocumentObjectExecReturn *execute() override;
+
+    const char* getViewProviderName() const override {
+        return "MeasureGui::ViewProviderMeasureDistancePoints";
+    }
+
+    Base::Quantity result() {return Distance.getQuantityValue();}
 
 protected:
     void onChanged(const App::Property* prop) override;
-
-private:
-    SoCoordinate3    * pCoords;
-    SoIndexedLineSet * pLines;
-
 };
 
-} //namespace PartGui
+} //namespace Measure
 
 
-#endif // GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
+#endif // APP_MEASUREDISTANCEPOINTS_H

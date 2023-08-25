@@ -41,8 +41,9 @@
 
 
 using namespace Part;
+using namespace Measure;
 
-PROPERTY_SOURCE(Part::MeasureDistancePoints, App::MeasurementBase)
+PROPERTY_SOURCE(Measure::MeasureDistancePoints, App::MeasurementBase)
 
 
 App::DocumentObjectExecReturn* getShape(const App::PropertyLinkSub& link,

@@ -75,7 +75,6 @@
 #include "ViewProviderSphereParametric.h"
 #include "ViewProviderSpline.h"
 #include "ViewProviderTorusParametric.h"
-#include "ViewProviderMeasureDistancePoints.h"
 #include "Workbench.h"
 
 
@@ -206,7 +205,6 @@ PyMOD_INIT_FUNC(PartGui)
     PartGui::ViewProviderTorusParametric            ::init();
     PartGui::ViewProviderRuledSurface               ::init();
     PartGui::ViewProviderFace                       ::init();
-    PartGui::ViewProviderMeasureDistancePoints      ::init();
     PartGui::DimensionLinear                        ::initClass();
     PartGui::DimensionAngular                       ::initClass();
 
