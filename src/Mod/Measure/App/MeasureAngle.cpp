@@ -131,6 +131,70 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
     return true;
 }
 
+Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subName) {
+const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
+    std::string mod = ob.getClassTypeId().getModuleName(className);
+
+    if (!hasGeometryHandler(mod)) {
+        return Base::Vector3d();
+    }
+
+    auto handler = getGeometryHandler(mod);
+    std::string obName = static_cast<std::string>(ob.getNameInDocument());
+    MeasureAngleInfo info = handler(&obName, &subName);
+
+    return info.position;
+}
+
+Base::Vector3d MeasureAngle::vector1() {
+
+    App::DocumentObject* ob = Element1.getValue();
+    std::vector<std::string> subs = Element1.getSubValues();
+
+    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+        return Base::Vector3d();
+    }
+
+    Base::Vector3d vec;
+    getVec(*ob, subs.at(0), vec);
+    return vec;
+}
+
+Base::Vector3d MeasureAngle::vector2() {
+    App::DocumentObject* ob = Element2.getValue();
+    std::vector<std::string> subs = Element2.getSubValues();
+
+    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+        return Base::Vector3d();
+    }
+
+    Base::Vector3d vec;
+    getVec(*ob, subs.at(0), vec);
+    return vec;
+}
+
+Base::Vector3d MeasureAngle::location1() {
+
+    App::DocumentObject* ob = Element1.getValue();
+    std::vector<std::string> subs = Element1.getSubValues();
+
+    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+        return Base::Vector3d();
+    }
+
+    return getLoc(*ob, subs.at(0));
+}
+Base::Vector3d MeasureAngle::location2() {
+    App::DocumentObject* ob = Element2.getValue();
+    std::vector<std::string> subs = Element2.getSubValues();
+
+    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+        return Base::Vector3d();
+    }
+
+    return getLoc(*ob, subs.at(0));
+}
+
 
 App::DocumentObjectExecReturn *MeasureAngle::execute()
 {

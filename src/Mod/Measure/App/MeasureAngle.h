@@ -60,13 +60,13 @@ public:
 
     App::PropertyLinkSub Element1;
     App::PropertyLinkSub Element2;
-    App::PropertyDistance Angle;
+    App::PropertyAngle Angle;
 
     App::DocumentObjectExecReturn *execute() override;
 
-    // const char* getViewProviderName() const override {
-    //     return "Gui::ViewProviderMeasureDistance";
-    // }
+    const char* getViewProviderName() const override {
+        return "Gui::ViewProviderMeasureAngle";
+    }
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     static bool isPrioritizedSelection(const App::MeasureSelection& selection);
@@ -74,6 +74,15 @@ public:
     Base::Quantity result() {return Angle.getQuantityValue();}
 
     bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
+    Base::Vector3d getLoc(App::DocumentObject& ob, std::string& subName);
+
+    // Orientation Vectors
+    Base::Vector3d vector1();
+    Base::Vector3d vector2();
+
+    // Location Vectors
+    Base::Vector3d location1();
+    Base::Vector3d location2();
 
 private:
 
