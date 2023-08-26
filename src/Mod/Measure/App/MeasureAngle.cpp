@@ -127,7 +127,7 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
     std::string obName = static_cast<std::string>(ob.getNameInDocument());
     Measure::MeasureAngleInfo info = handler(&obName, &subName);
 
-    vecOut = info.vector;
+    vecOut = info.orientation;
     return true;
 }
 

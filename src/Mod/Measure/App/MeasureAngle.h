@@ -44,7 +44,8 @@ namespace Measure
 
 struct MeasureAngleInfo {
     bool valid;
-    Base::Vector3d vector;
+    Base::Vector3d orientation;
+    Base::Vector3d position;
 };
 
 
