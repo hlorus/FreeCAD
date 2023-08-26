@@ -20,3 +20,10 @@
 #*   USA                                                                   *
 #***************************************************************************/
 
+
+# Import the gui module here in order to ensure that the measurement types are loaded during startup.
+# Note that they won't auto-load in gui-less mode. Ideally they would be loaded from "Init.py", similar
+# to how the import/export types are registered. This would require to register measurement types from
+# python which could complicate things further.
+
+import MeasureGui
