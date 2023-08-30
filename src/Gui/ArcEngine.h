@@ -59,6 +59,8 @@ public:
 
     SoEngineOutput points;
     SoEngineOutput pointCount;
+    SoEngineOutput midpoint;
+
 protected:
     void evaluate() override;
 private:

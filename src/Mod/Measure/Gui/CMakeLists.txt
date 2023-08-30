@@ -26,6 +26,8 @@ SET(MeasureGui_SRCS
     PreCompiled.h
     ViewProviderMeasureDistancePoints.cpp
     ViewProviderMeasureDistancePoints.h
+    ViewProviderMeasureAngle.cpp
+    ViewProviderMeasureAngle.h
     # Workbench.cpp
     # Workbench.h
 )

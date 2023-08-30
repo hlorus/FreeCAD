@@ -249,20 +249,24 @@ Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* 
 
     Part::VectorAdapter v = buildAdapter(ob, obName, subName);
 
-
+    gp_Pnt vec;
     Base::Vector3d position;
     if (sType == TopAbs_FACE) {
         TopoDS_Face face = TopoDS::Face(shape);
-        gp_Pnt vec;
+        
+        GProp_GProps gprops;
+        BRepGProp::SurfaceProperties(face, gprops);
+        vec = gprops.CentreOfMass();
+        
+    } else if (sType == TopAbs_EDGE) {
+        TopoDS_Edge edge = TopoDS::Edge(shape);
 
-        auto trf = static_cast<gp_Trsf>(face.Location());
-        vec.Transform(trf);
+        GProp_GProps gprops;
+        BRepGProp::LinearProperties(edge, gprops);
+        vec = gprops.CentreOfMass();
+    }
 
-        position.Set(vec.X(), vec.Y(), vec.Z());
-        }
-
-
-    // TODO: Support Edges 
+    position.Set(vec.X(), vec.Y(), vec.Z());
 
     Measure::MeasureAngleInfo info = {v.isValid(), (Base::Vector3d)v, position};
     return info;

@@ -21,76 +21,65 @@
  ***************************************************************************/
 
 
-#ifndef APP_MEASUREANGLE_H
-#define APP_MEASUREANGLE_H
+#ifndef GUI_VIEWPROVIDERMEASUREANGLE_H
+#define GUI_VIEWPROVIDERMEASUREANGLE_H
 
-#include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
-#include <tuple>
-#include <App/Measure.h>
-#include <functional>
-#include <string.h>
-#include <map>
-
-#include <Base/Vector3D.h>
-#include <gp_Vec.hxx>
-
+#include <Gui/ViewProviderDocumentObject.h>
+#include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
+#include <QObject>
+
+#include <Inventor/fields/SoSFFloat.h>
+#include <Inventor/fields/SoSFMatrix.h>
+#include <Inventor/fields/SoSFVec3f.h>
 
 
-namespace Measure
+class SoText2;
+class SoTranslation;
+class SoCoordinate3;
+class SoIndexedLineSet;
+class SoTransform;
+
+
+
+namespace MeasureGui
 {
 
 
-struct MeasureAngleInfo {
-    bool valid;
-    Base::Vector3d orientation;
-    Base::Vector3d position;
-};
-
-
-class MeasureExport MeasureAngle : public App::MeasurementBaseExtendable<MeasureAngleInfo>
+class GuiExport ViewProviderMeasureAngle : public Gui::ViewProviderMeasurementBase
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureAngle);
+    PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureAngle);
 
 public:
     /// Constructor
-    MeasureAngle();
-    ~MeasureAngle() override;
+    ViewProviderMeasureAngle();
+    ~ViewProviderMeasureAngle() override;
 
-    App::PropertyLinkSub Element1;
-    App::PropertyLinkSub Element2;
-    App::PropertyAngle Angle;
+    // // Display properties
+    App::PropertyFloat          Radius;
 
-    App::DocumentObjectExecReturn *execute() override;
 
-    const char* getViewProviderName() const override {
-        return "MeasureGui::ViewProviderMeasureAngle";
-    }
+    void attach(App::DocumentObject *) override;
+    void updateData(const App::Property*) override;
+    
 
-    static bool isValidSelection(const App::MeasureSelection& selection);
-    static bool isPrioritizedSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-    Base::Quantity result() {return Angle.getQuantityValue();}
-
-    bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
-    Base::Vector3d getLoc(App::DocumentObject& ob, std::string& subName);
-
-    // Orientation Vectors
-    gp_Vec vector1();
-    gp_Vec vector2();
-
-    // Location Vectors
-    gp_Vec location1();
-    gp_Vec location2();
+protected:
+    void onChanged(const App::Property* prop) override;
 
 private:
+    // Fields
+    SoSFFloat fieldAngle; //radians.
+    SoSFMatrix fieldMatrix;
+    SoSFFloat fieldRadius; //radians.
+    SoTransform *transform;
+    SoSFVec3f midpoint;
 
-    void onChanged(const App::Property* prop) override;
+    SbMatrix getMatrix();
 };
 
-} //namespace Measure
+
+} //namespace MeasureGui
 
 
-#endif // APP_MEASUREANGLE_H
+
+#endif // GUI_VIEWPROVIDERMEASUREANGLE_H

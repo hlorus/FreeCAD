@@ -1,0 +1,349 @@
+/***************************************************************************
+ *   Copyright (c) 2023 David Friedli <david[at]friedli-be.ch>             *
+ *                                                                         *
+ *   This file is part of the FreeCAD CAx development system.              *
+ *                                                                         *
+ *   This library is free software; you can redistribute it and/or         *
+ *   modify it under the terms of the GNU Library General Public           *
+ *   License as published by the Free Software Foundation; either          *
+ *   version 2 of the License, or (at your option) any later version.      *
+ *                                                                         *
+ *   This library  is distributed in the hope that it will be useful,      *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU Library General Public License for more details.                  *
+ *                                                                         *
+ *   You should have received a copy of the GNU Library General Public     *
+ *   License along with this library; see the file COPYING.LIB. If not,    *
+ *   write to the Free Software Foundation, Inc., 59 Temple Place,         *
+ *   Suite 330, Boston, MA  02111-1307, USA                                *
+ *                                                                         *
+ ***************************************************************************/
+
+#include "PreCompiled.h"
+
+#ifndef _PreComp_
+# include <sstream>
+# include <QApplication>
+# include <Inventor/nodes/SoAnnotation.h>
+# include <Inventor/nodes/SoBaseColor.h>
+# include <Inventor/nodes/SoCoordinate3.h>
+# include <Inventor/nodes/SoDrawStyle.h>
+# include <Inventor/nodes/SoFontStyle.h>
+# include <Inventor/nodes/SoIndexedLineSet.h>
+# include <Inventor/nodes/SoPickStyle.h>
+# include <Inventor/nodes/SoText2.h>
+# include <Inventor/nodes/SoTranslation.h>
+
+
+# include <Inventor/engines/SoCalculator.h>
+# include <Inventor/engines/SoComposeVec3f.h>
+# include <Inventor/engines/SoConcatenate.h>
+# include <Inventor/engines/SoComposeRotation.h>
+# include <Inventor/engines/SoComposeRotationFromTo.h>
+
+# include <Inventor/nodekits/SoShapeKit.h>
+# include <Inventor/nodes/SoFont.h>
+# include <Inventor/nodes/SoLineSet.h>
+# include <Inventor/nodes/SoMatrixTransform.h>
+# include <Inventor/nodes/SoSeparator.h>
+# include <Inventor/nodes/SoTransform.h>
+# include <Inventor/nodes/SoVertexProperty.h>
+
+# include <Inventor/nodekits/SoBaseKit.h>
+
+#endif
+
+
+#include <Gui/ArcEngine.h>
+
+#include <App/Document.h>
+#include <Base/Console.h>
+#include <Base/Quantity.h>
+#include "Gui/Application.h"
+#include <Gui/Command.h>
+#include <Gui/Document.h>
+#include <Gui/ViewParams.h>
+#include <Mod/Measure/App/MeasureAngle.h>
+
+#include <Precision.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom_Line.hxx>
+#include <gp_Vec.hxx>
+#include <gp_Lin.hxx>
+#include <gp_Pnt.hxx>
+# include <GeomAPI_ExtremaCurveCurve.hxx>
+# include <GeomAPI_ProjectPointOnCurve.hxx>
+
+#include "ViewProviderMeasureAngle.h"
+
+
+using namespace MeasureGui;
+
+gp_Lin* getLine(gp_Vec& vec, gp_Vec& origin) {
+    gp_Pnt tempOrigin;
+    tempOrigin.SetXYZ(origin.XYZ());
+    return new gp_Lin(tempOrigin, gp_Dir(vec));
+}
+
+SbMatrix ViewProviderMeasureAngle::getMatrix() {
+
+
+    if (pcObject == nullptr) {
+        Base::Console().Message(" no DocumentObject\n");
+        return SbMatrix();
+    }
+
+    Measure::MeasureAngle* measurement = static_cast<Measure::MeasureAngle*>(pcObject);
+
+    if (!measurement->Element1.getValue() || measurement->Element1.getSubValues().empty()){
+        return SbMatrix();
+    }
+    if (!measurement->Element2.getValue() || measurement->Element2.getSubValues().empty()){
+        return SbMatrix();
+    }
+
+
+    gp_Vec vector1 = measurement->vector1();
+    gp_Vec vector2 = measurement->vector2();
+
+    gp_Vec loc1 = measurement->location1();
+    gp_Vec loc2 = measurement->location2();
+
+    gp_Lin lin1 = *getLine(vector1, loc1);
+    gp_Lin lin2 = *getLine(vector2, loc2);
+
+    double angle = measurement->Angle.getValue();
+
+
+    SbMatrix dimSys = SbMatrix();
+    double radius;
+    double displayAngle;//have to fake the angle in the 3d.
+
+
+    if (vector1.IsParallel(vector2, Precision::Angular())) {
+        //take first point project it onto second vector.
+        Handle(Geom_Curve) heapLine2 = new Geom_Line(lin2);
+        gp_Pnt tempPoint(loc1.XYZ());
+
+        GeomAPI_ProjectPointOnCurve projection(tempPoint, heapLine2);
+        if (projection.NbPoints() < 1)
+        {
+            Base::Console().Message("parallel vectors: couldn't project onto line\n");
+            return dimSys;
+        }
+        gp_Vec newPoint2;
+        newPoint2.SetXYZ(projection.Point(1).XYZ());
+
+        //if points are colinear, projection doesn't work and returns the same point.
+        //In this case we just use the original point.
+        if ((newPoint2 - loc1).Magnitude() < Precision::Confusion())
+            newPoint2 = loc2;
+
+        //now get midpoint between for dim origin.
+        gp_Vec point1 = loc1;
+        gp_Vec midPointProjection = newPoint2 - point1;
+        double distance = midPointProjection.Magnitude();
+        midPointProjection.Normalize();
+        midPointProjection *= distance / 2.0;
+
+        gp_Vec origin = point1 + midPointProjection;
+
+        //yaxis should be the same as vector1, but doing this to eliminate any potential slop from
+        //using precision::angular. If lines are colinear and we have no plane, we can't establish zAxis from crossing.
+        //we just the absolute axis.
+        gp_Vec xAxis = (point1 - origin).Normalized();
+        gp_Vec zAxis;
+        if (xAxis.IsParallel(vector1, Precision::Angular())) {
+            if (!xAxis.IsParallel(gp_Vec(0.0, 0.0, 1.0), Precision::Angular()))
+            zAxis = gp_Vec(0.0, 0.0, 1.0);
+            else
+            zAxis = gp_Vec(0.0, 1.0, 0.0);
+        }
+        else
+            zAxis = xAxis.Crossed(vector1).Normalized();
+        gp_Vec yAxis = zAxis.Crossed(xAxis).Normalized();
+        zAxis = xAxis.Crossed(yAxis).Normalized();
+
+        dimSys = SbMatrix
+        (
+            xAxis.X(), yAxis.X(), zAxis.X(), origin.X(),
+            xAxis.Y(), yAxis.Y(), zAxis.Y(), origin.Y(),
+            xAxis.Z(), yAxis.Z(), zAxis.Z(), origin.Z(),
+            0.0, 0.0, 0.0, 1.0
+        );
+        dimSys = dimSys.transpose();
+
+        radius = midPointProjection.Magnitude();
+        displayAngle = M_PI;
+        }
+        else
+        {
+        Handle(Geom_Curve) heapLine1 = new Geom_Line(lin1);
+        Handle(Geom_Curve) heapLine2 = new Geom_Line(lin2);
+
+        GeomAPI_ExtremaCurveCurve extrema(heapLine1, heapLine2);
+
+        if (extrema.NbExtrema() < 1)
+        {
+            Base::Console().Message("couldn't get extrema\n");
+            return dimSys;
+        }
+
+        gp_Pnt extremaPoint1, extremaPoint2, dimensionOriginPoint;
+        extrema.Points(1, extremaPoint1, extremaPoint2);
+        if (extremaPoint1.Distance(extremaPoint2) < Precision::Confusion())
+            dimensionOriginPoint = extremaPoint1;
+        else
+        {
+            //find halfway point in between extrema points for dimension origin.
+            gp_Vec vec1(extremaPoint1.XYZ());
+            gp_Vec vec2(extremaPoint2.XYZ());
+            gp_Vec connection(vec2-vec1);
+            Standard_Real distance = connection.Magnitude();
+            connection.Normalize();
+            connection *= (distance / 2.0);
+            dimensionOriginPoint.SetXYZ((vec1 + connection).XYZ());
+        }
+
+        gp_Vec thirdPoint(loc2);
+        gp_Vec originVector(dimensionOriginPoint.XYZ());
+        gp_Vec extrema2Vector(extremaPoint2.XYZ());
+        radius = (loc1 - originVector).Magnitude();
+        double legOne = (extrema2Vector - originVector).Magnitude();
+        displayAngle = angle;
+        if (legOne > Precision::Confusion())
+        {
+            double legTwo = sqrt(pow(radius, 2) - pow(legOne, 2));
+            gp_Vec projectionVector(vector2);
+            projectionVector.Normalize();
+            projectionVector *= legTwo;
+            thirdPoint = extrema2Vector + projectionVector;
+            gp_Vec hyp(thirdPoint - originVector);
+            hyp.Normalize();
+            gp_Vec otherSide(loc1 - originVector);
+            otherSide.Normalize();
+            displayAngle = hyp.Angle(otherSide);
+        }
+
+        gp_Vec xAxis = (loc1 - originVector).Normalized();
+        gp_Vec fakeYAxis = (thirdPoint - originVector).Normalized();
+        gp_Vec zAxis = (xAxis.Crossed(fakeYAxis)).Normalized();
+        gp_Vec yAxis = zAxis.Crossed(xAxis).Normalized();
+
+        dimSys = SbMatrix
+        (
+            xAxis.X(), yAxis.X(), zAxis.X(), dimensionOriginPoint.X(),
+            xAxis.Y(), yAxis.Y(), zAxis.Y(), dimensionOriginPoint.Y(),
+            xAxis.Z(), yAxis.Z(), zAxis.Z(), dimensionOriginPoint.Z(),
+            0.0, 0.0, 0.0, 1.0
+        );
+
+        dimSys = dimSys.transpose();
+    }
+
+    transform->setMatrix(dimSys);
+    return dimSys;
+}
+
+
+
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, Gui::ViewProviderDocumentObject)
+
+
+ViewProviderMeasureAngle::ViewProviderMeasureAngle()
+{
+    ADD_PROPERTY(Radius, (10.0f));
+
+    this->transform = new SoTransform;
+    transform->ref();
+
+    sPixmap = "view-measurement";
+}
+
+ViewProviderMeasureAngle::~ViewProviderMeasureAngle()
+{
+    transform->unref();
+}
+
+void ViewProviderMeasureAngle::onChanged(const App::Property* prop)
+{
+    if (prop == &Radius) {
+        fieldRadius = Radius.getValue();
+    }
+    else {
+        ViewProviderDocumentObject::onChanged(prop);
+    }
+}
+
+
+void ViewProviderMeasureAngle::attach(App::DocumentObject* pcObject)
+{
+    ViewProviderMeasurementBase::attach(pcObject);
+
+    // Arc Engine
+    Gui::ArcEngine *arcEngine = new Gui::ArcEngine();
+    arcEngine->angle.connectFrom(&fieldAngle);
+
+    fieldRadius = Radius.getValue();
+    arcEngine->radius.connectFrom(&fieldRadius);
+    arcEngine->deviation.setValue(0.1f);
+
+    SoCoordinate3 *coordinates = new SoCoordinate3();
+    coordinates->point.connectFrom(&arcEngine->points);
+
+    // Main Line Separator
+    auto lineSep = new SoSeparator();
+    lineSep->addChild(getSoPickStyle());
+    lineSep->addChild(getSoLineStylePrimary());
+    lineSep->addChild(pColor);
+
+    SoLineSet *lineSet = new SoLineSet();
+    lineSet->ref();
+
+    lineSet->vertexProperty.setValue(coordinates);
+    lineSet->numVertices.connectFrom(&arcEngine->pointCount);
+    lineSet->startIndex.setValue(0);
+
+    lineSep->addChild(lineSet);
+
+    // Connect midpoint for label placement
+    midpoint.connectFrom(arcEngine->getOutput("midpoint"));
+
+    // Text Separator
+    auto textsep = getSoSeparatorText();
+
+    // Root Separator
+    auto sep = new SoAnnotation();
+    sep->addChild(this->transform);
+    sep->addChild(lineSep);
+    sep->addChild(textsep);
+
+    addDisplayMaskMode(sep, "Base");
+
+}
+
+void ViewProviderMeasureAngle::updateData(const App::Property* prop)
+{
+    if (pcObject == nullptr) {
+        return;
+    }
+
+    auto measurement = static_cast<Measure::MeasureAngle*>(pcObject);
+
+    if (strcmp(prop->getName(), "Element1") == 0 || strcmp(prop->getName(), "Element2") == 0 || strcmp(prop->getName(), "Angle") == 0) {
+        double angle = measurement->Angle.getValue();
+        this->fieldAngle = M_PI * angle / 180.0f;
+
+        getMatrix();
+
+        setLabelTranslation(midpoint.getValue());
+        setLabelValue(static_cast<App::MeasurementBase*>(pcObject)->result());
+
+    } else {
+        ViewProviderDocumentObject::updateData(prop);
+    }
+
+}
+
+

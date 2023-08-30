@@ -146,53 +146,54 @@ const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
     return info.position;
 }
 
-Base::Vector3d MeasureAngle::vector1() {
+gp_Vec MeasureAngle::vector1() {
 
     App::DocumentObject* ob = Element1.getValue();
     std::vector<std::string> subs = Element1.getSubValues();
 
     if (!ob || !ob->isValid() || subs.size() < 1 ) {
-        return Base::Vector3d();
+        return gp_Vec();
     }
 
     Base::Vector3d vec;
     getVec(*ob, subs.at(0), vec);
-    return vec;
+    return gp_Vec(vec.x, vec.y, vec.z);
 }
 
-Base::Vector3d MeasureAngle::vector2() {
+gp_Vec MeasureAngle::vector2() {
     App::DocumentObject* ob = Element2.getValue();
     std::vector<std::string> subs = Element2.getSubValues();
 
     if (!ob || !ob->isValid() || subs.size() < 1 ) {
-        return Base::Vector3d();
+        return gp_Vec();
     }
 
     Base::Vector3d vec;
     getVec(*ob, subs.at(0), vec);
-    return vec;
+    return gp_Vec(vec.x, vec.y, vec.z);
 }
 
-Base::Vector3d MeasureAngle::location1() {
+gp_Vec MeasureAngle::location1() {
 
     App::DocumentObject* ob = Element1.getValue();
     std::vector<std::string> subs = Element1.getSubValues();
 
     if (!ob || !ob->isValid() || subs.size() < 1 ) {
-        return Base::Vector3d();
+        return {};
     }
-
-    return getLoc(*ob, subs.at(0));
+    auto temp = getLoc(*ob, subs.at(0));
+    return {temp.x, temp.y, temp.z};
 }
-Base::Vector3d MeasureAngle::location2() {
+gp_Vec MeasureAngle::location2() {
     App::DocumentObject* ob = Element2.getValue();
     std::vector<std::string> subs = Element2.getSubValues();
 
     if (!ob || !ob->isValid() || subs.size() < 1 ) {
-        return Base::Vector3d();
+        return {};
     }
 
-    return getLoc(*ob, subs.at(0));
+    auto temp = getLoc(*ob, subs.at(0));
+    return {temp.x, temp.y, temp.z};
 }
 
 
