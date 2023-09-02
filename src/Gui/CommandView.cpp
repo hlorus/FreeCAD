@@ -3423,6 +3423,7 @@ bool StdCmdMeasureDistance::isActive()
 
 //===========================================================================
 // Std_Measure
+// this is the Unified Measurement Facility Measure command
 //===========================================================================
 
 
@@ -3433,10 +3434,10 @@ StdCmdMeasure::StdCmdMeasure()
 {
     sGroup        = "Measure";
     sMenuText     = QT_TR_NOOP("&Measure");
-    sToolTipText  = QT_TR_NOOP("Measure a feature");
+    sToolTipText  = QT_TR_NOOP("Measure a feature (UMF)");
     sWhatsThis    = "Std_Measure";
     sStatusTip    = QT_TR_NOOP("Measure a feature");
-    sPixmap       = "view-measurement";
+    sPixmap       = "umf-measurement";
 }
 
 void StdCmdMeasure::activated(int iMsg)

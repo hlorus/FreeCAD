@@ -63,30 +63,42 @@ ViewProviderMeasureDistancePoints::ViewProviderMeasureDistancePoints()
     ADD_PROPERTY(DistFactor,(1.0));
     ADD_PROPERTY(Mirror,(false));
 
-    static const SbVec3f verts[4] =
+    const size_t vertexCount(4);
+    const size_t lineCount(9);
+
+    static const SbVec3f verts[vertexCount] =
     {
         SbVec3f(0,0,0), SbVec3f(0,0,0),
         SbVec3f(0,0,0), SbVec3f(0,0,0)
     };
+//    static const std::array<SbVec3f, vertexCount> verts {
+//        SbVec3f(0,0,0), SbVec3f(0,0,0),
+//        SbVec3f(0,0,0), SbVec3f(0,0,0)
+//    };
 
     // indexes used to create the edges
-    static const int32_t lines[9] =
+    static const int32_t lines[lineCount] =
     {
         0,2,-1,
         1,3,-1,
         2,3,-1
     };
+//    static const std::array<int32_t, lineCount> lines {
+//        0,2,-1,
+//        1,3,-1,
+//        2,3,-1
+//    };
 
     pCoords = new SoCoordinate3();
     pCoords->ref();
-    pCoords->point.setNum(4);
-    pCoords->point.setValues(0, 4, verts);
+    pCoords->point.setNum(vertexCount);
+    pCoords->point.setValues(0, vertexCount, verts);
 
     pLines  = new SoIndexedLineSet();
     pLines->ref();
-    pLines->coordIndex.setNum(9);
-    pLines->coordIndex.setValues(0, 9, lines);
-    sPixmap = "view-measurement";
+    pLines->coordIndex.setNum(lineCount);
+    pLines->coordIndex.setValues(0, lineCount, lines);
+    sPixmap = "umf-measurement";
 }
 
 ViewProviderMeasureDistancePoints::~ViewProviderMeasureDistancePoints()
@@ -101,7 +113,7 @@ void ViewProviderMeasureDistancePoints::onChanged(const App::Property* prop)
         updateData(prop);
     }
     else {
-        ViewProviderDocumentObject::onChanged(prop);
+        Gui::ViewProviderMeasurementBase::onChanged(prop);
     }
 }
 
@@ -142,45 +154,45 @@ void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
     else if (prop->getTypeId() == App::PropertyLinkSub::getClassTypeId() ||
         prop == &Mirror || prop == &DistFactor) {
         if (strcmp(prop->getName(),"P1") == 0) {
-            Base::Vector3f v = static_cast<Measure::MeasureDistancePoints*>(getObject())->getP1();
-            pCoords->point.set1Value(0, SbVec3f(v.x,v.y,v.z));
+            Base::Vector3f vec = static_cast<Measure::MeasureDistancePoints*>(getObject())->getP1();
+            pCoords->point.set1Value(0, SbVec3f(vec.x, vec.y, vec.z));
         }
         else if (strcmp(prop->getName(),"P2") == 0) {
-            Base::Vector3f v = static_cast<Measure::MeasureDistancePoints*>(getObject())->getP2();
-            pCoords->point.set1Value(1, SbVec3f(v.x,v.y,v.z));
+            Base::Vector3f vec = static_cast<Measure::MeasureDistancePoints*>(getObject())->getP2();
+            pCoords->point.set1Value(1, SbVec3f(vec.x, vec.y, vec.z));
         }
 
         SbVec3f pt1 = pCoords->point[0];
         SbVec3f pt2 = pCoords->point[1];
         SbVec3f dif = pt1-pt2;
 
-        float length = fabs(dif.length())*DistFactor.getValue();
+        double length = fabs(dif.length())*DistFactor.getValue();
         if (Mirror.getValue()) {
             length = -length;
         }
 
-
-        if (dif.sqrLength() < 10.0e-6f) {
-            pCoords->point.set1Value(2, pt1+SbVec3f(0.0f,0.0f,length));
-            pCoords->point.set1Value(3, pt2+SbVec3f(0.0f,0.0f,length));
+        const double tolerance(10.0e-6);
+        if (dif.sqrLength() < tolerance) {
+            pCoords->point.set1Value(2, pt1+SbVec3f(0.0, 0.0, length));
+            pCoords->point.set1Value(3, pt2+SbVec3f(0.0, 0.0, length));
         }
         else {
-            SbVec3f dir = dif.cross(SbVec3f(1.0f,0.0f,0.0f));
-            if (dir.sqrLength() < 10.0e-6f) {
-                dir = dif.cross(SbVec3f(0.0f,1.0f,0.0f));
+            SbVec3f dir = dif.cross(SbVec3f(1.0, 0.0, 0.0));
+            if (dir.sqrLength() < tolerance) {
+                dir = dif.cross(SbVec3f(0.0, 1.0, 0.0));
             }
-            if (dir.sqrLength() < 10.0e-6f) {
-                dir = dif.cross(SbVec3f(0.0f,0.0f,1.0f));
+            if (dir.sqrLength() < tolerance) {
+                dir = dif.cross(SbVec3f(0.0, 0.0, 1.0));
             }
             dir.normalize();
-            if (dir.dot(SbVec3f(0.0f,0.0f,1.0f)) < 0.0f) {
+            if (dir.dot(SbVec3f(0.0, 0.0, 1.0)) < 0.0) {
                 length = -length;
             }
             pCoords->point.set1Value(2, pt1 + length*dir);
             pCoords->point.set1Value(3, pt2 + length*dir);
         }
 
-        SbVec3f pos = (pCoords->point[2]+pCoords->point[3])/2.0f;
+        SbVec3f pos = (pCoords->point[2]+pCoords->point[3]) / 2.0;
         setLabelTranslation(pos);
         setLabelValue(Base::Quantity(dif.length(), Base::Unit::Length));
 

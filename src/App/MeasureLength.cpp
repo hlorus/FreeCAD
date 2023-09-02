@@ -53,7 +53,7 @@ MeasureLength::~MeasureLength() = default;
 
 bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.size() < 1) {
+    if (selection.empty()) {
         return false;
     }
 
@@ -78,8 +78,8 @@ bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
             return false;
         }
 
-        if (!(type == App::MeasureElementType::LINE || type == App::MeasureElementType::CIRCLE
-              || type == App::MeasureElementType::ARC || type == App::MeasureElementType::CURVE)) {
+        if ((type != App::MeasureElementType::LINE && type != App::MeasureElementType::CIRCLE
+              && type != App::MeasureElementType::ARC && type != App::MeasureElementType::CURVE)) {
             return false;
         }
     }
@@ -106,10 +106,16 @@ void MeasureLength::parseSelection(const App::MeasureSelection& selection) {
 
 App::DocumentObjectExecReturn *MeasureLength::execute()
 {
+    recalculateDistance();
+    return DocumentObject::StdReturn;
+}
+
+void MeasureLength::recalculateDistance()
+{
     const std::vector<App::DocumentObject*>& objects = Elements.getValues();
     const std::vector<std::string>& subElements = Elements.getSubValues();
 
-    float result;
+    float result(0.0);
 
     // Loop through Elements and call the valid geometry handler
     for (std::vector<App::DocumentObject*>::size_type i=0; i<objects.size(); i++) {
@@ -121,7 +127,7 @@ App::DocumentObjectExecReturn *MeasureLength::execute()
         const std::string& mod = object->getClassTypeId().getModuleName(className);
         auto handler = getGeometryHandler(mod);
         if (!handler) {
-            return new App::DocumentObjectExecReturn("No geometry handler available for submitted element type");
+            throw Base::RuntimeError("No geometry handler available for submitted element type");
         }
 
         std::string obName = object->getNameInDocument();
@@ -129,16 +135,13 @@ App::DocumentObjectExecReturn *MeasureLength::execute()
     }
 
     Distance.setValue(result);
-
-    return DocumentObject::StdReturn;
 }
 
 void MeasureLength::onChanged(const App::Property* prop)
 {
     if (prop == &Elements) {
         if (!isRestoring()) {
-            App::DocumentObjectExecReturn *ret = recompute();
-            delete ret;
+            recalculateDistance();
         }
     }
     DocumentObject::onChanged(prop);

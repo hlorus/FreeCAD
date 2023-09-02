@@ -70,7 +70,7 @@ static float getFaceArea(TopoDS_Shape face){
 static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* subName) {
 
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName);
-    auto sub = ob->getSubObject(subName);
+//    auto sub = ob->getSubObject(subName);
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
     TopAbs_ShapeEnum sType = shape.ShapeType();
@@ -109,7 +109,7 @@ static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* sub
 
 App::MeasureElementType PartMeasureTypeCb(const char* obName, const char* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName);
-    auto sub = ob->getSubObject(subName);
+//    auto sub = ob->getSubObject(subName);
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
     TopAbs_ShapeEnum shapeType = shape.ShapeType();
@@ -174,6 +174,7 @@ bool getShapeFromStrings(TopoDS_Shape &shapeOut, const std::string &doc, const s
 
 Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obName, const std::string* subName)
 {
+    (void) obName;
     Base::Matrix4D mat;
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
     TopAbs_ShapeEnum shapeType = shape.ShapeType();
@@ -223,6 +224,8 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obN
       gp_Vec pickPoint(v.x, v.y, v.z);
       return {face, pickPoint};
     }
+
+    return {};
 }
 
 
@@ -245,7 +248,7 @@ float MeasureLengthHandler(std::string* obName, std::string* subName){
 Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
-    TopAbs_ShapeEnum sType = shape.ShapeType();
+//    TopAbs_ShapeEnum sType = shape.ShapeType();
 
     Part::VectorAdapter v = buildAdapter(ob, obName, subName);
 
