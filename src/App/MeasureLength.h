@@ -50,6 +50,7 @@ public:
     App::PropertyDistance Distance;
 
     App::DocumentObjectExecReturn *execute() override;
+    void recalculateDistance();
 
     // const char* getViewProviderName() const override {
     //     return "Gui::ViewProviderMeasureDistance";

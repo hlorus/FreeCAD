@@ -116,7 +116,6 @@ void ArcEngine::evaluate()
 
   SO_ENGINE_OUTPUT(midpoint, SoSFVec3f, setValue(midPnt));
 
-
 }
 
 void ArcEngine::defaultValues()
@@ -128,7 +127,6 @@ void ArcEngine::defaultValues()
   SbVec3f point2(7.07f, 7.07f, 0.0);
   SO_ENGINE_OUTPUT(points, SoMFVec3f, set1Value(1, point2));
   SO_ENGINE_OUTPUT(pointCount, SoSFInt32, setValue(2));
-  
   SbVec3f point3(7.07f, 7.07f, 0.0);
   SO_ENGINE_OUTPUT(midpoint, SoSFVec3f, setValue(point3));
 }

@@ -104,12 +104,12 @@ void ViewProviderMeasurementBase::setDisplayMode(const char* ModeName)
 void ViewProviderMeasurementBase::onChanged(const App::Property* prop)
 {
     if (prop == &TextColor) {
-        const App::Color& c = TextColor.getValue();
-        pTextColor->rgb.setValue(c.r,c.g,c.b);
+        const App::Color& color = TextColor.getValue();
+        pTextColor->rgb.setValue(color.r, color.g, color.b);
     }
     else if (prop == &LineColor) {
-        const App::Color& c = LineColor.getValue();
-        pColor->rgb.setValue(c.r,c.g,c.b);
+        const App::Color& color = LineColor.getValue();
+        pColor->rgb.setValue(color.r, color.g, color.b);
     }
     else if (prop == &FontSize) {
         pFont->size = FontSize.getValue();
@@ -149,6 +149,7 @@ SoSeparator* ViewProviderMeasurementBase::getSoSeparatorText() {
 
 
 void ViewProviderMeasurementBase::onGuiUpdate(const App::MeasurementBase* measureObject) {
+    (void) measureObject;
     updateView();
 }
 

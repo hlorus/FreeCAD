@@ -132,7 +132,7 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
 }
 
 Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subName) {
-const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
+    const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
     std::string mod = ob.getClassTypeId().getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {
@@ -195,7 +195,6 @@ gp_Vec MeasureAngle::location2() {
     auto temp = getLoc(*ob, subs.at(0));
     return {temp.x, temp.y, temp.z};
 }
-
 
 App::DocumentObjectExecReturn *MeasureAngle::execute()
 {

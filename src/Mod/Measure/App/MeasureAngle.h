@@ -84,7 +84,7 @@ public:
     // Location Vectors
     gp_Vec location1();
     gp_Vec location2();
-
+    
 private:
 
     void onChanged(const App::Property* prop) override;
