@@ -40,13 +40,8 @@ namespace Gui {
 class TaskMeasure : public TaskView::TaskDialog, public Gui::SelectionObserver {
 
 public:
-
-
-    QColumnView* dialog;
-    App::MeasureElementInfo elementInfo;
-
     TaskMeasure();
-    ~TaskMeasure();
+    ~TaskMeasure() override;
 
     void modifyStandardButtons(QDialogButtonBox* box) override;
     QDialogButtonBox::StandardButtons getStandardButtons() const override {
@@ -66,15 +61,23 @@ public:
     bool eventFilter(QObject* obj, QEvent* event) override;
 
 protected:
+
+
+private:
+    QColumnView* dialog{nullptr};
+    App::MeasureElementInfo elementInfo;
+
+    void onSelectionChanged(const Gui::SelectionChanges& msg) override;
+
     App::MeasurementBase *_mMeasureObject = nullptr;
 
-    QLineEdit* valueResult;
-    QLabel* labelResult;
-    QLabel *labelType;
-    QLabel *labelPosition;
-    QLabel *labelLength;
-    QLabel *labelArea;
-    QComboBox* modeSwitch;
+    QLineEdit* valueResult{nullptr};
+    QLabel* labelResult{nullptr};
+    QLabel *labelType{nullptr};
+    QLabel *labelPosition{nullptr};
+    QLabel *labelLength{nullptr};
+    QLabel *labelArea{nullptr};
+    QComboBox* modeSwitch{nullptr};
 
     void removeObject();
     void updateInfo();
@@ -83,7 +86,7 @@ protected:
     App::MeasureType* getMeasureType();
 
     // Store the active measure module
-    std::string measureModule;
+    std::string measureModuleName{std::string()};
 
     // Store a list of picked elements and subelements
     App::MeasureSelection selection;
@@ -93,9 +96,6 @@ protected:
 
     // Stores if the mode is explicitly set by the user or implicitly through the selection
     bool explicitMode = false;
-
-private:
-    void onSelectionChanged(const Gui::SelectionChanges& msg) override;
 
 };
 
