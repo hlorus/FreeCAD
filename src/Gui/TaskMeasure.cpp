@@ -118,6 +118,15 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
     btn->setToolTip(tr("Press the Close button to exit."));
 }
 
+void TaskMeasure::setMeasureObject(App::MeasurementBase* obj) {
+    _mMeasureObject = obj;
+
+    if (!obj) {
+        auto btn = this->buttonBox->button(QDialogButtonBox::Ok);
+        btn->setEnabled(false);
+    }
+}
+
 void TaskMeasure::updateInfo() {
     labelType->hide();
     labelPosition->hide();
@@ -213,7 +222,9 @@ void TaskMeasure::update(){
 
         // Create measure object
         App::Document *doc = App::GetApplication().getActiveDocument();
-        _mMeasureObject = (App::MeasurementBase*)doc->addObject(measureType->measureObject.c_str());
+        setMeasureObject(
+            (App::MeasurementBase*)doc->addObject(measureType->measureObject.c_str())
+        );
     }
 
     // Fill measure object's properties from selection
@@ -301,7 +312,7 @@ void TaskMeasure::removeObject() {
         return;
     }
     _mMeasureObject->getDocument()->removeObject (_mMeasureObject->getNameInDocument());
-    _mMeasureObject = nullptr;
+    setMeasureObject(nullptr);
 }
 
 bool TaskMeasure::hasSelection(){

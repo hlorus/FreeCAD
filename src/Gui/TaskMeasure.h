@@ -59,6 +59,7 @@ public:
     void clearSelection();
     void gatherSelection();
     bool eventFilter(QObject* obj, QEvent* event) override;
+    void setMeasureObject(App::MeasurementBase* obj);
 
 protected:
 
