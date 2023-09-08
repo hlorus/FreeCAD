@@ -28,6 +28,7 @@
 #include "Measure.h"
 #include <App/MeasureLength.h>
 #include <Mod/Measure/App/MeasureAngle.h>
+#include <Mod/Measure/App/MeasureDistance.h>
 
 
 using namespace Measure;
@@ -35,7 +36,9 @@ using namespace Measure;
 void PartDesign::Measure::initialize() {
     App::Application& app = App::GetApplication();
     const App::MeasureHandler& handler = app.getMeasureHandler("Part");
-    
+
+    // Note: This is not ideal, avoid having to pass along all Part geomerty handlers, PartDesign geometry should be the same
+
     app.addMeasureHandler("PartDesign", handler.infoCb, handler.typeCb);
 
     App::MeasureLength::addGeometryHandler("PartDesign",
@@ -43,5 +46,7 @@ void PartDesign::Measure::initialize() {
 
     MeasureAngle::addGeometryHandler("PartDesign",
                                            MeasureAngle::getGeometryHandler("Part"));
+
+    MeasureDistance::addGeometryHandler("PartDesign", MeasureDistance::getGeometryHandler("Part"));
 }
 

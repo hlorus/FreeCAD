@@ -38,6 +38,8 @@ SET(MeasureModule_SRCS
     MeasureDistancePoints.h
     MeasureAngle.cpp
     MeasureAngle.h
+    MeasureDistance.cpp
+    MeasureDistance.h
     Measure.cpp
     Measure.h
     PreCompiled.cpp
