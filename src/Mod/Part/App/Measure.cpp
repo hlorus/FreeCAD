@@ -54,13 +54,13 @@
 // From: https://github.com/Celemation/FreeCAD/blob/joel_selection_summary_demo/src/Gui/SelectionSummary.cpp
 
 // Should work with edges and wires
-static float getLength(TopoDS_Shape wire){
+static float getLength(TopoDS_Shape& wire){
     GProp_GProps gprops;
     BRepGProp::LinearProperties(wire, gprops);
     return gprops.Mass();
 }
 
-static float getFaceArea(TopoDS_Shape face){
+static float getFaceArea(TopoDS_Shape& face){
     GProp_GProps gprops;
     BRepGProp::SurfaceProperties(face, gprops);
     return gprops.Mass();
@@ -164,10 +164,7 @@ bool getShapeFromStrings(TopoDS_Shape &shapeOut, const std::string &doc, const s
     return false;
   }
   shapeOut = Part::Feature::getShape(objectPointer,sub.c_str(),true,mat);
-  if (shapeOut.IsNull()) {
-    return false;
-  }
-  return true;
+  return !shapeOut.IsNull();
 }
 
 
@@ -248,9 +245,15 @@ float MeasureLengthHandler(std::string* obName, std::string* subName){
 Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
-   TopAbs_ShapeEnum sType = shape.ShapeType();
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("MeasureAngleHandler did not retrieve shape for %s, %s\n", obName->c_str(), subName->c_str());
+        return Measure::MeasureAngleInfo();
+    }
 
-    Part::VectorAdapter v = buildAdapter(ob, obName, subName);
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    Part::VectorAdapter vAdapt = buildAdapter(ob, obName, subName);
 
     gp_Pnt vec;
     Base::Vector3d position;
@@ -271,7 +274,7 @@ Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* 
 
     position.Set(vec.X(), vec.Y(), vec.Z());
 
-    Measure::MeasureAngleInfo info = {v.isValid(), (Base::Vector3d)v, position};
+    Measure::MeasureAngleInfo info = {vAdapt.isValid(), (Base::Vector3d)vAdapt, position};
     return info;
 }
 

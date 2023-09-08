@@ -48,15 +48,15 @@ public:
     TaskMeasure();
     ~TaskMeasure();
 
-    void modifyStandardButtons(QDialogButtonBox* box);
+    void modifyStandardButtons(QDialogButtonBox* box) override;
     QDialogButtonBox::StandardButtons getStandardButtons() const override {
         return QDialogButtonBox::Ok | QDialogButtonBox::Close;
     }
 
     void update();
     void close();
-    bool accept();
-    bool reject();
+    bool accept() override;
+    bool reject() override;
     void reset();
 
     void addElement(const char* mod, const char* obName, const char* subName);

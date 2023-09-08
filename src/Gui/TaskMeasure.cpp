@@ -102,7 +102,7 @@ TaskMeasure::TaskMeasure(){
     layout->addLayout(layoutElement);
 
 
-    Content.push_back(taskbox);
+    Content.emplace_back(taskbox);
     gatherSelection();
     attachSelection();
 }
@@ -117,6 +117,9 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
 
     QPushButton* btn = box->button(QDialogButtonBox::Ok);
     btn->setText(tr("Annotate"));
+    btn->setToolTip(tr("Press the Annotate button to add measurement to the document."));
+    btn = box->button(QDialogButtonBox::Close);
+    btn->setToolTip(tr("Press the Close button to exit."));
 }
 
 void TaskMeasure::updateInfo() {
@@ -168,7 +171,7 @@ void TaskMeasure::update(){
 
     // Get valid measure type
     bool isValid = false;
-    App::MeasureType *measureType;
+    App::MeasureType *measureType(nullptr);
 
     for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
         // If the measure mode is explicitly set we only check matching measure types
@@ -256,7 +259,7 @@ void TaskMeasure::reset() {
 void TaskMeasure::addElement(const char* mod, const char* obName, const char* subName) {
 
     // Note: Currently only a selection of elements that belong to the same module is allowed
-    if (strcmp(mod, measureModule.c_str())){
+    if (strcmp(mod, measureModule.c_str()) != 0){
         clearSelection();
     }
 
@@ -266,7 +269,7 @@ void TaskMeasure::addElement(const char* mod, const char* obName, const char* su
     }
 
     measureModule = mod;
-    selection.push_back(std::make_tuple((std::string)obName, (std::string)subName));
+    selection.emplace_back(std::make_tuple((std::string)obName, (std::string)subName));
 
     // Update element info
     App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod);
@@ -298,7 +301,7 @@ void TaskMeasure::gatherSelection() {
             clearSelection();
         }
         measureModule = mod;
-        selection.push_back(std::tuple<std::string, std::string>(obName, sel.SubName));
+        selection.emplace_back(std::tuple<std::string, std::string>(obName, sel.SubName));
     }
 
     update();
@@ -316,7 +319,7 @@ void TaskMeasure::removeObject() {
 }
 
 bool TaskMeasure::hasSelection(){
-    return selection.size() > 0;
+    return !selection.empty();
 }
 
 void TaskMeasure::clearSelection(){
@@ -362,7 +365,8 @@ bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {
 
             return true;
         }
-        else if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
             this->accept();
             return true;
         }
