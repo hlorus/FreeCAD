@@ -37,6 +37,7 @@
 #include <TopoDS_Vertex.hxx>
 #include "App/MeasureLength.h"
 #include <Mod/Measure/App/MeasureAngle.h>
+#include <Mod/Measure/App/MeasureDistance.h>
 #include "VectorAdapter.h"
 
 #include <TopAbs.hxx>
@@ -240,8 +241,6 @@ float MeasureLengthHandler(std::string* obName, std::string* subName){
 }
 
 
-
-
 Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
@@ -279,6 +278,16 @@ Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* 
 }
 
 
+Measure::MeasureDistanceInfo MeasureDistanceHandler(std::string* obName, std::string* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    // Just return the TopoDS_Shape here
+    return {true, shape};
+}
+
+
 using namespace Measure;
 
 void Part::Measure::initialize() {
@@ -292,6 +301,7 @@ void Part::Measure::initialize() {
 
     // Extend MeasureAngle
     MeasureAngle::addGeometryHandler("Part", MeasureAngleHandler);
+
+    // Extend MeasureDistance
+    MeasureDistance::addGeometryHandler("Part", MeasureDistanceHandler);
 }
-
-
