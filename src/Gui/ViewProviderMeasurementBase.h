@@ -23,7 +23,9 @@
 #ifndef GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 #define GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 
+#include <App/Material.h>
 #include <App/Measure.h>
+#include <Base/Parameter.h>
 #include "ViewProviderDocumentObject.h"
 #include "App/PropertyContainer.h"
 
@@ -81,6 +83,12 @@ protected:
     SoFontStyle      * pFont;
     SoBaseColor      * pColor;
     SoBaseColor      * pTextColor;
+
+    // TODO: migrate these routines to Mod/Measure
+    Base::Reference<ParameterGrp> getPreferenceGroup(const char* Name);
+    App::Color defaultLineColor();
+    App::Color defaultTextColor();
+    int defaultFontSize();
 
 };
 
