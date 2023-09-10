@@ -55,7 +55,7 @@
 using namespace Gui;
 using namespace MeasureGui;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistancePoints, Gui::ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistancePoints, Gui::ViewProviderMeasurementBase)
 
 
 ViewProviderMeasureDistancePoints::ViewProviderMeasureDistancePoints()

@@ -1912,6 +1912,7 @@ void Application::initTypes()
     Gui::ViewProviderLink                       ::init();
     Gui::ViewProviderLinkPython                 ::init();
     Gui::AxisOrigin                             ::init();
+    Gui::ViewProviderMeasurementBase            ::init();
 
     // Workbench
     Gui::Workbench                              ::init();

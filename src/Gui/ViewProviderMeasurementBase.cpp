@@ -51,7 +51,7 @@ using namespace Gui;
 namespace bp = boost::placeholders;
 
 
-PROPERTY_SOURCE(ViewProviderMeasurementBase, ViewProviderDocumentObject)
+PROPERTY_SOURCE(Gui::ViewProviderMeasurementBase, Gui::ViewProviderDocumentObject)
 
 ViewProviderMeasurementBase::ViewProviderMeasurementBase()
 {
