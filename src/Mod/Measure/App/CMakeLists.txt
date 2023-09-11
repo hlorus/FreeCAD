@@ -44,6 +44,8 @@ SET(MeasureModule_SRCS
     Measure.h
     PreCompiled.cpp
     PreCompiled.h
+    Preferences.cpp
+    Preferences.h
 )
 
 SOURCE_GROUP("Module" FILES ${MeasureModule_SRCS})
