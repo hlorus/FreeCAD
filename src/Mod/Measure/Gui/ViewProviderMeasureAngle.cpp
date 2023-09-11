@@ -253,12 +253,13 @@ PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, Gui::ViewProviderMeasureme
 
 ViewProviderMeasureAngle::ViewProviderMeasureAngle()
 {
+    // TODO: is this a left over property?
     ADD_PROPERTY(Radius, (10.0f));
 
     this->transform = new SoTransform;
     transform->ref();
 
-    sPixmap = "view-measurement";
+    sPixmap = "umf-measurement";
 }
 
 ViewProviderMeasureAngle::~ViewProviderMeasureAngle()

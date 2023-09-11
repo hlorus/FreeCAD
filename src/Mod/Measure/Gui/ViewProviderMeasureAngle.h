@@ -24,7 +24,6 @@
 #ifndef GUI_VIEWPROVIDERMEASUREANGLE_H
 #define GUI_VIEWPROVIDERMEASUREANGLE_H
 
-#include <Gui/ViewProviderDocumentObject.h>
 #include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
 #include <QObject>
@@ -41,12 +40,10 @@ class SoIndexedLineSet;
 class SoTransform;
 
 
-
 namespace MeasureGui
 {
 
-
-class GuiExport ViewProviderMeasureAngle : public Gui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureAngle : public Gui::ViewProviderMeasurementBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureAngle);
 

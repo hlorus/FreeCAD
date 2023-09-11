@@ -24,13 +24,12 @@
 #ifndef GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
 #define GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
 
-#include <Gui/ViewProviderDocumentObject.h>
-#include <Gui/ViewProviderMeasurementBase.h>
+
 #include <Gui/ViewProviderMeasureDistance.h>
+#include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
 
 #include <QObject>
-
 
 class SoCoordinate3;
 class SoIndexedLineSet;
