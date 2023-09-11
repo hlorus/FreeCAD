@@ -51,6 +51,10 @@ MeasureDistance::MeasureDistance()
     ADD_PROPERTY_TYPE(Distance,(0.0)       ,"Measurement",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                                             "Distance between the two elements");
     Distance.setUnit(Base::Unit::Length);
+
+    ADD_PROPERTY_TYPE(Position1,(Base::Vector3d(0.0,0.0,0.0)),"Measurement", App::Prop_Hidden, "Position1");
+    ADD_PROPERTY_TYPE(Position2,(Base::Vector3d(0.0,1.0,0.0)),"Measurement", App::Prop_Hidden, "Position2");
+
 }
 
 MeasureDistance::~MeasureDistance() = default;
@@ -191,6 +195,13 @@ App::DocumentObjectExecReturn *MeasureDistance::execute()
     }
 
     Distance.setValue(measure.Value());
+
+    gp_Pnt p1 = measure.PointOnShape1(1);
+    Position1.setValue(p1.X(), p1.Y(), p1.Z());
+
+    gp_Pnt p2 = measure.PointOnShape2(1);
+    Position2.setValue(p2.X(), p2.Y(), p2.Z());
+
 
     return DocumentObject::StdReturn;
 }
