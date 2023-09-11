@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "Application.h"
 #include "App/Document.h"
+#include <Gui/BitmapFactory.h>
 
 #include <QFormLayout>
 #include <QPushButton>
@@ -44,17 +45,12 @@
 using namespace Gui;
 
 
-TaskMeasure::TaskMeasure(){
-
-
+TaskMeasure::TaskMeasure()
+{
     qApp->installEventFilter(this);
 
-    measureModule = "";
-
     this->setButtonPosition(TaskMeasure::South);
-    Gui::TaskView::TaskBox* taskbox = new Gui::TaskView::TaskBox(QPixmap(), QString(), true, nullptr);
-
-
+    auto taskbox = new Gui::TaskView::TaskBox(Gui::BitmapFactory().pixmap("umf-measurement"), tr("Measurement"), true, nullptr);
 
     labelType = new QLabel();
     labelPosition = new QLabel();
@@ -102,7 +98,7 @@ TaskMeasure::TaskMeasure(){
     layout->addLayout(layoutElement);
 
 
-    Content.push_back(taskbox);
+    Content.emplace_back(taskbox);
     gatherSelection();
     attachSelection();
 }
@@ -117,6 +113,9 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
 
     QPushButton* btn = box->button(QDialogButtonBox::Ok);
     btn->setText(tr("Annotate"));
+    btn->setToolTip(tr("Press the Annotate button to add measurement to the document."));
+    btn = box->button(QDialogButtonBox::Close);
+    btn->setToolTip(tr("Press the Close button to exit."));
 }
 
 void TaskMeasure::updateInfo() {
@@ -168,7 +167,7 @@ void TaskMeasure::update(){
 
     // Get valid measure type
     bool isValid = false;
-    App::MeasureType *measureType;
+    App::MeasureType *measureType(nullptr);
 
     for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
         // If the measure mode is explicitly set we only check matching measure types
@@ -253,10 +252,10 @@ void TaskMeasure::reset() {
 }
 
 
-void TaskMeasure::addElement(const char* mod, const char* obName, const char* subName) {
+void TaskMeasure::addElement(const char* mod, const char* objectName, const char* subName) {
 
     // Note: Currently only a selection of elements that belong to the same module is allowed
-    if (strcmp(mod, measureModule.c_str())){
+    if (strcmp(mod, measureModuleName.c_str()) != 0){
         clearSelection();
     }
 
@@ -265,12 +264,12 @@ void TaskMeasure::addElement(const char* mod, const char* obName, const char* su
         return;
     }
 
-    measureModule = mod;
-    selection.push_back(std::make_tuple((std::string)obName, (std::string)subName));
+    measureModuleName = mod;
+    selection.emplace_back(std::make_tuple((std::string)objectName, (std::string)subName));
 
     // Update element info
     App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod);
-    auto info = handler.infoCb(obName, subName);
+    auto info = handler.infoCb(objectName, subName);
     elementInfo.type = info.type;
     elementInfo.pos = info.pos;
     elementInfo.length = info.length;
@@ -289,16 +288,16 @@ void TaskMeasure::gatherSelection() {
     App::Document* doc = App::GetApplication().getActiveDocument();
 
     for (auto sel : Gui::Selection().getSelection()) {
-        const char* obName = sel.pObject->getNameInDocument();
-        App::DocumentObject* ob = doc->getObject(obName);
+        const char* objectName = sel.pObject->getNameInDocument();
+        App::DocumentObject* ob = doc->getObject(objectName);
         auto sub = ob->getSubObject(sel.SubName);
         std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
 
-        if (mod != measureModule){
+        if (mod != measureModuleName){
             clearSelection();
         }
-        measureModule = mod;
-        selection.push_back(std::tuple<std::string, std::string>(obName, sel.SubName));
+        measureModuleName = mod;
+        selection.emplace_back(objectName, sel.SubName);
     }
 
     update();
@@ -316,7 +315,7 @@ void TaskMeasure::removeObject() {
 }
 
 bool TaskMeasure::hasSelection(){
-    return selection.size() > 0;
+    return !selection.empty();
 }
 
 void TaskMeasure::clearSelection(){
@@ -362,7 +361,8 @@ bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {
 
             return true;
         }
-        else if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
             this->accept();
             return true;
         }
@@ -396,5 +396,6 @@ App::MeasureType* TaskMeasure::getMeasureType() {
     }
     return nullptr;
 }
+
 
 #endif //GUI_TASKMEASURE_H

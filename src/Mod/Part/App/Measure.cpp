@@ -55,28 +55,34 @@
 // From: https://github.com/Celemation/FreeCAD/blob/joel_selection_summary_demo/src/Gui/SelectionSummary.cpp
 
 // Should work with edges and wires
-static float getLength(TopoDS_Shape wire){
+static float getLength(TopoDS_Shape& wire){
     GProp_GProps gprops;
     BRepGProp::LinearProperties(wire, gprops);
     return gprops.Mass();
 }
 
-static float getFaceArea(TopoDS_Shape face){
+static float getFaceArea(TopoDS_Shape& face){
     GProp_GProps gprops;
     BRepGProp::SurfaceProperties(face, gprops);
     return gprops.Mass();
 }
 
 
-static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* subName) {
+static App::MeasureElementInfo PartMeasureCb(const char* objectName, const char* subName) {
 
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName);
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName);
 //    auto sub = ob->getSubObject(subName);
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("Part::VectorAdapter did not retrieve shape for %s, %s\n", objectName, subName);
+        return App::MeasureElementInfo();
+    }
+
     TopAbs_ShapeEnum sType = shape.ShapeType();
 
-    std::string type = "";
+    std::string type;
     Base::Vector3d pos;
     float length = 0.0;
     float area = 0.0;
@@ -108,11 +114,16 @@ static App::MeasureElementInfo PartMeasureCb(const char* obName, const char* sub
     return info;
 }
 
-App::MeasureElementType PartMeasureTypeCb(const char* obName, const char* subName) {
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName);
+App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName);
 //    auto sub = ob->getSubObject(subName);
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("Part::VectorAdapter did not retrieve shape for %s, %s\n", objectName, subName);
+        return App::MeasureElementType();
+    }
     TopAbs_ShapeEnum shapeType = shape.ShapeType();
 
     switch (shapeType) {
@@ -165,19 +176,22 @@ bool getShapeFromStrings(TopoDS_Shape &shapeOut, const std::string &doc, const s
     return false;
   }
   shapeOut = Part::Feature::getShape(objectPointer,sub.c_str(),true,mat);
-  if (shapeOut.IsNull()) {
-    return false;
-  }
-  return true;
+  return !shapeOut.IsNull();
 }
 
 
 
-Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obName, const std::string* subName)
+Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* objectName, const std::string* subName)
 {
-    (void) obName;
+    (void) objectName;
     Base::Matrix4D mat;
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("Part::VectorAdapter did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        return Part::VectorAdapter();
+    }
+
     TopAbs_ShapeEnum shapeType = shape.ShapeType();
 
 
@@ -220,9 +234,9 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obN
       }
 
       TopoDS_Face face = TopoDS::Face(faceShape);
-      Base::Vector3d v(0.0, 0.0, 0.0); //v(current.x, current.y, current.z);
-      v = mat*v;
-      gp_Vec pickPoint(v.x, v.y, v.z);
+      Base::Vector3d vTemp(0.0, 0.0, 0.0); //v(current.x, current.y, current.z);
+      vTemp = mat*vTemp;
+      gp_Vec pickPoint(vTemp.x, vTemp.y, vTemp.z);
       return {face, pickPoint};
     }
 
@@ -230,10 +244,15 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obN
 }
 
 
-float MeasureLengthHandler(std::string* obName, std::string* subName){
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
+float MeasureLengthHandler(std::string* objectName, std::string* subName){
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        return 0.0;
+    }
     TopAbs_ShapeEnum sType = shape.ShapeType();
 
     if (sType != TopAbs_EDGE) {
@@ -244,12 +263,18 @@ float MeasureLengthHandler(std::string* obName, std::string* subName){
 }
 
 
-Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* subName) {
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
+Measure::MeasureAngleInfo MeasureAngleHandler(std::string* objectName, std::string* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
-   TopAbs_ShapeEnum sType = shape.ShapeType();
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("MeasureAngleHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        return Measure::MeasureAngleInfo();
+    }
 
-    Part::VectorAdapter v = buildAdapter(ob, obName, subName);
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    Part::VectorAdapter vAdapt = buildAdapter(ob, objectName, subName);
 
     gp_Pnt vec;
     Base::Vector3d position;
@@ -270,14 +295,20 @@ Measure::MeasureAngleInfo MeasureAngleHandler(std::string* obName, std::string* 
 
     position.Set(vec.X(), vec.Y(), vec.Z());
 
-    Measure::MeasureAngleInfo info = {v.isValid(), (Base::Vector3d)v, position};
+    Measure::MeasureAngleInfo info = {vAdapt.isValid(), (Base::Vector3d)vAdapt, position};
     return info;
 }
 
 
-Measure::MeasureDistanceInfo MeasureDistanceHandler(std::string* obName, std::string* subName) {
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(obName->c_str());
+Measure::MeasureDistanceInfo MeasureDistanceHandler(std::string* objectName, std::string* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("MeasureDistanceHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        return Measure::MeasureDistanceInfo();
+    }
+
     TopAbs_ShapeEnum sType = shape.ShapeType();
 
     // Just return the TopoDS_Shape here
