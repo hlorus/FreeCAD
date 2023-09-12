@@ -35,6 +35,8 @@ SET(MeasureGui_SRCS
     ViewProviderMeasureDistancePoints.h
     ViewProviderMeasureAngle.cpp
     ViewProviderMeasureAngle.h
+    ViewProviderMeasureDistance.cpp
+    ViewProviderMeasureDistance.h
     # Workbench.cpp
     # Workbench.h
     DlgPrefsMeasureAppearanceImp.ui

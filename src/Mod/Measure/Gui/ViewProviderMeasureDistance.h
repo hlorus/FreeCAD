@@ -21,70 +21,49 @@
  ***************************************************************************/
 
 
-#ifndef MEASUREAPP_MEASUREDISTANCE_H
-#define MEASUREAPP_MEASUREDISTANCE_H
+#ifndef MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
+#define MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
 
-#include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
-#include <tuple>
-#include <App/Measure.h>
-#include <functional>
-#include <string.h>
-#include <map>
-#include <TopoDS_Shape.hxx>
-
+#include <Gui/ViewProviderDocumentObject.h>
+#include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
 
-#include <gp_Pnt.hxx>
+#include <QObject>
 
 
-namespace Measure
+class SoCoordinate3;
+class SoIndexedLineSet;
+
+namespace MeasureGui
 {
 
-// Translate geometry reference into an OCC type
-struct MeasureDistanceInfo {
-    bool valid;
-    TopoDS_Shape shape;
-};
 
-
-class MeasureExport MeasureDistance : public App::MeasurementBaseExtendable<MeasureDistanceInfo>
+class MeasureGuiExport ViewProviderMeasureDistance : public Gui::ViewProviderMeasurementBase
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureDistance);
+    PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureDistance);
 
 public:
     /// Constructor
-    MeasureDistance();
-    ~MeasureDistance() override;
+    ViewProviderMeasureDistance();
+    ~ViewProviderMeasureDistance() override;
 
-    App::PropertyLinkSub Element1;
-    App::PropertyLinkSub Element2;
-    App::PropertyDistance Distance;
+    // // Display properties
+    App::PropertyFloat          DistFactor;
+    App::PropertyBool           Mirror;
 
-    // Position properties for the viewprovider
-    App::PropertyVector Position1;
-    App::PropertyVector Position2;
+    void attach(App::DocumentObject *) override;
+    void updateData(const App::Property*) override;
 
-    App::DocumentObjectExecReturn *execute() override;
-
-    const char* getViewProviderName() const override {
-        return "MeasureGui::ViewProviderMeasureDistance";
-    }
-
-    static bool isValidSelection(const App::MeasureSelection& selection);
-    static bool isPrioritizedSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-    Base::Quantity result() {return Distance.getQuantityValue();}
-
-    bool getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape);
+protected:
+    void onChanged(const App::Property* prop) override;
 
 private:
+    SoCoordinate3    * pCoords;
+    SoIndexedLineSet * pLines;
 
-    void onChanged(const App::Property* prop) override;
 };
 
-} //namespace Measure
+} //namespace MeasureGui
 
 
-#endif // MEASUREAPP_MEASUREDISTANCE_H
+#endif // MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
