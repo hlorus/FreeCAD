@@ -24,7 +24,6 @@
 #ifndef MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
 #define MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
 
-#include <Gui/ViewProviderDocumentObject.h>
 #include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
 

@@ -65,6 +65,7 @@
 #include <Gui/Document.h>
 #include <Gui/ViewParams.h>
 #include <Mod/Measure/App/MeasureAngle.h>
+#include <Mod/Measure/App/Preferences.h>
 
 #include <Precision.hxx>
 #include <Geom_Curve.hxx>
@@ -79,6 +80,7 @@
 
 
 using namespace MeasureGui;
+using namespace Measure;
 
 gp_Lin* getLine(gp_Vec& vec, gp_Vec& origin) {
     gp_Pnt tempOrigin;
@@ -255,6 +257,9 @@ ViewProviderMeasureAngle::ViewProviderMeasureAngle()
 {
     // TODO: is this a left over property?
     ADD_PROPERTY(Radius, (10.0f));
+    static const char *agroup = "Appearance";
+    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
+    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
 
     this->transform = new SoTransform;
     transform->ref();
