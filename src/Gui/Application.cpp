@@ -112,7 +112,6 @@
 #include "ViewProviderLinkPy.h"
 #include "ViewProviderMaterialObject.h"
 #include "ViewProviderMeasureDistance.h"
-#include "ViewProviderMeasurementBase.h"
 #include "ViewProviderOrigin.h"
 #include "ViewProviderOriginFeature.h"
 #include "ViewProviderOriginGroup.h"
@@ -1912,7 +1911,6 @@ void Application::initTypes()
     Gui::ViewProviderLink                       ::init();
     Gui::ViewProviderLinkPython                 ::init();
     Gui::AxisOrigin                             ::init();
-    Gui::ViewProviderMeasurementBase            ::init();
 
     // Workbench
     Gui::Workbench                              ::init();

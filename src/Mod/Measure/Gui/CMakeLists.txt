@@ -31,6 +31,8 @@ SET(MeasureGui_SRCS
     Resources/Measure.qrc
     PreCompiled.cpp
     PreCompiled.h
+    ViewProviderMeasurementBase.cpp
+    ViewProviderMeasurementBase.h
     ViewProviderMeasureDistancePoints.cpp
     ViewProviderMeasureDistancePoints.h
     ViewProviderMeasureAngle.cpp

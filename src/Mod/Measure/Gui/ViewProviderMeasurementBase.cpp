@@ -38,20 +38,17 @@
 # include <Inventor/nodes/SoTranslation.h>
 #endif
 
-
-
-
 #include <App/DocumentObject.h>
+#include <Base/Console.h>
+
 #include "ViewProviderMeasurementBase.h"
 
-#include "Base/Console.h"
 
-
-using namespace Gui;
+using namespace MeasureGui;
 namespace bp = boost::placeholders;
 
 
-PROPERTY_SOURCE(Gui::ViewProviderMeasurementBase, Gui::ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasurementBase, Gui::ViewProviderDocumentObject)
 
 ViewProviderMeasurementBase::ViewProviderMeasurementBase()
 {

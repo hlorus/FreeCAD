@@ -57,7 +57,7 @@ using namespace Gui;
 using namespace MeasureGui;
 using namespace Measure;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, Gui::ViewProviderMeasurementBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, MeasureGui::ViewProviderMeasurementBase)
 
 
 ViewProviderMeasureDistance::ViewProviderMeasureDistance()
@@ -108,7 +108,7 @@ void ViewProviderMeasureDistance::onChanged(const App::Property* prop)
         updateData(prop);
     }
     else {
-        Gui::ViewProviderMeasurementBase::onChanged(prop);
+        ViewProviderMeasurementBase::onChanged(prop);
     }
 }
 

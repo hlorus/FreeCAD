@@ -250,7 +250,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
 
 
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, Gui::ViewProviderMeasurementBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, MeasureGui::ViewProviderMeasurementBase)
 
 
 ViewProviderMeasureAngle::ViewProviderMeasureAngle()

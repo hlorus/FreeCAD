@@ -35,7 +35,7 @@
 #include "ViewProviderMeasureAngle.h"
 #include "ViewProviderMeasureDistancePoints.h"
 #include "ViewProviderMeasureDistance.h"
-
+#include "ViewProviderMeasurementBase.h"
 
 
 // use a different name to CreateCommand()
@@ -89,6 +89,7 @@ PyMOD_INIT_FUNC(MeasureGui)
     // instantiating the commands
     CreateMeasureCommands();
 
+    MeasureGui::ViewProviderMeasurementBase            ::init();
     MeasureGui::ViewProviderMeasureDistancePoints      ::init();
     MeasureGui::ViewProviderMeasureAngle               ::init();
     MeasureGui::ViewProviderMeasureDistance            ::init();

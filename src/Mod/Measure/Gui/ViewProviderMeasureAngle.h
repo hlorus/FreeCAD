@@ -24,13 +24,15 @@
 #ifndef GUI_VIEWPROVIDERMEASUREANGLE_H
 #define GUI_VIEWPROVIDERMEASUREANGLE_H
 
-#include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
+
 #include <QObject>
 
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/fields/SoSFMatrix.h>
 #include <Inventor/fields/SoSFVec3f.h>
+
+#include "ViewProviderMeasurementBase.h"
 
 
 class SoText2;
@@ -43,7 +45,7 @@ class SoTransform;
 namespace MeasureGui
 {
 
-class MeasureGuiExport ViewProviderMeasureAngle : public Gui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureAngle : public MeasureGui::ViewProviderMeasurementBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureAngle);
 

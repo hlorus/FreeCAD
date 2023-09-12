@@ -23,10 +23,12 @@
 #ifndef GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 #define GUI_VIEWPROVIDER_MEASUREMENTBASE_H
 
+#include <Mod/Measure/MeasureGlobal.h>
+
 #include <App/Material.h>
 #include <App/Measure.h>
 #include <Base/Parameter.h>
-#include "ViewProviderDocumentObject.h"
+#include <Gui/ViewProviderDocumentObject.h>
 #include "App/PropertyContainer.h"
 
 
@@ -38,10 +40,12 @@ class SoTranslation;
 class SoPickStyle;
 
 namespace Gui {
-
 class View3DInventorViewer;
+}
 
-class GuiExport ViewProviderMeasurementBase:public ViewProviderDocumentObject
+namespace MeasureGui {
+
+class MeasureGuiExport ViewProviderMeasurementBase :public Gui::ViewProviderDocumentObject
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderMeasurementBase);
 
