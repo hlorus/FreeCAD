@@ -28,7 +28,6 @@
 #include "Measure.h"
 #include "Measurement.h"
 #include "MeasurementPy.h"
-#include "MeasureDistancePoints.h"
 #include "MeasureAngle.h"
 #include "MeasureDistance.h"
 
@@ -68,7 +67,6 @@ PyMOD_INIT_FUNC(Measure)
     // Add Types to module
     Base::Interpreter().addType(&Measure::MeasurementPy      ::Type,mod,"Measurement");
     Measure::Measurement            ::init();
-    Measure::MeasureDistancePoints  ::init();
     Measure::MeasureAngle           ::init();
     Measure::MeasureDistance        ::init();
     Measure::Measure                ::initialize();

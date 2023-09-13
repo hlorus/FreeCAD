@@ -32,7 +32,6 @@
 #include "App/Document.h"
 #include "App/DocumentObject.h"
 
-#include "MeasureDistancePoints.h"
 #include "MeasureAngle.h"
 #include "MeasureDistance.h"
 
@@ -48,15 +47,6 @@ void Measure::initialize() {
     App::Application& app = App::GetApplication();
 
     // Add Measure Types
-    app.addMeasureType(
-        new App::MeasureType {
-            "DISTANCEPOINTS",
-            "Distance Points",
-            "Measure::MeasureDistancePoints",
-            MeasureDistancePoints::isValidSelection,
-            nullptr,
-        });
-
     app.addMeasureType(
         new App::MeasureType {
             "ANGLE",
