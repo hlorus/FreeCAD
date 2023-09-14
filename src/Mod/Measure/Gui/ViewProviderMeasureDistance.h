@@ -24,12 +24,11 @@
 #ifndef MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
 #define MEASUREGUI_VIEWPROVIDERMEASUREDISTANCE_H
 
-#include <Gui/ViewProviderDocumentObject.h>
-#include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
 
 #include <QObject>
 
+#include "ViewProviderMeasurementBase.h"
 
 class SoCoordinate3;
 class SoIndexedLineSet;
@@ -38,7 +37,7 @@ namespace MeasureGui
 {
 
 
-class MeasureGuiExport ViewProviderMeasureDistance : public Gui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureDistance : public MeasureGui::ViewProviderMeasurementBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureDistance);
 

@@ -38,26 +38,24 @@
 # include <Inventor/nodes/SoTranslation.h>
 #endif
 
-
-
-
 #include <App/DocumentObject.h>
+#include <Base/Console.h>
+
 #include "ViewProviderMeasurementBase.h"
 
-#include "Base/Console.h"
 
-
-using namespace Gui;
+using namespace MeasureGui;
 namespace bp = boost::placeholders;
 
 
-PROPERTY_SOURCE(ViewProviderMeasurementBase, ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasurementBase, Gui::ViewProviderDocumentObject)
 
 ViewProviderMeasurementBase::ViewProviderMeasurementBase()
 {
-    ADD_PROPERTY(TextColor,(1.0f,1.0f,1.0f));
-    ADD_PROPERTY(LineColor,(1.0f,1.0f,1.0f));
-    ADD_PROPERTY(FontSize,(18));
+    static const char *agroup = "Appearance";
+    ADD_PROPERTY_TYPE(TextColor, (defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
+    ADD_PROPERTY_TYPE(LineColor, (defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
+    ADD_PROPERTY_TYPE(FontSize, (defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
 
     pFont = new SoFontStyle();
     pFont->ref();
@@ -165,3 +163,28 @@ void ViewProviderMeasurementBase::attach(App::DocumentObject *pcObj)
     }
 }
 
+// TODO: migrate these routines to Mod/Measure
+//! Returns the Measure preference group
+Base::Reference<ParameterGrp> ViewProviderMeasurementBase::getPreferenceGroup(const char* Name)
+{
+    return App::GetApplication().GetUserParameter().GetGroup("BaseApp/Preferences/Mod/Measure")->GetGroup(Name);
+}
+
+App::Color ViewProviderMeasurementBase::defaultLineColor()
+{
+    App::Color fcColor;
+    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultLineColor", 0xFFFFFFFF));
+    return fcColor;
+}
+
+App::Color ViewProviderMeasurementBase::defaultTextColor()
+{
+    App::Color fcColor;
+    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextColor", 0xFFFFFFFF));
+    return fcColor;
+}
+
+int ViewProviderMeasurementBase::defaultFontSize()
+{
+    return getPreferenceGroup("Appearance")->GetInt("DefaultFontSize", 18);
+}

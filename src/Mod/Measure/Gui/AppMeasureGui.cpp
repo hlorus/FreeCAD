@@ -26,11 +26,15 @@
 #include <Base/Console.h>
 #include <Base/Interpreter.h>
 #include <Base/PyObjectBase.h>
+#include <Base/Tools.h>
 #include <Gui/Application.h>
+#include <Gui/Language/Translator.h>
+#include <Gui/WidgetFactory.h>
 
+#include "DlgPrefsMeasureAppearanceImp.h"
 #include "ViewProviderMeasureAngle.h"
-#include <Mod/Measure/Gui/ViewProviderMeasureDistance.h>
-
+#include "ViewProviderMeasureDistance.h"
+#include "ViewProviderMeasurementBase.h"
 
 
 // use a different name to CreateCommand()
@@ -78,14 +82,20 @@ PyMOD_INIT_FUNC(MeasureGui)
         PyMOD_Return(nullptr);
     }
 
-    MeasureGui::ViewProviderMeasureAngle               ::init();
-    MeasureGui::ViewProviderMeasureDistance            ::init();
+    PyObject* mod = MeasureGui::initModule();
+    Base::Console().Log("Loading GUI of Measure module... done\n");
 
     // instantiating the commands
     CreateMeasureCommands();
 
+    MeasureGui::ViewProviderMeasurementBase            ::init();
+    MeasureGui::ViewProviderMeasureAngle               ::init();
+    MeasureGui::ViewProviderMeasureDistance            ::init();
 
-    PyObject* mod = MeasureGui::initModule();
-    Base::Console().Log("Loading GUI of Measure module... done\n");
+    // register preferences pages
+    new Gui::PrefPageProducer<MeasureGui::DlgPrefsMeasureAppearanceImp>(QT_TRANSLATE_NOOP("QObject", "Measure"));
+
+//    Q_INIT_RESOURCE(Measure);
+
     PyMOD_Return(mod);
 }
