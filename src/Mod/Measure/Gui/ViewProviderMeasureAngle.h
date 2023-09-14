@@ -24,14 +24,15 @@
 #ifndef GUI_VIEWPROVIDERMEASUREANGLE_H
 #define GUI_VIEWPROVIDERMEASUREANGLE_H
 
-#include <Gui/ViewProviderDocumentObject.h>
-#include <Gui/ViewProviderMeasurementBase.h>
 #include <Mod/Measure/MeasureGlobal.h>
+
 #include <QObject>
 
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/fields/SoSFMatrix.h>
 #include <Inventor/fields/SoSFVec3f.h>
+
+#include "ViewProviderMeasurementBase.h"
 
 
 class SoText2;
@@ -41,12 +42,10 @@ class SoIndexedLineSet;
 class SoTransform;
 
 
-
 namespace MeasureGui
 {
 
-
-class GuiExport ViewProviderMeasureAngle : public Gui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureAngle : public MeasureGui::ViewProviderMeasurementBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureAngle);
 
@@ -57,7 +56,8 @@ public:
 
     // // Display properties
     App::PropertyFloat          Radius;
-
+    App::PropertyFloat          DistFactor;
+    App::PropertyBool           Mirror;
 
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;

@@ -44,6 +44,7 @@
 #include <Base/Console.h>
 #include <Base/Quantity.h>
 #include "Mod/Measure/App/MeasureDistance.h"
+#include <Mod/Measure/App/Preferences.h>
 
 #include "ViewProviderMeasureDistance.h"
 #include "Gui/Application.h"
@@ -54,14 +55,17 @@
 
 using namespace Gui;
 using namespace MeasureGui;
+using namespace Measure;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, Gui::ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, MeasureGui::ViewProviderMeasurementBase)
 
 
 ViewProviderMeasureDistance::ViewProviderMeasureDistance()
 {
-    ADD_PROPERTY(DistFactor,(1.0));
-    ADD_PROPERTY(Mirror,(false));
+    static const char *agroup = "Appearance";
+    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
+    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
+
 
     const size_t vertexCount(4);
     const size_t lineCount(9);
@@ -104,7 +108,7 @@ void ViewProviderMeasureDistance::onChanged(const App::Property* prop)
         updateData(prop);
     }
     else {
-        Gui::ViewProviderMeasurementBase::onChanged(prop);
+        ViewProviderMeasurementBase::onChanged(prop);
     }
 }
 

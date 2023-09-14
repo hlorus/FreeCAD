@@ -43,25 +43,28 @@
 #include <App/MeasureDistance.h>
 #include <Base/Console.h>
 #include <Base/Quantity.h>
-#include "Mod/Measure/App/MeasureDistancePoints.h"
+#include <Mod/Measure/App/MeasureDistancePoints.h>
+#include <Mod/Measure/App/Preferences.h>
 
-#include "ViewProviderMeasureDistancePoints.h"
 #include "Gui/Application.h"
 #include <Gui/Command.h>
 #include "Gui/Document.h"
 #include "Gui/ViewParams.h"
 
+#include "ViewProviderMeasureDistancePoints.h"
 
 using namespace Gui;
+using namespace Measure;
 using namespace MeasureGui;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistancePoints, Gui::ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistancePoints, MeasureGui::ViewProviderMeasurementBase)
 
 
 ViewProviderMeasureDistancePoints::ViewProviderMeasureDistancePoints()
 {
-    ADD_PROPERTY(DistFactor,(1.0));
-    ADD_PROPERTY(Mirror,(false));
+    static const char *agroup = "Appearance";
+    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
+    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
 
     const size_t vertexCount(4);
     const size_t lineCount(9);
@@ -113,7 +116,7 @@ void ViewProviderMeasureDistancePoints::onChanged(const App::Property* prop)
         updateData(prop);
     }
     else {
-        Gui::ViewProviderMeasurementBase::onChanged(prop);
+        ViewProviderMeasurementBase::onChanged(prop);
     }
 }
 
@@ -199,6 +202,6 @@ void ViewProviderMeasureDistancePoints::updateData(const App::Property* prop)
         updateView();
     }
 
-    ViewProviderDocumentObject::updateData(prop);
+    ViewProviderMeasurementBase::updateData(prop);
 }
 

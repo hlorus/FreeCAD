@@ -24,13 +24,14 @@
 #ifndef GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
 #define GUI_VIEWPROVIDERMEASUREDISTANCEPOINTS_H
 
-#include <Gui/ViewProviderDocumentObject.h>
-#include <Gui/ViewProviderMeasurementBase.h>
-#include <Gui/ViewProviderMeasureDistance.h>
 #include <Mod/Measure/MeasureGlobal.h>
 
 #include <QObject>
 
+// isn't this the old measuredistance vp??
+#include <Gui/ViewProviderMeasureDistance.h>
+
+#include "ViewProviderMeasurementBase.h"
 
 class SoCoordinate3;
 class SoIndexedLineSet;
@@ -39,7 +40,7 @@ namespace MeasureGui
 {
 
 
-class MeasureGuiExport ViewProviderMeasureDistancePoints : public Gui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureDistancePoints : public MeasureGui::ViewProviderMeasurementBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureDistancePoints);
 
