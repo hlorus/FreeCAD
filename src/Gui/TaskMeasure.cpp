@@ -114,17 +114,33 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
     QPushButton* btn = box->button(QDialogButtonBox::Ok);
     btn->setText(tr("Annotate"));
     btn->setToolTip(tr("Press the Annotate button to add measurement to the document."));
+
+    // Disable button by default
+    btn->setEnabled(false);
+
     btn = box->button(QDialogButtonBox::Close);
     btn->setToolTip(tr("Press the Close button to exit."));
+}
+
+bool enableAnnotateBtn(App::MeasurementBase* obj) {
+    if (obj == nullptr) {
+        return false;
+    }
+
+    auto vpName = obj->getViewProviderName();
+    if ((vpName == NULL) || (vpName[0] == '\0')){
+        return false;
+    }
+
+    return true;
 }
 
 void TaskMeasure::setMeasureObject(App::MeasurementBase* obj) {
     _mMeasureObject = obj;
 
-    if (!obj) {
-        auto btn = this->buttonBox->button(QDialogButtonBox::Ok);
-        btn->setEnabled(false);
-    }
+    // Enable/Disable annotate button
+    auto btn = this->buttonBox->button(QDialogButtonBox::Ok);
+    btn->setEnabled(enableAnnotateBtn(obj));
 }
 
 void TaskMeasure::updateInfo() {
@@ -196,9 +212,6 @@ void TaskMeasure::update(){
             measureType = mType;
 
         }
-
-
-        // break;
     }
 
     if (!isValid) {
@@ -209,6 +222,9 @@ void TaskMeasure::update(){
         // std::tuple<std::string, std::string> sel = selection.back();
         // clearSelection();
         // addElement(measureModule.c_str(), get<0>(sel).c_str(), get<1>(sel).c_str());
+
+        // Reset measure object
+        setMeasureObject(nullptr);
         return;
     }
 
