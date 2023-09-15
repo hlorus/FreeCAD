@@ -81,7 +81,7 @@ private:
 };
 
 template <typename T>
-AppExport typename MeasurementBaseExtendable<T>::HandlerMap MeasurementBaseExtendable<T>::_mGeometryHandlers = MeasurementBaseExtendable<T>::HandlerMap();
+typename MeasurementBaseExtendable<T>::HandlerMap MeasurementBaseExtendable<T>::_mGeometryHandlers = MeasurementBaseExtendable<T>::HandlerMap();
 
 
 
