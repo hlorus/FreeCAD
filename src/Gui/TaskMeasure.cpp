@@ -254,17 +254,11 @@ void TaskMeasure::reset() {
 
 void TaskMeasure::addElement(const char* mod, const char* objectName, const char* subName) {
 
-    // Note: Currently only a selection of elements that belong to the same module is allowed
-    if (strcmp(mod, measureModuleName.c_str()) != 0){
-        clearSelection();
-    }
-
     if (!App::GetApplication().hasMeasureHandler(mod)) {
         Base::Console().Message("No measure handler available for geometry of module: %s\n", mod);
         return;
     }
 
-    measureModuleName = mod;
     selection.emplace_back(std::make_tuple((std::string)objectName, (std::string)subName));
 
     // Update element info
@@ -293,10 +287,6 @@ void TaskMeasure::gatherSelection() {
         auto sub = ob->getSubObject(sel.SubName);
         std::string mod = sub->getClassTypeId().getModuleName(sub->getTypeId().getName());
 
-        if (mod != measureModuleName){
-            clearSelection();
-        }
-        measureModuleName = mod;
         selection.emplace_back(objectName, sel.SubName);
     }
 

@@ -85,9 +85,6 @@ private:
     void setModeSilent(App::MeasureType* mode);
     App::MeasureType* getMeasureType();
 
-    // Store the active measure module
-    std::string measureModuleName{std::string()};
-
     // Store a list of picked elements and subelements
     App::MeasureSelection selection;
 
