@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "Application.h"
 #include "App/Document.h"
+#include "App/DocumentObjectGroup.h"
 #include <Gui/BitmapFactory.h>
 
 #include <QFormLayout>
@@ -255,7 +256,28 @@ void TaskMeasure::close(){
     Control().closeDialog();
 }
 
+
+void ensureGroup(App::MeasurementBase* measurement) {
+    // Ensure measurement object is part of the measurements group
+
+    const char* measurementGroupName = "Measurements";
+    if (measurement == nullptr) {
+        return;
+    }
+
+    App::Document* doc = App::GetApplication().getActiveDocument();
+    App::DocumentObject* obj = doc->getObject(measurementGroupName);
+    if (!obj || !obj->isValid()) {
+        obj = doc->addObject("App::DocumentObjectGroup", measurementGroupName);
+    }
+
+    auto group = static_cast<App::DocumentObjectGroup*>(obj);
+    group->addObject(measurement);
+}
+
+
 bool TaskMeasure::accept(){
+    ensureGroup(_mMeasureObject);
     close();
     return false;
 }
