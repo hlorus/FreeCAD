@@ -324,12 +324,13 @@ void Part::Measure::initialize() {
     app.addMeasureHandler("Part", PartMeasureCb, PartMeasureTypeCb);
 
 
+    std::vector<std::string> proxyList(  { "Part", "PartDesign" } );
     // Extend MeasureLength
-    App::MeasureLength::addGeometryHandler("Part", MeasureLengthHandler);
+    App::MeasureLength::addGeometryHandlers(proxyList, MeasureLengthHandler);
 
     // Extend MeasureAngle
-    MeasureAngle::addGeometryHandler("Part", MeasureAngleHandler);
+    MeasureAngle::addGeometryHandlers(proxyList, MeasureAngleHandler);
 
     // Extend MeasureDistance
-    MeasureDistance::addGeometryHandler("Part", MeasureDistanceHandler);
+    MeasureDistance::addGeometryHandlers(proxyList, MeasureDistanceHandler);
 }

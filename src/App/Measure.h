@@ -72,6 +72,15 @@ public:
         return _mGeometryHandlers[module];
     }
 
+    static void addGeometryHandlers(const std::vector<std::string>& modules, GeometryHandler callback){
+        // TODO: this will replace a callback with a later one.  Should we check that there isn't already a
+        // handler defined for this module?
+        for (auto& mod : modules) {
+            _mGeometryHandlers[mod] = callback;
+        }
+    }
+
+
     static bool hasGeometryHandler(const std::string& module) {
         return (_mGeometryHandlers.count(module) > 0);
     }

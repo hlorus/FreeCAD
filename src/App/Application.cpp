@@ -1545,12 +1545,12 @@ std::map<std::string, std::string> Application::getExportFilters() const
 // measure
 
 void Application::addMeasureHandler(const char* module, MeasureInfoMethod infoCb, MeasureTypeMethod typeCb) {
-    MeasureHandler* item = new MeasureHandler{module, infoCb, typeCb};
+    auto item = new MeasureHandler{module, infoCb, typeCb};
     _mMeasureHandlers.push_back(*item);
 }
 
 bool Application::hasMeasureHandler(const char* module) {
-    for(MeasureHandler handler : _mMeasureHandlers) {
+    for(MeasureHandler& handler : _mMeasureHandlers) {
         if (strcmp(handler.module.c_str(), module) == 0) {
             return true;
         }
