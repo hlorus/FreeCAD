@@ -100,7 +100,10 @@ TaskMeasure::TaskMeasure()
 
 
     Content.emplace_back(taskbox);
+
     gatherSelection();
+
+    // engage the selectionObserver
     attachSelection();
 }
 
@@ -123,12 +126,14 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
     btn->setToolTip(tr("Press the Close button to exit."));
 }
 
-bool enableAnnotateBtn(App::MeasurementBase* obj) {
+bool canAnnotate(App::MeasurementBase* obj) {
     if (obj == nullptr) {
+        // null object, can't annotate this
         return false;
     }
 
     auto vpName = obj->getViewProviderName();
+    // if there is not a vp, return false
     if ((vpName == NULL) || (vpName[0] == '\0')){
         return false;
     }
@@ -136,12 +141,18 @@ bool enableAnnotateBtn(App::MeasurementBase* obj) {
     return true;
 }
 
-void TaskMeasure::setMeasureObject(App::MeasurementBase* obj) {
-    _mMeasureObject = obj;
-
+void TaskMeasure::enableAnnotateButton(bool state) {
+    // if the task ui is not init yet we don't have a button box.
+    if (!this->buttonBox) {
+        return;
+    }
     // Enable/Disable annotate button
     auto btn = this->buttonBox->button(QDialogButtonBox::Ok);
-    btn->setEnabled(enableAnnotateBtn(obj));
+    btn->setEnabled(state);
+}
+
+void TaskMeasure::setMeasureObject(App::MeasurementBase* obj) {
+    _mMeasureObject = obj;
 }
 
 void TaskMeasure::updateInfo() {
@@ -177,7 +188,7 @@ void TaskMeasure::updateInfo() {
 }
 
 
-void TaskMeasure::update(){
+void TaskMeasure::update() {
     valueResult->setText(QString::asprintf("-"));
 
     // Update element info display
@@ -226,6 +237,7 @@ void TaskMeasure::update(){
 
         // Reset measure object
         setMeasureObject(nullptr);
+        enableAnnotateButton(false);
         return;
     }
 
@@ -233,8 +245,7 @@ void TaskMeasure::update(){
     setModeSilent(measureType);
 
     if (!_mMeasureObject || measureType->measureObject != _mMeasureObject->getTypeId().getName()) {
-
-        // Remove existing measurement object
+        // we don't already have a measureobject or it isn't the same type as the new one
         removeObject();
 
         // Create measure object
@@ -244,12 +255,14 @@ void TaskMeasure::update(){
         );
     }
 
+    // we have a valid measure object so we can enable the annotate button
+    enableAnnotateButton(true);
+
     // Fill measure object's properties from selection
     _mMeasureObject->parseSelection(selection);
 
     // Get result
     valueResult->setText(_mMeasureObject->result().getUserString());
-
 }
 
 void TaskMeasure::close(){
@@ -383,6 +396,7 @@ void TaskMeasure::onSelectionChanged(const Gui::SelectionChanges& msg)
         addElement(mod.c_str(), msg.pObjectName, msg.pSubName);
     }
 
+    // TODO: should there be an update here to reflect the new selection??
 }
 
 bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {

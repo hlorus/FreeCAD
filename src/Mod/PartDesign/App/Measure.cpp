@@ -41,12 +41,12 @@ void PartDesign::Measure::initialize() {
 
     app.addMeasureHandler("PartDesign", handler.infoCb, handler.typeCb);
 
-    App::MeasureLength::addGeometryHandler("PartDesign",
-                                           App::MeasureLength::getGeometryHandler("Part"));
+//    App::MeasureLength::addGeometryHandler("PartDesign",
+//                                           App::MeasureLength::getGeometryHandler("Part"));
 
-    MeasureAngle::addGeometryHandler("PartDesign",
-                                           MeasureAngle::getGeometryHandler("Part"));
+//    MeasureAngle::addGeometryHandler("PartDesign",
+//                                           MeasureAngle::getGeometryHandler("Part"));
 
-    MeasureDistance::addGeometryHandler("PartDesign", MeasureDistance::getGeometryHandler("Part"));
+//    MeasureDistance::addGeometryHandler("PartDesign", MeasureDistance::getGeometryHandler("Part"));
 }
 

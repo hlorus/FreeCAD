@@ -85,6 +85,7 @@ private:
     void onModeChanged(int index);
     void setModeSilent(App::MeasureType* mode);
     App::MeasureType* getMeasureType();
+    void enableAnnotateButton(bool state);
 
     // Store a list of picked elements and subelements
     App::MeasureSelection selection;
