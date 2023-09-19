@@ -52,9 +52,9 @@ public:
     App::DocumentObjectExecReturn *execute() override;
     void recalculateDistance();
 
-    // const char* getViewProviderName() const override {
-    //     return "Gui::ViewProviderMeasureDistance";
-    // }
+    const char* getViewProviderName() const override {
+        return "MeasureGui::ViewProviderMeasureDistance";
+    }
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection);
