@@ -21,60 +21,56 @@
  ***************************************************************************/
 
 
-#include "PreCompiled.h"
+#ifndef MEASURE_MEASURELENGTH_H
+#define MEASURE_MEASURELENGTH_H
 
-#include <App/Application.h>
 #include <Mod/Measure/MeasureGlobal.h>
-#include "Measure.h"
 
-#include "Base/Console.h"
-#include <Base/Vector3D.h>
-#include "App/Document.h"
-#include "App/DocumentObject.h"
+#include <functional>
+#include <string.h>
+#include <map>
+#include <tuple>
 
-#include "MeasureAngle.h"
-#include "MeasureDistance.h"
-#include "MeasureLength.h"
-
-#include <string>
+#include <App/DocumentObject.h>
+#include <App/PropertyGeo.h>
+#include <App/PropertyUnits.h>
+#include <App/Measure.h>
 
 
+namespace Measure
+{
 
-namespace Measure {
+
+class MeasureExport MeasureLength : public App::MeasurementBaseExtendable<float>
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureLength);
+
+public:
+    /// Constructor
+    MeasureLength();
+    ~MeasureLength() override;
+
+    App::PropertyLinkSubList Elements;
+    App::PropertyDistance Length;
+
+    App::DocumentObjectExecReturn *execute() override;
+    void recalculateLength();
+
+    const char* getViewProviderName() const override {
+        return "MeasureGui::ViewProviderMeasureLength";
+    }
+
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection);
+    Base::Quantity result() {return Length.getQuantityValue();}
+
+private:
+
+    void onChanged(const App::Property* prop) override;
+};
+
+} //namespace Measure
 
 
-void Measure::initialize() {
-
-    App::Application& app = App::GetApplication();
-
-    // Add Measure Types
-    app.addMeasureType(
-        new App::MeasureType {
-            "ANGLE",
-            "Angle",
-            "Measure::MeasureAngle",
-            MeasureAngle::isValidSelection,
-            MeasureAngle::isPrioritizedSelection,
-        });
-        
-    app.addMeasureType(
-        new App::MeasureType {
-            "DISTANCE",
-            "Distance",
-            "Measure::MeasureDistance",
-            MeasureDistance::isValidSelection,
-            MeasureDistance::isPrioritizedSelection,
-    });
-
-    app.addMeasureType(
-        new App::MeasureType {
-            "LENGTH",
-            "Length",
-            "Measure::MeasureLength",
-            MeasureLength::isValidSelection,
-            nullptr,
-    });
-}
-
-}
+#endif // MEASURE_MEASURELENGTH_H
 

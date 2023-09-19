@@ -24,6 +24,8 @@
 #ifndef MEASUREAPP_MEASUREDISTANCE_H
 #define MEASUREAPP_MEASUREDISTANCE_H
 
+#include <Mod/Measure/MeasureGlobal.h>
+
 #include <App/DocumentObject.h>
 #include <App/PropertyGeo.h>
 #include <App/PropertyUnits.h>
@@ -34,7 +36,6 @@
 #include <map>
 #include <TopoDS_Shape.hxx>
 
-#include <Mod/Measure/MeasureGlobal.h>
 
 #include <gp_Pnt.hxx>
 

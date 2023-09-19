@@ -35,6 +35,7 @@
 #include "ViewProviderMeasureAngle.h"
 #include "ViewProviderMeasureDistance.h"
 #include "ViewProviderMeasurementBase.h"
+#include "ViewProviderMeasureLength.h"
 
 
 // use a different name to CreateCommand()
@@ -91,6 +92,7 @@ PyMOD_INIT_FUNC(MeasureGui)
     MeasureGui::ViewProviderMeasurementBase            ::init();
     MeasureGui::ViewProviderMeasureAngle               ::init();
     MeasureGui::ViewProviderMeasureDistance            ::init();
+    MeasureGui::ViewProviderMeasureLength              ::init();
 
     // register preferences pages
     new Gui::PrefPageProducer<MeasureGui::DlgPrefsMeasureAppearanceImp>(QT_TRANSLATE_NOOP("QObject", "Measure"));

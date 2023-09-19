@@ -31,8 +31,8 @@ PROPERTY_SOURCE_ABSTRACT(App::MeasurementBase, App::DocumentObject)
 
 
 void App::Measure::initialize(){
-    App::Application& app = App::GetApplication();
+//    App::Application& app = App::GetApplication();
 
-    app.addMeasureType(new MeasureType{"LENGTH", "Length", "App::MeasureLength", App::MeasureLength::isValidSelection, nullptr});
+//    app.addMeasureType(new MeasureType{"LENGTH", "Length", "App::MeasureLength", App::MeasureLength::isValidSelection, nullptr});
 
 }

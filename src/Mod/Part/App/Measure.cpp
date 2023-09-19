@@ -23,34 +23,37 @@
 
 #include "PreCompiled.h"
 
-#include <App/Application.h>
 #include <Mod/Part/PartGlobal.h>
-#include "Measure.h"
 
-#include "Base/Console.h"
-#include <Base/Vector3D.h>
-#include "App/Document.h"
-#include "App/DocumentObject.h"
-#include "PrimitiveFeature.h"
-#include "PartFeature.h"
+#include <string>
+
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
-#include "App/MeasureLength.h"
-#include <Mod/Measure/App/MeasureAngle.h>
-#include <Mod/Measure/App/MeasureDistance.h>
-#include "VectorAdapter.h"
-
 #include <TopAbs.hxx>
-#include "Base/Vector3D.h"
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepGProp.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <TopExp.hxx>
+#include <GProp_GProps.hxx>
 
-#include <string>
+#include <App/Application.h>
+#include <App/Document.h>
+#include <App/DocumentObject.h>
+#include <Base/Console.h>
+#include <Base/Vector3D.h>
 
+//#include "App/MeasureLength.h"
+#include <Mod/Measure/App/MeasureAngle.h>
+#include <Mod/Measure/App/MeasureDistance.h>
+#include <Mod/Measure/App/MeasureLength.h>
+
+#include "VectorAdapter.h"
+//#include "PrimitiveFeature.h"
+#include "PartFeature.h"
+
+#include "Measure.h"
 
 // From: https://github.com/Celemation/FreeCAD/blob/joel_selection_summary_demo/src/Gui/SelectionSummary.cpp
 
@@ -326,7 +329,7 @@ void Part::Measure::initialize() {
 
     std::vector<std::string> proxyList(  { "Part", "PartDesign" } );
     // Extend MeasureLength
-    App::MeasureLength::addGeometryHandlers(proxyList, MeasureLengthHandler);
+    MeasureLength::addGeometryHandlers(proxyList, MeasureLengthHandler);
 
     // Extend MeasureAngle
     MeasureAngle::addGeometryHandlers(proxyList, MeasureAngleHandler);

@@ -30,6 +30,7 @@
 #include "MeasurementPy.h"
 #include "MeasureAngle.h"
 #include "MeasureDistance.h"
+#include "MeasureLength.h"
 
 
 namespace Measure {
@@ -69,6 +70,7 @@ PyMOD_INIT_FUNC(Measure)
     Measure::Measurement            ::init();
     Measure::MeasureAngle           ::init();
     Measure::MeasureDistance        ::init();
+    Measure::MeasureLength          ::init();
     Measure::Measure                ::initialize();
     
     Base::Console().Log("Loading Measure module... done\n");

@@ -101,7 +101,7 @@
 #include "MaterialObject.h"
 #include "Measure.h"
 #include "MeasureDistance.h"
-#include "MeasureLength.h"
+//#include "MeasureLength.h"
 #include "Measure.h"
 #include "Origin.h"
 #include "OriginFeature.h"
@@ -2122,9 +2122,12 @@ void Application::initTypes()
     App::VRMLObject                ::init();
     App::Annotation                ::init();
     App::AnnotationLabel           ::init();
+
+    // this should move to Mod/Measure?
     App::MeasurementBase           ::init();
+
     App::MeasureDistance           ::init();
-    App::MeasureLength             ::init();
+//    App::MeasureLength             ::init();
     App::MaterialObject            ::init();
     App::MaterialObjectPython      ::init();
     App::TextDocument              ::init();
@@ -2763,7 +2766,7 @@ void Application::initApplication()
 
     // Initialize base measurments
     // Note: Where to put this? Throws an error when called from Application::initTypes
-    App::Measure::initialize();
+//    App::Measure::initialize();
 }
 
 std::list<std::string> Application::getCmdLineFiles()
