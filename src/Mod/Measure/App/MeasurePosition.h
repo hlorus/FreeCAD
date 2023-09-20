@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (c) 2013 Luke Parry <l.parry@warwick.ac.uk>                 *
+ *   Copyright (c) 2023 David Friedli <david[at]friedli-be.ch>             *
  *                                                                         *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
@@ -20,65 +20,59 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "PreCompiled.h"
 
-#include <Base/Console.h>
-#include <Base/Interpreter.h>
+#ifndef APP_MEASUREPOSITION_H
+#define APP_MEASUREPOSITION_H
 
-#include "Measure.h"
-#include "Measurement.h"
-#include "MeasurementPy.h"
-#include "MeasureAngle.h"
-#include "MeasureDistance.h"
-#include "MeasurePosition.h"
+#include <App/DocumentObject.h>
+#include <App/PropertyGeo.h>
+#include <App/PropertyUnits.h>
+#include <tuple>
+#include <App/Measure.h>
+#include <functional>
+#include <string.h>
+#include <map>
+
+#include <Mod/Measure/MeasureGlobal.h>
 
 
-namespace Measure {
-class Module : public Py::ExtensionModule<Module>
+namespace Measure
 {
+
+
+class MeasureExport MeasurePosition : public App::MeasurementBaseExtendable<float>
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasurePosition);
+
 public:
-    Module() : Py::ExtensionModule<Module>("Measure")
-    {
-        initialize("This module is the Measure module."); // register with Python
-    }
+    /// Constructor
+    MeasurePosition();
+    ~MeasurePosition() override;
+
+    App::PropertyLinkSubList Elements;
+    App::PropertyVector Position;
+
+    App::DocumentObjectExecReturn *execute() override;
+    void recalculatePosition();
+
+    // const char* getViewProviderName() const override {
+    //     return "Gui::ViewProviderMeasurePosition";
+    // }
+
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection);
+    
+    // Note: How should we display a vector?
+    // Allow multiple result values along with labels? X, Y, Z
+    // Just return a string?
+    Base::Quantity result() {return Base::Quantity();}
 
 private:
+
+    void onChanged(const App::Property* prop) override;
 };
 
-PyObject* initModule()
-{
-    return Base::Interpreter().addModule(new Module);
-}
-
-} // namespace Measure
+} //namespace Measure
 
 
-/* Python entry */
-PyMOD_INIT_FUNC(Measure)
-{
-    // load dependent module
-    try {
-        Base::Interpreter().runString("import Part");
-    }
-    catch(const Base::Exception& e) {
-        PyErr_SetString(PyExc_ImportError, e.what());
-        PyMOD_Return(nullptr);
-    }
-    PyObject* mod = Measure::initModule();
-    // Add Types to module
-    Base::Interpreter().addType(&Measure::MeasurementPy      ::Type,mod,"Measurement");
-    Measure::Measurement            ::init();
-    Measure::MeasureAngle           ::init();
-    Measure::MeasureDistance        ::init();
-    Measure::MeasurePosition        ::init();
-    Measure::Measure                ::initialize();
-    
-    Base::Console().Log("Loading Measure module... done\n");
-    PyMOD_Return(mod);
-}
-
-// debug print for sketchsolv 
-void debugprint(const std::string& s)
-{
-    Base::Console().Log("%s", s.c_str());
-}
+#endif // APP_MEASUREPOSITION_H
