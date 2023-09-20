@@ -20,16 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #include "PreCompiled.h"
-#include "Measure.h"
+
+#include "MeasureBase.h"
 
 
-using namespace App;
+using namespace Measure;
 
-PROPERTY_SOURCE_ABSTRACT(App::MeasurementBase, App::DocumentObject)
+PROPERTY_SOURCE_ABSTRACT(Measure::MeasureBase, App::DocumentObject)
 
-
-void App::Measure::initialize(){
-
-}

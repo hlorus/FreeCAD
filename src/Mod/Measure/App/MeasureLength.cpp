@@ -33,7 +33,7 @@
 
 using namespace Measure;
 
-PROPERTY_SOURCE(Measure::MeasureLength, App::MeasurementBase)
+PROPERTY_SOURCE(Measure::MeasureLength, Measure::MeasureBase)
 
 
 
@@ -145,7 +145,7 @@ void MeasureLength::onChanged(const App::Property* prop)
         }
     }
     
-    // should be immediate parent?  can a templated object be a parent?  should at least be MeasurementBase?
+    // should be immediate parent?  can a templated object be a parent?  should at least be MeasureBase?
     DocumentObject::onChanged(prop);
 }
 

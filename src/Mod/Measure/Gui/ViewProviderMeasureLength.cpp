@@ -56,7 +56,7 @@ using namespace Gui;
 using namespace MeasureGui;
 using namespace Measure;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureLength, MeasureGui::ViewProviderMeasurementBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureLength, MeasureGui::ViewProviderMeasureBase)
 
 
 ViewProviderMeasureLength::ViewProviderMeasureLength()
@@ -107,14 +107,14 @@ void ViewProviderMeasureLength::onChanged(const App::Property* prop)
         updateData(prop);
     }
     else {
-        ViewProviderMeasurementBase::onChanged(prop);
+        ViewProviderMeasureBase::onChanged(prop);
     }
 }
 
 
 void ViewProviderMeasureLength::attach(App::DocumentObject* pcObject)
 {
-    ViewProviderMeasurementBase::attach(pcObject);
+    ViewProviderMeasureBase::attach(pcObject);
 
     auto ps = getSoPickStyle();
 
@@ -200,7 +200,7 @@ void ViewProviderMeasureLength::updateData(const App::Property* prop)
         updateView();
     }
 
-    ViewProviderMeasurementBase::updateData(prop);
+    ViewProviderMeasureBase::updateData(prop);
 }
 
 

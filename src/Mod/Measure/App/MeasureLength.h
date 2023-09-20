@@ -32,16 +32,16 @@
 #include <tuple>
 
 #include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
+#include <App/PropertyLinks.h>
 #include <App/PropertyUnits.h>
-#include <App/Measure.h>
 
+#include "MeasureBase.h"
 
 namespace Measure
 {
 
 
-class MeasureExport MeasureLength : public App::MeasurementBaseExtendable<float>
+class MeasureExport MeasureLength : public Measure::MeasureBaseExtendable<float>
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureLength);
 
@@ -61,8 +61,8 @@ public:
     }
 
     static bool isValidSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-    Base::Quantity result() {return Length.getQuantityValue();}
+    void parseSelection(const App::MeasureSelection& selection) override;
+    Base::Quantity result() override {return Length.getQuantityValue();}
 
 private:
 

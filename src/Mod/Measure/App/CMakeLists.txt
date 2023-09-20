@@ -31,19 +31,25 @@ SET(Python_SRCS
 SOURCE_GROUP("Python" FILES ${Python_SRCS})
 
 SET(MeasureModule_SRCS
+    PreCompiled.cpp
+    PreCompiled.h
     AppMeasure.cpp
+
     Measurement.cpp
     Measurement.h
+
+# umf
+    MeasureBase.cpp
+    MeasureBase.h
     MeasureAngle.cpp
     MeasureAngle.h
     MeasureDistance.cpp
     MeasureDistance.h
     MeasureLength.cpp
     MeasureLength.h
-    Measure.cpp
-    Measure.h
-    PreCompiled.cpp
-    PreCompiled.h
+#    Measure.cpp
+#    Measure.h
+
     Preferences.cpp
     Preferences.h
 )

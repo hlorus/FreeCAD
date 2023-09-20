@@ -26,7 +26,7 @@
 
 #include <Mod/Measure/MeasureGlobal.h>
 
-#include "ViewProviderMeasurementBase.h"
+#include "ViewProviderMeasureBase.h"
 
 class SoCoordinate3;
 class SoIndexedLineSet;
@@ -40,7 +40,7 @@ class Property;
 namespace MeasureGui
 {
 
-class MeasureGuiExport ViewProviderMeasureLength : public MeasureGui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureLength : public MeasureGui::ViewProviderMeasureBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureLength);
 
@@ -53,8 +53,8 @@ public:
     App::PropertyFloat          DistFactor;
     App::PropertyBool           Mirror;
 
-    void attach(App::DocumentObject *) override;
-    void updateData(const App::Property*) override;
+    void attach(App::DocumentObject * feature) override;
+    void updateData(const App::Property* prop) override;
 
 protected:
     void onChanged(const App::Property* prop) override;

@@ -34,7 +34,7 @@
 #include "DlgPrefsMeasureAppearanceImp.h"
 #include "ViewProviderMeasureAngle.h"
 #include "ViewProviderMeasureDistance.h"
-#include "ViewProviderMeasurementBase.h"
+#include "ViewProviderMeasureBase.h"
 #include "ViewProviderMeasureLength.h"
 
 
@@ -89,7 +89,7 @@ PyMOD_INIT_FUNC(MeasureGui)
     // instantiating the commands
     CreateMeasureCommands();
 
-    MeasureGui::ViewProviderMeasurementBase            ::init();
+    MeasureGui::ViewProviderMeasureBase            ::init();
     MeasureGui::ViewProviderMeasureAngle               ::init();
     MeasureGui::ViewProviderMeasureDistance            ::init();
     MeasureGui::ViewProviderMeasureLength              ::init();

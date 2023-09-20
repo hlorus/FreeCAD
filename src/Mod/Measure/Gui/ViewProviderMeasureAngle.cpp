@@ -250,7 +250,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
 
 
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, MeasureGui::ViewProviderMeasurementBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, MeasureGui::ViewProviderMeasureBase)
 
 
 ViewProviderMeasureAngle::ViewProviderMeasureAngle()
@@ -285,7 +285,7 @@ void ViewProviderMeasureAngle::onChanged(const App::Property* prop)
 
 void ViewProviderMeasureAngle::attach(App::DocumentObject* pcObject)
 {
-    ViewProviderMeasurementBase::attach(pcObject);
+    ViewProviderMeasureBase::attach(pcObject);
 
     // Arc Engine
     Gui::ArcEngine *arcEngine = new Gui::ArcEngine();
@@ -344,7 +344,7 @@ void ViewProviderMeasureAngle::updateData(const App::Property* prop)
         getMatrix();
 
         setLabelTranslation(midpoint.getValue());
-        setLabelValue(static_cast<App::MeasurementBase*>(pcObject)->result());
+        setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->result());
 
     } else {
         ViewProviderDocumentObject::updateData(prop);

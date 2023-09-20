@@ -25,13 +25,14 @@
 #include <Base/Console.h>
 #include <Base/Interpreter.h>
 
-#include "Measure.h"
 #include "Measurement.h"
 #include "MeasurementPy.h"
+
+// unified measurement facility
+#include "MeasureBase.h"
 #include "MeasureAngle.h"
 #include "MeasureDistance.h"
 #include "MeasureLength.h"
-
 
 namespace Measure {
 class Module : public Py::ExtensionModule<Module>
@@ -52,6 +53,7 @@ PyObject* initModule()
 
 } // namespace Measure
 
+using namespace Measure;
 
 /* Python entry */
 PyMOD_INIT_FUNC(Measure)
@@ -68,17 +70,47 @@ PyMOD_INIT_FUNC(Measure)
     // Add Types to module
     Base::Interpreter().addType(&Measure::MeasurementPy      ::Type,mod,"Measurement");
     Measure::Measurement            ::init();
+
+    // umf classes
+    Measure::MeasureBase            ::init();
     Measure::MeasureAngle           ::init();
     Measure::MeasureDistance        ::init();
     Measure::MeasureLength          ::init();
-    Measure::Measure                ::initialize();
-    
+
+    // Add fundamental umf Measure Types
+    App::Application& app = App::GetApplication();
+    app.addMeasureType(
+        new App::MeasureType {
+            "ANGLE",
+            "Angle",
+            "Measure::MeasureAngle",
+            MeasureAngle::isValidSelection,
+            MeasureAngle::isPrioritizedSelection,
+        });
+        
+    app.addMeasureType(
+        new App::MeasureType {
+            "DISTANCE",
+            "Distance",
+            "Measure::MeasureDistance",
+            MeasureDistance::isValidSelection,
+            MeasureDistance::isPrioritizedSelection,
+    });
+
+    app.addMeasureType(
+        new App::MeasureType {
+            "LENGTH",
+            "Length",
+            "Measure::MeasureLength",
+            MeasureLength::isValidSelection,
+            nullptr,
+    });    
     Base::Console().Log("Loading Measure module... done\n");
     PyMOD_Return(mod);
 }
 
 // debug print for sketchsolv 
-void debugprint(const std::string& s)
+void debugprint(const std::string& text)
 {
-    Base::Console().Log("%s", s.c_str());
+    Base::Console().Log("%s", text.c_str());
 }

@@ -99,7 +99,7 @@
 #include "Link.h"
 #include "LinkBaseExtensionPy.h"
 #include "MaterialObject.h"
-#include "Measure.h"
+//#include "Measure.h"
 #include "MeasureDistance.h"
 #include "Origin.h"
 #include "OriginFeature.h"
@@ -2122,7 +2122,7 @@ void Application::initTypes()
     App::AnnotationLabel           ::init();
 
     // this should move to Mod/Measure?
-    App::MeasurementBase           ::init();
+//    App::MeasureBase           ::init();
 
     App::MeasureDistance           ::init();
     App::MaterialObject            ::init();

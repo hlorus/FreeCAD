@@ -24,19 +24,21 @@
 #ifndef APP_MEASUREANGLE_H
 #define APP_MEASUREANGLE_H
 
-#include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
+#include <Mod/Measure/MeasureGlobal.h>
+
+#include <gp_Vec.hxx>
+
 #include <tuple>
-#include <App/Measure.h>
 #include <functional>
 #include <string.h>
 #include <map>
 
+#include <App/DocumentObject.h>
+#include <App/PropertyGeo.h>
+#include <App/PropertyUnits.h>
 #include <Base/Vector3D.h>
-#include <gp_Vec.hxx>
 
-#include <Mod/Measure/MeasureGlobal.h>
+#include "MeasureBase.h"
 
 
 namespace Measure
@@ -50,7 +52,7 @@ struct MeasureAngleInfo {
 };
 
 
-class MeasureExport MeasureAngle : public App::MeasurementBaseExtendable<MeasureAngleInfo>
+class MeasureExport MeasureAngle : public Measure::MeasureBaseExtendable<MeasureAngleInfo>
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureAngle);
 
@@ -71,8 +73,8 @@ public:
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     static bool isPrioritizedSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-    Base::Quantity result() {return Angle.getQuantityValue();}
+    void parseSelection(const App::MeasureSelection& selection) override;
+    Base::Quantity result() override {return Angle.getQuantityValue();}
 
     bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
     Base::Vector3d getLoc(App::DocumentObject& ob, std::string& subName);
