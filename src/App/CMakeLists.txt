@@ -161,7 +161,6 @@ SET(Document_CPP_SRCS
     InventorObject.cpp
     Measure.cpp
     MeasureDistance.cpp
-#    MeasureLength.cpp
     Placement.cpp
     OriginFeature.cpp
     Range.cpp
@@ -207,7 +206,6 @@ SET(Document_HPP_SRCS
     InventorObject.h
     Measure.h
     MeasureDistance.h
-#    MeasureLength.h
     Placement.h
     OriginFeature.h
     Range.h

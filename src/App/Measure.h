@@ -93,7 +93,7 @@ template <typename T>
 typename MeasurementBaseExtendable<T>::HandlerMap MeasurementBaseExtendable<T>::_mGeometryHandlers = MeasurementBaseExtendable<T>::HandlerMap();
 
 
-
+// What is this?
 class AppExport Measure {
 
 public:

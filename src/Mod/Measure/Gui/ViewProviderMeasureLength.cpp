@@ -47,12 +47,10 @@
 #include <Gui/Document.h>
 #include <Gui/ViewParams.h>
 
-#include <App/MeasureLength.h>
+#include <Mod/Measure/App/MeasureLength.h>
 #include <Mod/Measure/App/Preferences.h>
 
 #include "ViewProviderMeasureLength.h"
-
-
 
 using namespace Gui;
 using namespace MeasureGui;
@@ -151,7 +149,7 @@ void ViewProviderMeasureLength::updateData(const App::Property* prop)
     if (prop->getTypeId() == App::PropertyVector::getClassTypeId() ||
         prop == &Mirror || prop == &DistFactor) {
 
-        auto ob = static_cast<App::MeasureLength*>(getObject());
+        auto ob = static_cast<Measure::MeasureLength*>(getObject());
 
 //        if (strcmp(prop->getName(),"Position1") == 0) {
 //            auto vec1 = ob->Position1.getValue();
