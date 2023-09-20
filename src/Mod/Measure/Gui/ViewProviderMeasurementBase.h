@@ -30,6 +30,7 @@
 #include <Base/Parameter.h>
 #include <Gui/ViewProviderDocumentObject.h>
 #include "App/PropertyContainer.h"
+#include <Gui/SoTextLabel.h>
 
 
 class SbVec2s;
@@ -58,6 +59,7 @@ public:
 
     // Display properties
     App::PropertyColor          TextColor;
+    App::PropertyColor          TextBackgroundColor;
     App::PropertyColor          LineColor;
     App::PropertyInteger        FontSize;
 
@@ -82,7 +84,7 @@ protected:
 
     bool _mShowTree = true;
 
-    SoText2          * pLabel;
+    Gui::SoTextLabel * pLabel;
     SoTranslation    * pTranslation;
     SoFontStyle      * pFont;
     SoBaseColor      * pColor;
@@ -92,6 +94,7 @@ protected:
     Base::Reference<ParameterGrp> getPreferenceGroup(const char* Name);
     App::Color defaultLineColor();
     App::Color defaultTextColor();
+    App::Color defaultTextBackgroundColor();
     int defaultFontSize();
 
 };

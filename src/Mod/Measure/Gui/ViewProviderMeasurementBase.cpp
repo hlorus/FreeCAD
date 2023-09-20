@@ -54,12 +54,13 @@ ViewProviderMeasurementBase::ViewProviderMeasurementBase()
 {
     static const char *agroup = "Appearance";
     ADD_PROPERTY_TYPE(TextColor, (defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
+    ADD_PROPERTY_TYPE(TextBackgroundColor, (defaultTextBackgroundColor()), agroup, App::Prop_None, "Color for the measurement text background");
     ADD_PROPERTY_TYPE(LineColor, (defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
     ADD_PROPERTY_TYPE(FontSize, (defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
 
     pFont = new SoFontStyle();
     pFont->ref();
-    pLabel = new SoText2();
+    pLabel = new Gui::SoTextLabel();
     pLabel->ref();
     pColor = new SoBaseColor();
     pColor->ref();
@@ -69,6 +70,7 @@ ViewProviderMeasurementBase::ViewProviderMeasurementBase()
     pTranslation->ref();
 
     TextColor.touch();
+    TextBackgroundColor.touch();
     FontSize.touch();
     LineColor.touch();
 }
@@ -104,6 +106,10 @@ void ViewProviderMeasurementBase::onChanged(const App::Property* prop)
     if (prop == &TextColor) {
         const App::Color& color = TextColor.getValue();
         pTextColor->rgb.setValue(color.r, color.g, color.b);
+    }
+    else if (prop == &TextBackgroundColor) {
+        const App::Color& color = TextBackgroundColor.getValue();
+        pLabel->backgroundColor.setValue(color.r, color.g, color.b);
     }
     else if (prop == &LineColor) {
         const App::Color& color = LineColor.getValue();
@@ -181,6 +187,13 @@ App::Color ViewProviderMeasurementBase::defaultTextColor()
 {
     App::Color fcColor;
     fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextColor", 0xFFFFFFFF));
+    return fcColor;
+}
+
+App::Color ViewProviderMeasurementBase::defaultTextBackgroundColor()
+{
+    App::Color fcColor;
+    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextBackgroundColor", 0x00000000));
     return fcColor;
 }
 
