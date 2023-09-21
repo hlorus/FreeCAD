@@ -126,7 +126,7 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
     btn->setToolTip(tr("Press the Close button to exit."));
 }
 
-bool canAnnotate(App::MeasurementBase* obj) {
+bool canAnnotate(Measure::MeasureBase* obj) {
     if (obj == nullptr) {
         // null object, can't annotate this
         return false;
@@ -151,7 +151,7 @@ void TaskMeasure::enableAnnotateButton(bool state) {
     btn->setEnabled(state);
 }
 
-void TaskMeasure::setMeasureObject(App::MeasurementBase* obj) {
+void TaskMeasure::setMeasureObject(Measure::MeasureBase* obj) {
     _mMeasureObject = obj;
 }
 
@@ -251,7 +251,7 @@ void TaskMeasure::update() {
         // Create measure object
         App::Document *doc = App::GetApplication().getActiveDocument();
         setMeasureObject(
-            (App::MeasurementBase*)doc->addObject(measureType->measureObject.c_str())
+            (Measure::MeasureBase*)doc->addObject(measureType->measureObject.c_str())
         );
     }
 
@@ -270,7 +270,7 @@ void TaskMeasure::close(){
 }
 
 
-void ensureGroup(App::MeasurementBase* measurement) {
+void ensureGroup(Measure::MeasureBase* measurement) {
     // Ensure measurement object is part of the measurements group
 
     const char* measurementGroupName = "Measurements";

@@ -34,6 +34,7 @@
 
 #include "MeasureAngle.h"
 #include "MeasureDistance.h"
+#include "MeasureLength.h"
 
 #include <string>
 
@@ -63,6 +64,15 @@ void Measure::initialize() {
             "Measure::MeasureDistance",
             MeasureDistance::isValidSelection,
             MeasureDistance::isPrioritizedSelection,
+    });
+
+    app.addMeasureType(
+        new App::MeasureType {
+            "LENGTH",
+            "Length",
+            "Measure::MeasureLength",
+            MeasureLength::isValidSelection,
+            nullptr,
     });
 }
 

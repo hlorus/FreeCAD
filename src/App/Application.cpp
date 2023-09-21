@@ -99,10 +99,8 @@
 #include "Link.h"
 #include "LinkBaseExtensionPy.h"
 #include "MaterialObject.h"
-#include "Measure.h"
+//#include "Measure.h"
 #include "MeasureDistance.h"
-#include "MeasureLength.h"
-#include "Measure.h"
 #include "Origin.h"
 #include "OriginFeature.h"
 #include "OriginGroupExtension.h"
@@ -2122,9 +2120,11 @@ void Application::initTypes()
     App::VRMLObject                ::init();
     App::Annotation                ::init();
     App::AnnotationLabel           ::init();
-    App::MeasurementBase           ::init();
+
+    // this should move to Mod/Measure?
+//    App::MeasureBase           ::init();
+
     App::MeasureDistance           ::init();
-    App::MeasureLength             ::init();
     App::MaterialObject            ::init();
     App::MaterialObjectPython      ::init();
     App::TextDocument              ::init();
@@ -2761,9 +2761,6 @@ void Application::initApplication()
     // seed randomizer
     srand(time(nullptr));
 
-    // Initialize base measurments
-    // Note: Where to put this? Throws an error when called from Application::initTypes
-    App::Measure::initialize();
 }
 
 std::list<std::string> Application::getCmdLineFiles()

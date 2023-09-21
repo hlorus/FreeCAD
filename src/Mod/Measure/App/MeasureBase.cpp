@@ -20,52 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "PreCompiled.h"
 
-#ifndef APP_MEASURELENGTH_H
-#define APP_MEASURELENGTH_H
-
-#include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
-#include <tuple>
-#include "Measure.h"
-#include <functional>
-#include <string.h>
-#include <map>
-
-namespace App
-{
+#include "MeasureBase.h"
 
 
-class AppExport MeasureLength : public App::MeasurementBaseExtendable<float>
-{
-    PROPERTY_HEADER_WITH_OVERRIDE(App::MeasureLength);
+using namespace Measure;
 
-public:
-    /// Constructor
-    MeasureLength();
-    ~MeasureLength() override;
+PROPERTY_SOURCE_ABSTRACT(Measure::MeasureBase, App::DocumentObject)
 
-    App::PropertyLinkSubList Elements;
-    App::PropertyDistance Distance;
-
-    App::DocumentObjectExecReturn *execute() override;
-    void recalculateDistance();
-
-    // const char* getViewProviderName() const override {
-    //     return "Gui::ViewProviderMeasureDistance";
-    // }
-
-    static bool isValidSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-    Base::Quantity result() {return Distance.getQuantityValue();}
-
-private:
-
-    void onChanged(const App::Property* prop) override;
-};
-
-} //namespace App
-
-
-#endif // APP_MEASURELENGTH_H
