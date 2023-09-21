@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (c) 2023 David Friedli <david[at]friedli-be.ch>             *
+ *   Copyright (c) 2023 Wanderer Fan <wandererfan@gmail.com>               *
  *                                                                         *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
@@ -21,31 +21,52 @@
  ***************************************************************************/
 
 
-#include "PreCompiled.h"
+#ifndef MEASUREGUI_VIEWPROVIDERMEASURELENGTH_H
+#define MEASUREGUI_VIEWPROVIDERMEASURELENGTH_H
 
-#include <App/Application.h>
-#include "Base/Console.h"
-#include "Measure.h"
-//#include <Mod/Measure/App/MeasureAngle.h>
-//#include <Mod/Measure/App/MeasureDistance.h>
+#include <Mod/Measure/MeasureGlobal.h>
 
+#include "ViewProviderMeasureBase.h"
 
-//using namespace Measure;
+class SoCoordinate3;
+class SoIndexedLineSet;
 
-void PartDesign::Measure::initialize() {
-    App::Application& app = App::GetApplication();
-    const App::MeasureHandler& handler = app.getMeasureHandler("Part");
-
-    // Note: This is not ideal, avoid having to pass along all Part geomerty handlers, PartDesign geometry should be the same
-
-    app.addMeasureHandler("PartDesign", handler.infoCb, handler.typeCb);
-
-//    App::MeasureLength::addGeometryHandler("PartDesign",
-//                                           App::MeasureLength::getGeometryHandler("Part"));
-
-//    MeasureAngle::addGeometryHandler("PartDesign",
-//                                           MeasureAngle::getGeometryHandler("Part"));
-
-//    MeasureDistance::addGeometryHandler("PartDesign", MeasureDistance::getGeometryHandler("Part"));
+namespace App
+{
+class DocumentObject;
+class Property;
 }
+
+namespace MeasureGui
+{
+
+class MeasureGuiExport ViewProviderMeasureLength : public MeasureGui::ViewProviderMeasureBase
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureLength);
+
+public:
+    /// Constructor
+    ViewProviderMeasureLength();
+    ~ViewProviderMeasureLength() override;
+
+    // // Display properties
+    App::PropertyFloat          DistFactor;
+    App::PropertyBool           Mirror;
+
+    void attach(App::DocumentObject * feature) override;
+    void updateData(const App::Property* prop) override;
+
+protected:
+    void onChanged(const App::Property* prop) override;
+
+private:
+    SoCoordinate3    * pCoords;
+    SoIndexedLineSet * pLines;
+
+};
+
+} //namespace MeasureGui
+
+
+#endif // MEASUREGUI_VIEWPROVIDERMEASURELENGTH_H
 

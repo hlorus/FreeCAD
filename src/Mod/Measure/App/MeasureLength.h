@@ -21,31 +21,56 @@
  ***************************************************************************/
 
 
-#include "PreCompiled.h"
+#ifndef MEASURE_MEASURELENGTH_H
+#define MEASURE_MEASURELENGTH_H
 
-#include <App/Application.h>
-#include "Base/Console.h"
-#include "Measure.h"
-//#include <Mod/Measure/App/MeasureAngle.h>
-//#include <Mod/Measure/App/MeasureDistance.h>
+#include <Mod/Measure/MeasureGlobal.h>
+
+#include <functional>
+#include <string.h>
+#include <map>
+#include <tuple>
+
+#include <App/DocumentObject.h>
+#include <App/PropertyLinks.h>
+#include <App/PropertyUnits.h>
+
+#include "MeasureBase.h"
+
+namespace Measure
+{
 
 
-//using namespace Measure;
+class MeasureExport MeasureLength : public Measure::MeasureBaseExtendable<float>
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureLength);
 
-void PartDesign::Measure::initialize() {
-    App::Application& app = App::GetApplication();
-    const App::MeasureHandler& handler = app.getMeasureHandler("Part");
+public:
+    /// Constructor
+    MeasureLength();
+    ~MeasureLength() override;
 
-    // Note: This is not ideal, avoid having to pass along all Part geomerty handlers, PartDesign geometry should be the same
+    App::PropertyLinkSubList Elements;
+    App::PropertyDistance Length;
 
-    app.addMeasureHandler("PartDesign", handler.infoCb, handler.typeCb);
+    App::DocumentObjectExecReturn *execute() override;
+    void recalculateLength();
 
-//    App::MeasureLength::addGeometryHandler("PartDesign",
-//                                           App::MeasureLength::getGeometryHandler("Part"));
+    const char* getViewProviderName() const override {
+        return "MeasureGui::ViewProviderMeasureLength";
+    }
 
-//    MeasureAngle::addGeometryHandler("PartDesign",
-//                                           MeasureAngle::getGeometryHandler("Part"));
+    static bool isValidSelection(const App::MeasureSelection& selection);
+    void parseSelection(const App::MeasureSelection& selection) override;
+    Base::Quantity result() override {return Length.getQuantityValue();}
 
-//    MeasureDistance::addGeometryHandler("PartDesign", MeasureDistance::getGeometryHandler("Part"));
-}
+private:
+
+    void onChanged(const App::Property* prop) override;
+};
+
+} //namespace Measure
+
+
+#endif // MEASURE_MEASURELENGTH_H
 

@@ -41,16 +41,16 @@
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
 
-#include "ViewProviderMeasurementBase.h"
+#include "ViewProviderMeasureBase.h"
 
 
 using namespace MeasureGui;
 namespace bp = boost::placeholders;
 
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasurementBase, Gui::ViewProviderDocumentObject)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureBase, Gui::ViewProviderDocumentObject)
 
-ViewProviderMeasurementBase::ViewProviderMeasurementBase()
+ViewProviderMeasureBase::ViewProviderMeasureBase()
 {
     static const char *agroup = "Appearance";
     ADD_PROPERTY_TYPE(TextColor, (defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
@@ -75,7 +75,7 @@ ViewProviderMeasurementBase::ViewProviderMeasurementBase()
     LineColor.touch();
 }
 
-ViewProviderMeasurementBase::~ViewProviderMeasurementBase()
+ViewProviderMeasureBase::~ViewProviderMeasureBase()
 {
     pFont->unref();
     pLabel->unref();
@@ -84,7 +84,7 @@ ViewProviderMeasurementBase::~ViewProviderMeasurementBase()
     pTranslation->unref();
 }
 
-std::vector<std::string> ViewProviderMeasurementBase::getDisplayModes() const
+std::vector<std::string> ViewProviderMeasureBase::getDisplayModes() const
 {
     // add modes
     std::vector<std::string> StrList;
@@ -92,7 +92,7 @@ std::vector<std::string> ViewProviderMeasurementBase::getDisplayModes() const
     return StrList;
 }
 
-void ViewProviderMeasurementBase::setDisplayMode(const char* ModeName)
+void ViewProviderMeasureBase::setDisplayMode(const char* ModeName)
 {
     if (strcmp(ModeName, "Base") == 0) {
         setDisplayMaskMode("Base");
@@ -101,7 +101,7 @@ void ViewProviderMeasurementBase::setDisplayMode(const char* ModeName)
 }
 
 
-void ViewProviderMeasurementBase::onChanged(const App::Property* prop)
+void ViewProviderMeasureBase::onChanged(const App::Property* prop)
 {
     if (prop == &TextColor) {
         const App::Color& color = TextColor.getValue();
@@ -121,28 +121,28 @@ void ViewProviderMeasurementBase::onChanged(const App::Property* prop)
 }
 
 
-void ViewProviderMeasurementBase::setLabelValue(const Base::Quantity& value) {
+void ViewProviderMeasureBase::setLabelValue(const Base::Quantity& value) {
     pLabel->string.setValue(value.getUserString().toUtf8().constData());
 }
 
-void ViewProviderMeasurementBase::setLabelTranslation(const SbVec3f& position) {
+void ViewProviderMeasureBase::setLabelTranslation(const SbVec3f& position) {
     pTranslation->translation.setValue(position);
 }
 
 
-SoPickStyle* ViewProviderMeasurementBase::getSoPickStyle() {
+SoPickStyle* ViewProviderMeasureBase::getSoPickStyle() {
     auto ps = new SoPickStyle();
     ps->style = SoPickStyle::UNPICKABLE;
     return ps;
 }
 
-SoDrawStyle* ViewProviderMeasurementBase::getSoLineStylePrimary() {
+SoDrawStyle* ViewProviderMeasureBase::getSoLineStylePrimary() {
     auto style = new SoDrawStyle();
     style->lineWidth = 2.0f;
     return style;
 }
 
-SoSeparator* ViewProviderMeasurementBase::getSoSeparatorText() {
+SoSeparator* ViewProviderMeasureBase::getSoSeparatorText() {
     auto textsep = new SoSeparator();
     textsep->addChild(pTranslation);
     textsep->addChild(pTextColor);
@@ -152,18 +152,18 @@ SoSeparator* ViewProviderMeasurementBase::getSoSeparatorText() {
 }
 
 
-void ViewProviderMeasurementBase::onGuiUpdate(const App::MeasurementBase* measureObject) {
+void ViewProviderMeasureBase::onGuiUpdate(const Measure::MeasureBase* measureObject) {
     (void) measureObject;
     updateView();
 }
 
-void ViewProviderMeasurementBase::attach(App::DocumentObject *pcObj)
+void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
 {
     ViewProviderDocumentObject::attach(pcObj);
 
-    auto bnd = boost::bind(&ViewProviderMeasurementBase::onGuiUpdate, this, bp::_1);
+    auto bnd = boost::bind(&ViewProviderMeasureBase::onGuiUpdate, this, bp::_1);
 
-    App::MeasurementBase* feature = dynamic_cast<App::MeasurementBase*>(pcObject);
+    Measure::MeasureBase* feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
     if (feature) {
         feature->signalGuiUpdate.connect(bnd);
     }
@@ -171,33 +171,33 @@ void ViewProviderMeasurementBase::attach(App::DocumentObject *pcObj)
 
 // TODO: migrate these routines to Mod/Measure
 //! Returns the Measure preference group
-Base::Reference<ParameterGrp> ViewProviderMeasurementBase::getPreferenceGroup(const char* Name)
+Base::Reference<ParameterGrp> ViewProviderMeasureBase::getPreferenceGroup(const char* Name)
 {
     return App::GetApplication().GetUserParameter().GetGroup("BaseApp/Preferences/Mod/Measure")->GetGroup(Name);
 }
 
-App::Color ViewProviderMeasurementBase::defaultLineColor()
+App::Color ViewProviderMeasureBase::defaultLineColor()
 {
     App::Color fcColor;
     fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultLineColor", 0xFFFFFFFF));
     return fcColor;
 }
 
-App::Color ViewProviderMeasurementBase::defaultTextColor()
+App::Color ViewProviderMeasureBase::defaultTextColor()
 {
     App::Color fcColor;
     fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextColor", 0xFFFFFFFF));
     return fcColor;
 }
 
-App::Color ViewProviderMeasurementBase::defaultTextBackgroundColor()
+App::Color ViewProviderMeasureBase::defaultTextBackgroundColor()
 {
     App::Color fcColor;
     fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextBackgroundColor", 0x00000000));
     return fcColor;
 }
 
-int ViewProviderMeasurementBase::defaultFontSize()
+int ViewProviderMeasureBase::defaultFontSize()
 {
     return getPreferenceGroup("Appearance")->GetInt("DefaultFontSize", 18);
 }

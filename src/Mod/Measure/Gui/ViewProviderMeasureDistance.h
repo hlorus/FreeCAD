@@ -28,7 +28,7 @@
 
 #include <QObject>
 
-#include "ViewProviderMeasurementBase.h"
+#include "ViewProviderMeasureBase.h"
 
 class SoCoordinate3;
 class SoIndexedLineSet;
@@ -37,7 +37,7 @@ namespace MeasureGui
 {
 
 
-class MeasureGuiExport ViewProviderMeasureDistance : public MeasureGui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureDistance : public MeasureGui::ViewProviderMeasureBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureDistance);
 

@@ -31,12 +31,14 @@ SET(MeasureGui_SRCS
     Resources/Measure.qrc
     PreCompiled.cpp
     PreCompiled.h
-    ViewProviderMeasurementBase.cpp
-    ViewProviderMeasurementBase.h
+    ViewProviderMeasureBase.cpp
+    ViewProviderMeasureBase.h
     ViewProviderMeasureAngle.cpp
     ViewProviderMeasureAngle.h
     ViewProviderMeasureDistance.cpp
     ViewProviderMeasureDistance.h
+    ViewProviderMeasureLength.cpp
+    ViewProviderMeasureLength.h
     # Workbench.cpp
     # Workbench.h
     DlgPrefsMeasureAppearanceImp.ui

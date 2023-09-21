@@ -25,13 +25,14 @@
 
 #include <Mod/Measure/MeasureGlobal.h>
 
-#include <App/Material.h>
-#include <App/Measure.h>
+#include <App/Application.h>
+#include <App/PropertyStandard.h>
+#include <App/PropertyGeo.h>
 #include <Base/Parameter.h>
 #include <Gui/ViewProviderDocumentObject.h>
-#include "App/PropertyContainer.h"
 #include <Gui/SoTextLabel.h>
 
+#include <Mod/Measure/App/MeasureBase.h>
 
 class SbVec2s;
 class SoFontStyle;
@@ -40,22 +41,22 @@ class SoText2;
 class SoTranslation;
 class SoPickStyle;
 
-namespace Gui {
-class View3DInventorViewer;
-}
+//namespace MeasureGui {
+//class View3DInventorViewer;
+//}
 
 namespace MeasureGui {
 
-class MeasureGuiExport ViewProviderMeasurementBase :public Gui::ViewProviderDocumentObject
+class MeasureGuiExport ViewProviderMeasureBase :public Gui::ViewProviderDocumentObject
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderMeasurementBase);
+    PROPERTY_HEADER_WITH_OVERRIDE(ViewProviderMeasureBase);
 
 public:
     /// constructor.
-    ViewProviderMeasurementBase();
+    ViewProviderMeasureBase();
 
     /// destructor.
-    ~ViewProviderMeasurementBase() override;
+    ~ViewProviderMeasureBase() override;
 
     // Display properties
     App::PropertyColor          TextColor;
@@ -67,7 +68,7 @@ public:
      * Attaches the document object to this view provider.
      */
     void attach(App::DocumentObject *pcObj) override;
-    void onGuiUpdate(const App::MeasurementBase* measureObject);
+    void onGuiUpdate(const Measure::MeasureBase* measureObject);
 
     bool useNewSelectionModel() const override {return true;}
     std::vector<std::string> getDisplayModes() const override;
