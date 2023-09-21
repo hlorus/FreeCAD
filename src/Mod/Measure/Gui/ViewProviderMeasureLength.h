@@ -26,6 +26,10 @@
 
 #include <Mod/Measure/MeasureGlobal.h>
 
+#include <Base/Vector3D.h>
+
+#include <Mod/Measure/App/MeasureLength.h>
+
 #include "ViewProviderMeasureBase.h"
 
 class SoCoordinate3;
@@ -56,8 +60,15 @@ public:
     void attach(App::DocumentObject * feature) override;
     void updateData(const App::Property* prop) override;
 
+    Measure::MeasureLength* getMeasureLength();
+
+    void redrawAnnotation() override;
+
 protected:
     void onChanged(const App::Property* prop) override;
+    std::pair<Base::Vector3d, Base::Vector3d> getPositionPoints();
+    Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = 10e-6) const;
+
 
 private:
     SoCoordinate3    * pCoords;

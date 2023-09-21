@@ -28,6 +28,7 @@
 
 #include <App/Application.h>
 #include <App/DocumentObject.h>
+#include <App/PropertyStandard.h>
 #include <Base/Quantity.h>
 
 

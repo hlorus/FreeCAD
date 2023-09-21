@@ -201,3 +201,12 @@ void ViewProviderMeasureDistance::updateData(const App::Property* prop)
     ViewProviderDocumentObject::updateData(prop);
 }
 
+Measure::MeasureDistance* ViewProviderMeasureDistance::getMeasureDistance()
+{
+    Measure::MeasureDistance* feature = dynamic_cast<Measure::MeasureDistance*>(pcObject);
+    if (!feature) {
+        throw Base::RuntimeError("Feature not found for ViewProviderMeasureDistance");
+    }
+    return feature;
+}
+

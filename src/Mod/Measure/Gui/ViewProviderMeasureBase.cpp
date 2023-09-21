@@ -41,10 +41,13 @@
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
 
+#include <Mod/Measure/App/Preferences.h>
+
 #include "ViewProviderMeasureBase.h"
 
 
 using namespace MeasureGui;
+using namespace Measure;
 namespace bp = boost::placeholders;
 
 
@@ -53,10 +56,10 @@ PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureBase, Gui::ViewProviderDocumentOb
 ViewProviderMeasureBase::ViewProviderMeasureBase()
 {
     static const char *agroup = "Appearance";
-    ADD_PROPERTY_TYPE(TextColor, (defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
-    ADD_PROPERTY_TYPE(TextBackgroundColor, (defaultTextBackgroundColor()), agroup, App::Prop_None, "Color for the measurement text background");
-    ADD_PROPERTY_TYPE(LineColor, (defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
-    ADD_PROPERTY_TYPE(FontSize, (defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
+    ADD_PROPERTY_TYPE(TextColor, (Preferences::defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
+    ADD_PROPERTY_TYPE(TextBackgroundColor, (Preferences::defaultTextBackgroundColor()), agroup, App::Prop_None, "Color for the measurement text background");
+    ADD_PROPERTY_TYPE(LineColor, (Preferences::defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
+    ADD_PROPERTY_TYPE(FontSize, (Preferences::defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
 
     pFont = new SoFontStyle();
     pFont->ref();
@@ -169,35 +172,9 @@ void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
     }
 }
 
-// TODO: migrate these routines to Mod/Measure
-//! Returns the Measure preference group
-Base::Reference<ParameterGrp> ViewProviderMeasureBase::getPreferenceGroup(const char* Name)
+void ViewProviderMeasureBase::redrawAnnotation()
 {
-    return App::GetApplication().GetUserParameter().GetGroup("BaseApp/Preferences/Mod/Measure")->GetGroup(Name);
+//    Base::Console().Message("VPMB::redrawAnnotation()\n");
 }
 
-App::Color ViewProviderMeasureBase::defaultLineColor()
-{
-    App::Color fcColor;
-    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultLineColor", 0xFFFFFFFF));
-    return fcColor;
-}
 
-App::Color ViewProviderMeasureBase::defaultTextColor()
-{
-    App::Color fcColor;
-    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextColor", 0xFFFFFFFF));
-    return fcColor;
-}
-
-App::Color ViewProviderMeasureBase::defaultTextBackgroundColor()
-{
-    App::Color fcColor;
-    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextBackgroundColor", 0x00000000));
-    return fcColor;
-}
-
-int ViewProviderMeasureBase::defaultFontSize()
-{
-    return getPreferenceGroup("Appearance")->GetInt("DefaultFontSize", 18);
-}
