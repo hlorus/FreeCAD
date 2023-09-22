@@ -29,14 +29,14 @@
 #include <functional>
 #include <string.h>
 #include <map>
+#include <tuple>
 
 #include <TopoDS_Shape.hxx>
 #include <gp_Pnt.hxx>
 
-#include <App/DocumentObject.h>
 #include <App/PropertyGeo.h>
+#include <App/PropertyLinks.h>
 #include <App/PropertyUnits.h>
-#include <tuple>
 
 #include "MeasureBase.h"
 

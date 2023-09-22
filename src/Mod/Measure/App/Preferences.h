@@ -23,11 +23,12 @@
 #ifndef Preferences_h_
 #define Preferences_h_
 
+#include <Mod/Measure/MeasureGlobal.h>
+
 #include <string>
 
 #include <Base/Parameter.h>
-#include <Mod/Measure/MeasureGlobal.h>
-
+#include <App/Material.h>
 
 namespace App
 {
@@ -49,6 +50,7 @@ public:
     static double defaultDistFactor();
     static int defaultFontSize();
     static bool defaultMirror();
+    static App::Color defaultTextBackgroundColor();
 };
 
 

@@ -27,7 +27,6 @@
 
 #include <App/Application.h>
 #include <App/PropertyStandard.h>
-#include <App/PropertyGeo.h>
 #include <Base/Parameter.h>
 #include <Gui/ViewProviderDocumentObject.h>
 #include <Gui/SoTextLabel.h>
@@ -74,6 +73,8 @@ public:
     std::vector<std::string> getDisplayModes() const override;
     void setDisplayMode(const char* ModeName) override;
 
+    virtual void redrawAnnotation();
+
 protected:
     void onChanged(const App::Property* prop) override;
     void setLabelValue(const Base::Quantity& value);
@@ -90,13 +91,6 @@ protected:
     SoFontStyle      * pFont;
     SoBaseColor      * pColor;
     SoBaseColor      * pTextColor;
-
-    // TODO: migrate these routines to Mod/Measure
-    Base::Reference<ParameterGrp> getPreferenceGroup(const char* Name);
-    App::Color defaultLineColor();
-    App::Color defaultTextColor();
-    App::Color defaultTextBackgroundColor();
-    int defaultFontSize();
 
 };
 

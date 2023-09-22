@@ -28,6 +28,8 @@
 
 #include <QObject>
 
+#include <Mod/Measure/App/MeasureDistance.h>
+
 #include "ViewProviderMeasureBase.h"
 
 class SoCoordinate3;
@@ -52,6 +54,8 @@ public:
 
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;
+
+    Measure::MeasureDistance* getMeasureDistance();
 
 protected:
     void onChanged(const App::Property* prop) override;
