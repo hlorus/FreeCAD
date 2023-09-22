@@ -105,6 +105,9 @@ TaskMeasure::TaskMeasure()
 
     // engage the selectionObserver
     attachSelection();
+
+    if(!App::GetApplication().getActiveTransaction())
+        App::GetApplication().setActiveTransaction("Add Measurement");
 }
 
 TaskMeasure::~TaskMeasure(){
@@ -292,13 +295,18 @@ void ensureGroup(Measure::MeasureBase* measurement) {
 bool TaskMeasure::accept(){
     ensureGroup(_mMeasureObject);
     close();
+
+    // Commit transaction
+    App::GetApplication().closeActiveTransaction();
     return false;
 }
 
 bool TaskMeasure::reject(){
     removeObject();
-
     close();
+
+    // Abort transaction
+    App::GetApplication().closeActiveTransaction(true);
     return false;
 }
 
