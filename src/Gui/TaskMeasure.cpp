@@ -101,13 +101,13 @@ TaskMeasure::TaskMeasure()
 
     Content.emplace_back(taskbox);
 
-    gatherSelection();
-
     // engage the selectionObserver
     attachSelection();
 
     if(!App::GetApplication().getActiveTransaction())
         App::GetApplication().setActiveTransaction("Add Measurement");
+
+    gatherSelection();
 }
 
 TaskMeasure::~TaskMeasure(){
