@@ -236,7 +236,7 @@ void TaskMeasure::update() {
         // addElement(measureModule.c_str(), get<0>(sel).c_str(), get<1>(sel).c_str());
 
         // Reset measure object
-        setMeasureObject(nullptr);
+        removeObject();
         enableAnnotateButton(false);
         return;
     }
