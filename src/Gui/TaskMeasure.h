@@ -46,7 +46,7 @@ public:
 
     void modifyStandardButtons(QDialogButtonBox* box) override;
     QDialogButtonBox::StandardButtons getStandardButtons() const override {
-        return QDialogButtonBox::Ok | QDialogButtonBox::Close;
+        return QDialogButtonBox::Ok | QDialogButtonBox::Abort;
     }
 
     void update();

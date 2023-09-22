@@ -124,8 +124,8 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
 
     // Disable button by default
     btn->setEnabled(false);
-
-    btn = box->button(QDialogButtonBox::Close);
+    btn = box->button(QDialogButtonBox::Abort);
+    btn->setText(QString::fromLatin1("Close"));
     btn->setToolTip(tr("Press the Close button to exit."));
 }
 
@@ -302,6 +302,7 @@ bool TaskMeasure::accept(){
 }
 
 bool TaskMeasure::reject(){
+    Base::Console().Message("reject\n");
     removeObject();
     close();
 
