@@ -31,9 +31,17 @@
 #include <map>
 #include <tuple>
 
-#include <App/DocumentObject.h>
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <BRep_Tool.hxx>
+#include <gp_Pnt.hxx>
+#include <TopExp.hxx>
+
 #include <App/PropertyLinks.h>
 #include <App/PropertyUnits.h>
+#include <App/GeoFeature.h>
+
+#include <Mod/Part/App/TopoShape.h>
 
 #include "MeasureBase.h"
 
@@ -64,9 +72,13 @@ public:
     void parseSelection(const App::MeasureSelection& selection) override;
     Base::Quantity result() override {return Length.getQuantityValue();}
 
-private:
+    std::pair<Base::Vector3d, Base::Vector3d> getEndPoints() const;
 
+private:
     void onChanged(const App::Property* prop) override;
+
+    TopoDS_Shape getSubShape(App::DocumentObject* object, std::string subName) const;
+
 };
 
 } //namespace Measure

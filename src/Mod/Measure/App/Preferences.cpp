@@ -58,6 +58,13 @@ App::Color Preferences::defaultTextColor()
     return fcColor;
 }
 
+App::Color Preferences::defaultTextBackgroundColor()
+{
+    App::Color fcColor;
+    fcColor.setPackedValue(getPreferenceGroup("Appearance")->GetUnsigned("DefaultTextBackgroundColor", 0x00000000));
+    return fcColor;
+}
+
 double Preferences::defaultDistFactor()
 {
     return getPreferenceGroup("Appearance")->GetFloat("DefaultDistFactor", 1.0);

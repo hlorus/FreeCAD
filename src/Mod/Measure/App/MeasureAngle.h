@@ -33,13 +33,12 @@
 #include <string.h>
 #include <map>
 
-#include <App/DocumentObject.h>
 #include <App/PropertyGeo.h>
+#include <App/PropertyLinks.h>
 #include <App/PropertyUnits.h>
 #include <Base/Vector3D.h>
 
 #include "MeasureBase.h"
-
 
 namespace Measure
 {
