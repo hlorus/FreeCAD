@@ -74,6 +74,7 @@ public:
     void setDisplayMode(const char* ModeName) override;
 
     virtual void redrawAnnotation();
+    Measure::MeasureBase* getMeasureObject();
 
 protected:
     void onChanged(const App::Property* prop) override;

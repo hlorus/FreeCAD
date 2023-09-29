@@ -178,3 +178,14 @@ void ViewProviderMeasureBase::redrawAnnotation()
 }
 
 
+//! retrive the feature
+Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
+{
+
+    // Note: Cast to MeasurePropertyBase once we use it to provide the needed values e.g. basePosition textPosition etc.
+    auto feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
+    if (!feature) {
+        throw Base::RuntimeError("Feature not found for ViewProviderMeasureBase");
+    }
+    return feature;
+}
