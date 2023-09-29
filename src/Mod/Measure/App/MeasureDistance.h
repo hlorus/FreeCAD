@@ -76,6 +76,8 @@ public:
     static bool isValidSelection(const App::MeasureSelection& selection);
     static bool isPrioritizedSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection) override;
+
+    App::PropertyQuantity* getResultProp() override {return &this->Distance;}
     Base::Quantity result() override {return Distance.getQuantityValue();}
 
     bool getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape);

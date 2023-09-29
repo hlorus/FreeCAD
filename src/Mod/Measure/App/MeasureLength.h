@@ -70,6 +70,8 @@ public:
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection) override;
+
+    App::PropertyQuantity* getResultProp() override {return &this->Length;}
     Base::Quantity result() override {return Length.getQuantityValue();}
 
     std::pair<Base::Vector3d, Base::Vector3d> getEndPoints() const;

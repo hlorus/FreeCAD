@@ -29,7 +29,9 @@
 #include <App/Application.h>
 #include <App/DocumentObject.h>
 #include <App/PropertyStandard.h>
+#include <App/PropertyUnits.h>
 #include <Base/Quantity.h>
+#include <QString>
 
 
 // TODO: this is the base for the MeasureXXXXX classes.  It should be renamed to MeasureBase and moved to Mod/Measure/App
@@ -50,6 +52,15 @@ public:
     virtual void parseSelection(const App::MeasureSelection&) = 0;
 
     virtual Base::Quantity result() = 0;
+    virtual App::PropertyQuantity* getResultProp() = 0;
+    virtual QString getResultString() {
+        App::PropertyQuantity* prop = this->getResultProp();
+        if (prop == nullptr) {
+            return QString();
+        }
+
+        return prop->getQuantityValue().getUserString();
+    }
 };
 
 
