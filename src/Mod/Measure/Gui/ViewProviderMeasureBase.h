@@ -30,6 +30,7 @@
 #include <Base/Parameter.h>
 #include <Gui/ViewProviderDocumentObject.h>
 #include <Gui/SoTextLabel.h>
+#include <QString>
 
 #include <Mod/Measure/App/MeasureBase.h>
 
@@ -79,6 +80,7 @@ public:
 protected:
     void onChanged(const App::Property* prop) override;
     void setLabelValue(const Base::Quantity& value);
+    void setLabelValue(const QString& value);
     void setLabelTranslation(const SbVec3f& position);
 
     SoPickStyle* getSoPickStyle();

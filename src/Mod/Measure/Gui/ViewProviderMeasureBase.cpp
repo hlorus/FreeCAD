@@ -128,6 +128,10 @@ void ViewProviderMeasureBase::setLabelValue(const Base::Quantity& value) {
     pLabel->string.setValue(value.getUserString().toUtf8().constData());
 }
 
+void ViewProviderMeasureBase::setLabelValue(const QString& value) {
+    pLabel->string.setValue(value.toUtf8().constData());
+}
+
 void ViewProviderMeasureBase::setLabelTranslation(const SbVec3f& position) {
     pTranslation->translation.setValue(position);
 }
