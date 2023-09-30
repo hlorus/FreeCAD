@@ -40,6 +40,8 @@
 
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
+#include <Gui/ViewParams.h>
+#include <Gui/Inventor/MarkerBitmaps.h>
 
 #include <Mod/Measure/App/Preferences.h>
 
@@ -193,3 +195,139 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
     }
     return feature;
 }
+
+
+
+PROPERTY_SOURCE_ABSTRACT(MeasureGui::ViewProviderMeasurePropertyBase, MeasureGui::ViewProviderMeasureBase)
+
+
+ViewProviderMeasurePropertyBase::ViewProviderMeasurePropertyBase()
+{
+
+    const size_t vertexCount(2);
+    const size_t lineCount(3);
+
+    // the vertices that define the extension and dimension lines
+    static const SbVec3f verts[vertexCount] =
+    {
+        SbVec3f(0,0,0), SbVec3f(0,0,0)
+    };
+
+    // indexes used to create the edges
+    // this makes a line from verts[0] to verts[1] above
+    static const int32_t lines[lineCount] =
+    {
+        0,1,-1
+    };
+
+    pCoords = new SoCoordinate3();
+    pCoords->ref();
+    pCoords->point.setNum(vertexCount);
+    pCoords->point.setValues(0, vertexCount, verts);
+
+    pLines  = new SoIndexedLineSet();
+    pLines->ref();
+    pLines->coordIndex.setNum(lineCount);
+    pLines->coordIndex.setValues(0, lineCount, lines);
+
+    sPixmap = "umf-measurement";
+}
+
+ViewProviderMeasurePropertyBase::~ViewProviderMeasurePropertyBase()
+{
+    pCoords->unref();
+    pLines->unref();
+}
+
+void ViewProviderMeasurePropertyBase::onChanged(const App::Property* prop)
+{
+    if (pcObject == nullptr) {
+        return;
+    }
+
+    redrawAnnotation();
+    ViewProviderMeasureBase::onChanged(prop);
+}
+
+
+//! handle changes to the feature's properties
+void ViewProviderMeasurePropertyBase::updateData(const App::Property* prop)
+{
+    if (pcObject == nullptr) {
+        return;
+    }
+
+    ViewProviderMeasureBase::updateData(prop);
+}
+
+
+void ViewProviderMeasurePropertyBase::attach(App::DocumentObject* pcObject)
+{
+    ViewProviderMeasureBase::attach(pcObject);
+
+    auto ps = getSoPickStyle();
+
+    auto lineSep = new SoSeparator();
+    auto style = getSoLineStylePrimary();
+    lineSep->addChild(ps);
+    lineSep->addChild(style);
+    lineSep->addChild(pColor);
+    lineSep->addChild(pCoords);
+    lineSep->addChild(pLines);
+    auto points = new SoMarkerSet();
+    points->markerIndex = Gui::Inventor::MarkerBitmaps::getMarkerIndex("CROSS",
+            Gui::ViewParams::instance()->getMarkerSize());
+    points->numPoints=1;
+    lineSep->addChild(points);
+
+    auto textsep = getSoSeparatorText();
+
+    auto sep = new SoAnnotation();
+    sep->addChild(lineSep);
+    sep->addChild(textsep);
+    addDisplayMaskMode(sep, "Base");
+}
+
+
+//! repaint the anotation
+void ViewProviderMeasurePropertyBase::redrawAnnotation()
+{
+    // point on element
+    Base::Vector3d basePos = getBasePosition();
+    pCoords->point.set1Value(0, SbVec3f(basePos.x, basePos.y, basePos.z));
+    
+    // text position
+    Base::Vector3d textPos = getTextPosition();
+    pCoords->point.set1Value(1, SbVec3f(textPos.x, textPos.y, textPos.z));
+
+    setLabelTranslation(pCoords->point[1]);
+    setLabelValue(getMeasureObject()->getResultString());
+
+    updateView();
+}
+
+
+//! calculate a good direction for the text based on the layout of the elements and its
+//! relationship with the cardinal axes.  elementDirection should be normalized.
+//! original is in VPMeasureDistance.
+Base::Vector3d ViewProviderMeasurePropertyBase::getTextDirection(Base::Vector3d elementDirection, double tolerance) const
+{
+    const Base::Vector3d stdX(1.0, 0.0, 0.0);
+    const Base::Vector3d stdY(0.0, 1.0, 0.0);
+    const Base::Vector3d stdZ(0.0, 0.0, 1.0);
+
+    Base::Vector3d textDirection = elementDirection.Cross(stdX);
+    if (textDirection.Length() < tolerance) {
+        textDirection = elementDirection.Cross(stdY);
+    }
+    if (textDirection.Length() < tolerance) {
+        textDirection = elementDirection.Cross(stdZ);
+    }
+    textDirection.Normalize();
+    if (textDirection.Dot(stdZ) < 0.0) {
+        textDirection = textDirection * -1.0;
+    }
+
+    return textDirection.Normalize();
+}
+

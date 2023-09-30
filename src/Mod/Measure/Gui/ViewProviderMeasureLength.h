@@ -44,35 +44,17 @@ class Property;
 namespace MeasureGui
 {
 
-class MeasureGuiExport ViewProviderMeasureLength : public MeasureGui::ViewProviderMeasureBase
+class MeasureGuiExport ViewProviderMeasureLength : public MeasureGui::ViewProviderMeasurePropertyBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureLength);
 
 public:
-    /// Constructor
-    ViewProviderMeasureLength();
-    ~ViewProviderMeasureLength() override;
-
-    // // Display properties
-    App::PropertyFloat          DistFactor;
-    App::PropertyBool           Mirror;
-
-    void attach(App::DocumentObject * feature) override;
     void updateData(const App::Property* prop) override;
 
-    Measure::MeasureLength* getMeasureLength();
-
-    void redrawAnnotation() override;
-
 protected:
-    void onChanged(const App::Property* prop) override;
-    std::pair<Base::Vector3d, Base::Vector3d> getPositionPoints();
+    Base::Vector3d getBasePosition();
+    Base::Vector3d getTextPosition();
     Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = 10e-6) const;
-
-
-private:
-    SoCoordinate3    * pCoords;
-    SoIndexedLineSet * pLines;
 
 };
 

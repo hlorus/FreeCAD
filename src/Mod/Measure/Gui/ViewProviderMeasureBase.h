@@ -40,10 +40,10 @@ class SoBaseColor;
 class SoText2;
 class SoTranslation;
 class SoPickStyle;
+class SoCoordinate3;
+class SoIndexedLineSet;
 
-//namespace MeasureGui {
-//class View3DInventorViewer;
-//}
+
 
 namespace MeasureGui {
 
@@ -94,6 +94,36 @@ protected:
     SoFontStyle      * pFont;
     SoBaseColor      * pColor;
     SoBaseColor      * pTextColor;
+
+};
+
+
+class MeasureGuiExport ViewProviderMeasurePropertyBase : public MeasureGui::ViewProviderMeasureBase
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasurePropertyBase);
+
+public:
+    /// Constructor
+    ViewProviderMeasurePropertyBase();
+    ~ViewProviderMeasurePropertyBase() override;
+
+    void attach(App::DocumentObject * feature) override;
+    void updateData(const App::Property* prop) override;
+
+    void redrawAnnotation() override;
+
+protected:
+    void onChanged(const App::Property* prop) override;
+
+    virtual Base::Vector3d getBasePosition() = 0;
+    virtual Base::Vector3d getTextPosition() = 0;
+
+    Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = 10e-6) const;
+
+
+private:
+    SoCoordinate3    * pCoords;
+    SoIndexedLineSet * pLines;
 
 };
 
