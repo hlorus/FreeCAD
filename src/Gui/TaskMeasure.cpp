@@ -127,6 +127,10 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
     btn = box->button(QDialogButtonBox::Abort);
     btn->setText(QString::fromLatin1("Close"));
     btn->setToolTip(tr("Press the Close button to exit."));
+
+    // Connect reset button
+    btn = box->button(QDialogButtonBox::Reset);
+    connect(btn, &QPushButton::released, this, &TaskMeasure::reset);
 }
 
 bool canAnnotate(Measure::MeasureBase* obj) {
@@ -302,7 +306,6 @@ bool TaskMeasure::accept(){
 }
 
 bool TaskMeasure::reject(){
-    Base::Console().Message("reject\n");
     removeObject();
     close();
 
