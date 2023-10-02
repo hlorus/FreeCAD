@@ -245,7 +245,6 @@ void ViewProviderMeasurePropertyBase::onChanged(const App::Property* prop)
         return;
     }
 
-    redrawAnnotation();
     ViewProviderMeasureBase::onChanged(prop);
 }
 

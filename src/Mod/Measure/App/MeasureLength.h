@@ -48,8 +48,14 @@
 namespace Measure
 {
 
+struct MeasureLengthInfo {
+    bool valid;
+    double length;
+    Base::Placement placement;
+};
 
-class MeasureExport MeasureLength : public Measure::MeasureBaseExtendable<float>
+
+class MeasureExport MeasureLength : public Measure::MeasureBaseExtendable<MeasureLengthInfo>
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureLength);
 
@@ -74,12 +80,11 @@ public:
     App::PropertyQuantity* getResultProp() override {return &this->Length;}
     Base::Quantity result() override {return Length.getQuantityValue();}
 
-    std::pair<Base::Vector3d, Base::Vector3d> getEndPoints() const;
+    // Return a placement for the viewprovider, just use the first element for now
+    Base::Placement getPlacement();
 
 private:
     void onChanged(const App::Property* prop) override;
-
-    TopoDS_Shape getSubShape(App::DocumentObject* object, std::string subName) const;
 
 };
 

@@ -37,20 +37,21 @@
 #include <BRepAdaptor_Surface.hxx>
 #include <TopExp.hxx>
 #include <GProp_GProps.hxx>
+#include <ShapeAnalysis_Edge.hxx>
 
 #include <App/Application.h>
 #include <App/Document.h>
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
+#include <Base/Matrix.h>
+#include <Base/Rotation.h>
 #include <Base/Vector3D.h>
 
-//#include "App/MeasureLength.h"
 #include <Mod/Measure/App/MeasureAngle.h>
 #include <Mod/Measure/App/MeasureDistance.h>
 #include <Mod/Measure/App/MeasureLength.h>
 
 #include "VectorAdapter.h"
-//#include "PrimitiveFeature.h"
 #include "PartFeature.h"
 
 #include "Measure.h"
@@ -247,22 +248,38 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obj
 }
 
 
-float MeasureLengthHandler(std::string* objectName, std::string* subName){
+Measure::MeasureLengthInfo MeasureLengthHandler(std::string* objectName, std::string* subName){
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
 
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
         Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
-        return 0.0;
+        return {false, 0.0, Base::Matrix4D()};
     }
     TopAbs_ShapeEnum sType = shape.ShapeType();
 
     if (sType != TopAbs_EDGE) {
-        return 0.0;
+        return {false, 0.0, Base::Matrix4D()};
     }
 
-    return getLength(shape);
+    // Get Center of mass as the attachment point of the label
+    GProp_GProps gprops;
+    BRepGProp::LinearProperties(shape, gprops);
+    auto origin = gprops.CentreOfMass();
+
+    // Get rotation of line
+    auto edge = TopoDS::Edge(shape);
+    ShapeAnalysis_Edge edgeAnalyzer;
+    gp_Pnt firstPoint = BRep_Tool::Pnt(edgeAnalyzer.FirstVertex(edge));
+    gp_Pnt lastPoint = BRep_Tool::Pnt(edgeAnalyzer.LastVertex(edge));
+    auto dir = (lastPoint.XYZ() - firstPoint.XYZ()).Normalized();
+    Base::Vector3d elementDirection(dir.X(), dir.Y(), dir.Z());
+    Base::Vector3d axisUp(0.0, 0.0, 1.0);
+    Base::Rotation rot(axisUp, elementDirection);
+
+    Base::Placement placement(Base::Vector3d(origin.X(), origin.Y(), origin.Z()), rot);
+    return {true, getLength(shape), placement};
 }
 
 

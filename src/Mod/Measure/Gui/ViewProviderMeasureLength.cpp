@@ -77,27 +77,25 @@ void ViewProviderMeasureLength::updateData(const App::Property* prop)
 }
 
 
-
 Base::Vector3d ViewProviderMeasureLength::getBasePosition(){
     auto measureObject = dynamic_cast<Measure::MeasureLength*>(getMeasureObject());
-
-    std::pair<Base::Vector3d, Base::Vector3d> ends = measureObject->getEndPoints();
-    return (ends.first + ends.second) / 2.0;     
+    Base::Placement placement = measureObject->getPlacement();
+    return placement.getPosition();
 }
 
 
 Base::Vector3d ViewProviderMeasureLength::getTextPosition(){
     auto measureObject = dynamic_cast<Measure::MeasureLength*>(getMeasureObject());
 
-    std::pair<Base::Vector3d, Base::Vector3d> ends = measureObject->getEndPoints();
-    auto pointOnElements = getBasePosition();
-    double distance = (ends.second - ends.first).Length();
-    auto elementDirection = (ends.second - ends.first).Normalize();
-    auto textDirection = getTextDirection(elementDirection);
+    auto basePoint = getBasePosition();
+    double length = measureObject->Length.getValue();
+    Base::Placement placement = measureObject->getPlacement();
+    Base::Rotation rotation = placement.getRotation();
+    Base::Vector3d textDirection = getTextDirection(rotation.multVec(Base::Vector3d(0.0, 0.0, 1.0)));
 
-    // without the fudgeFactor, the text is too far away sometimes.  Not a big deal if we can drag the text. Could change the default for DistFactor too.
+    // without the fudgeFactor, the text is too far away sometimes.  Not a big deal if we can drag the text.
     double fudgeFactor(0.5);
-    return pointOnElements + textDirection * distance * fudgeFactor;
+    return basePoint + textDirection * length * fudgeFactor;
 }
 
 

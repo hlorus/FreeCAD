@@ -121,7 +121,7 @@ void MeasureLength::recalculateLength()
     const std::vector<App::DocumentObject*>& objects = Elements.getValues();
     const std::vector<std::string>& subElements = Elements.getSubValues();
 
-    float result(0.0);
+    double result(0.0);
 
     // Loop through Elements and call the valid geometry handler
     for (std::vector<App::DocumentObject*>::size_type i=0; i<objects.size(); i++) {
@@ -137,7 +137,7 @@ void MeasureLength::recalculateLength()
         }
 
         std::string obName = object->getNameInDocument();
-        result += handler(&obName, &subElement);
+        result += handler(&obName, &subElement).length;
     }
 
     Length.setValue(result);
@@ -154,59 +154,27 @@ void MeasureLength::onChanged(const App::Property* prop)
     MeasureBase::onChanged(prop);
 }
 
-//! find a first and last point in the elements being measured.
-//! an assumption is that only edges (wires?) have length
-std::pair<Base::Vector3d, Base::Vector3d> MeasureLength::getEndPoints() const
-{
-    std::pair<Base::Vector3d, Base::Vector3d> result;
+
+Base::Placement MeasureLength::getPlacement() {
     const std::vector<App::DocumentObject*>& objects = Elements.getValues();
     const std::vector<std::string>& subElements = Elements.getSubValues();
-//    Base::Console().Message("ML::getEndPoints() - objects: %d  subs: %d\n", objects.size(), subElements.size());
-    if ( objects.empty() || subElements.empty()) {
-        // happens during object creation?
-        return result;
+
+    Base::Matrix4D transform;
+
+    if (!objects.size() || !subElements.size()) {
+        return transform;
     }
 
-    TopoDS_Shape firstShape = getSubShape(objects.front(), subElements.front());
-    TopoDS_Vertex tvFirst;
-    TopoDS_Vertex tvLast;
-    if (firstShape.ShapeType() == TopAbs_EDGE) {
-        TopoDS_Edge firstEdge = TopoDS::Edge(firstShape);
-        TopExp::Vertices(firstEdge, tvFirst, tvLast);
-    } else if (firstShape.ShapeType() == TopAbs_WIRE) {
-        TopoDS_Wire firstWire = TopoDS::Wire(firstShape);
-        TopExp::Vertices(firstWire, tvFirst, tvLast);
-    } else {
-        throw Base::RuntimeError("MeasureLength shape is not an edge or wire");
-    }
-    gp_Pnt gpFirst = BRep_Tool::Pnt(tvFirst);
-    Base::Vector3d firstEnd(gpFirst.X(), gpFirst.Y(), gpFirst.Z());
-    result.first = firstEnd;
+    App::DocumentObject* object = objects.front();
+    std::string subElement = subElements.front();
+    const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
+    const std::string& mod = object->getClassTypeId().getModuleName(className);
 
-    TopoDS_Shape lastShape = getSubShape(objects.back(), subElements.back());
-    if (lastShape.ShapeType() == TopAbs_EDGE) {
-        TopoDS_Edge lastEdge = TopoDS::Edge(lastShape);
-        TopExp::Vertices(lastEdge, tvFirst, tvLast);
-    } else if (lastShape.ShapeType() == TopAbs_WIRE) {
-        TopoDS_Wire lastWire = TopoDS::Wire(lastShape);
-        TopExp::Vertices(lastWire, tvFirst, tvLast);
-    } else {
-        throw Base::RuntimeError("MeasureLength shape is not an edge or wire");
+    auto handler = getGeometryHandler(mod);
+    if (!handler) {
+        throw Base::RuntimeError("No geometry handler available for submitted element type");
     }
-    gp_Pnt gpLast = BRep_Tool::Pnt(tvLast);
-    Base::Vector3d lastEnd(gpLast.X(), gpLast.Y(), gpLast.Z());
-    result.second = lastEnd;
 
-    return result;
-}
-
-//! get the shape for an object + subElement
-TopoDS_Shape MeasureLength::getSubShape(App::DocumentObject* object, std::string subName) const
-{
-    Part::TopoShape shape = Part::Feature::getTopoShape(object);
-    auto geoFeat = dynamic_cast<App::GeoFeature*>(object);
-    if (geoFeat) {
-        shape.setPlacement(geoFeat->globalPlacement());
-    }
-    return shape.getSubShape(subName.c_str());
+    std::string obName = object->getNameInDocument();
+    return handler(&obName, &subElement).placement;
 }
