@@ -34,6 +34,7 @@
 #include "MeasureDistance.h"
 #include "MeasurePosition.h"
 #include "MeasureLength.h"
+#include "MeasureArea.h"
 
 namespace Measure {
 class Module : public Py::ExtensionModule<Module>
@@ -78,6 +79,7 @@ PyMOD_INIT_FUNC(Measure)
     Measure::MeasureDistance        ::init();
     Measure::MeasurePosition        ::init();
     Measure::MeasureLength          ::init();
+    Measure::MeasureArea            ::init();
 
     // Add fundamental umf Measure Types
     App::Application& app = App::GetApplication();
@@ -114,6 +116,15 @@ PyMOD_INIT_FUNC(Measure)
         "Position",
         "Measure::MeasurePosition",
         MeasurePosition::isValidSelection,
+        nullptr,
+    });
+
+    app.addMeasureType(
+    new App::MeasureType {
+        "Area",
+        "Area",
+        "Measure::MeasureArea",
+        MeasureArea::isValidSelection,
         nullptr,
     });
 

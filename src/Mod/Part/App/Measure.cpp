@@ -51,6 +51,7 @@
 #include <Mod/Measure/App/MeasureDistance.h>
 #include <Mod/Measure/App/MeasureLength.h>
 #include <Mod/Measure/App/MeasurePosition.h>
+#include <Mod/Measure/App/MeasureArea.h>
 
 #include "VectorAdapter.h"
 #include "PartFeature.h"
@@ -284,6 +285,33 @@ Measure::MeasureLengthInfo MeasureLengthHandler(std::string* objectName, std::st
 }
 
 
+Measure::MeasureAreaInfo MeasureAreaHandler(std::string* objectName, std::string* subName){
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
+
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    if (shape.IsNull()) {
+        // failure here on loading document with existing measurement.
+        Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        return {false, 0.0, Base::Matrix4D()};
+    }
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    if (sType != TopAbs_FACE) {
+        return {false, 0.0, Base::Matrix4D()};
+    }
+
+    // Get Center of mass as the attachment point of the label
+    GProp_GProps gprops;
+    BRepGProp::SurfaceProperties(shape, gprops);
+    auto origin = gprops.CentreOfMass();
+
+    // TODO: Center of Mass might not lie on the surface, somehow snap to the closest point on the surface? 
+
+    Base::Placement placement(Base::Vector3d(origin.X(), origin.Y(), origin.Z()), Base::Rotation());
+    return {true, getFaceArea(shape), placement};
+}
+
+
 Base::Vector3d MeasurePositionHandler(std::string* objectName, std::string* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
 
@@ -371,6 +399,9 @@ void Part::Measure::initialize() {
 
     // Extend MeasurePosition
     MeasurePosition::addGeometryHandlers(proxyList, MeasurePositionHandler);
+
+    // Extend MeasureArea
+    MeasureArea::addGeometryHandlers(proxyList, MeasureAreaHandler);
 
     // Extend MeasureAngle
     MeasureAngle::addGeometryHandlers(proxyList, MeasureAngleHandler);

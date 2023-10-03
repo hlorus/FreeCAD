@@ -49,6 +49,8 @@ SET(MeasureModule_SRCS
     MeasurePosition.h
     MeasureLength.cpp
     MeasureLength.h
+    MeasureArea.cpp
+    MeasureArea.h
 #    Measure.cpp
 #    Measure.h
 
