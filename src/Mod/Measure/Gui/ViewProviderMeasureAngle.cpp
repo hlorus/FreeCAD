@@ -343,7 +343,7 @@ void ViewProviderMeasureAngle::updateData(const App::Property* prop)
         getMatrix();
 
         setLabelTranslation(midpoint.getValue());
-        setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->result());
+        setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->getResultString());
 
     } else {
         ViewProviderDocumentObject::updateData(prop);

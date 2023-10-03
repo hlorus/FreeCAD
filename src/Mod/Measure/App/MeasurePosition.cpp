@@ -164,3 +164,10 @@ QString MeasurePosition::getResultString() {
 
     return text;
 }
+
+
+Base::Placement MeasurePosition::getPlacement() {
+    Base::Placement placement;
+    placement.setPosition(Position.getValue());
+    return placement;
+}

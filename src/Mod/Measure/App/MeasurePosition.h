@@ -56,9 +56,9 @@ public:
     App::DocumentObjectExecReturn *execute() override;
     void recalculatePosition();
 
-    // const char* getViewProviderName() const override {
-    //     return "Gui::ViewProviderMeasurePosition";
-    // }
+    const char* getViewProviderName() const override {
+        return "MeasureGui::ViewProviderMeasurePosition";
+    }
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection);
@@ -66,6 +66,7 @@ public:
     App::Property* getResultProp() override {return &this->Position;}
     QString getResultString() override;
 
+    Base::Placement getPlacement();
 private:
 
     void onChanged(const App::Property* prop) override;
