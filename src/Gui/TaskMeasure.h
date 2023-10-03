@@ -49,6 +49,7 @@ public:
         return QDialogButtonBox::Ok | QDialogButtonBox::Abort | QDialogButtonBox::Reset;
     }
 
+    void invoke();
     void update();
     void close();
     bool accept() override;

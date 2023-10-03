@@ -107,7 +107,9 @@ TaskMeasure::TaskMeasure()
     if(!App::GetApplication().getActiveTransaction())
         App::GetApplication().setActiveTransaction("Add Measurement");
 
-    gatherSelection();
+
+    // Call invoke method delayed, otherwise the dialog might not be fully initialized
+    QTimer::singleShot(0, this, &TaskMeasure::invoke);
 }
 
 TaskMeasure::~TaskMeasure(){
@@ -295,6 +297,11 @@ void ensureGroup(Measure::MeasureBase* measurement) {
     group->addObject(measurement);
 }
 
+
+// Runs after the dialog is created
+void TaskMeasure::invoke() {
+    gatherSelection();
+}
 
 bool TaskMeasure::accept(){
     ensureGroup(_mMeasureObject);
