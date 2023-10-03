@@ -74,8 +74,7 @@ public:
     static bool isPrioritizedSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection) override;
 
-    App::PropertyQuantity* getResultProp() override {return &this->Angle;}
-    Base::Quantity result() override {return Angle.getQuantityValue();}
+    App::Property* getResultProp() override {return &this->Angle;}
 
     bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
     Base::Vector3d getLoc(App::DocumentObject& ob, std::string& subName);

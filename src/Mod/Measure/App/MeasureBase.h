@@ -51,16 +51,8 @@ public:
     // Initalize measurement properties from selection
     virtual void parseSelection(const App::MeasureSelection&) = 0;
 
-    virtual Base::Quantity result() = 0;
-    virtual App::PropertyQuantity* getResultProp() = 0;
-    virtual QString getResultString() {
-        App::PropertyQuantity* prop = this->getResultProp();
-        if (prop == nullptr) {
-            return QString();
-        }
-
-        return prop->getQuantityValue().getUserString();
-    }
+    virtual App::Property* getResultProp() = 0;
+    virtual QString getResultString();
 };
 
 

@@ -271,7 +271,7 @@ void TaskMeasure::update() {
     _mMeasureObject->parseSelection(selection);
 
     // Get result
-    valueResult->setText(_mMeasureObject->result().getUserString());
+    valueResult->setText(_mMeasureObject->getResultString());
 }
 
 void TaskMeasure::close(){

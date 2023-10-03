@@ -29,3 +29,17 @@ using namespace Measure;
 
 PROPERTY_SOURCE_ABSTRACT(Measure::MeasureBase, App::DocumentObject)
 
+
+QString MeasureBase::getResultString() {
+    App::Property* prop = getResultProp();
+        if (prop == nullptr) {
+            return QString();
+        }
+
+    if (prop->isDerivedFrom(App::PropertyQuantity::getClassTypeId())) {
+        return static_cast<App::PropertyQuantity*>(prop)->getQuantityValue().getUserString();
+    }
+
+
+    return QString();
+}
