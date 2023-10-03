@@ -31,6 +31,7 @@
 #include <App/PropertyStandard.h>
 #include <App/PropertyUnits.h>
 #include <Base/Quantity.h>
+#include <Base/Placement.h>
 #include <QString>
 
 
@@ -53,6 +54,7 @@ public:
 
     virtual App::Property* getResultProp() = 0;
     virtual QString getResultString();
+    virtual Base::Placement getPlacement() {return Base::Placement();}
 };
 
 

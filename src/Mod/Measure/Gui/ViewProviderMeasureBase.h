@@ -115,11 +115,9 @@ public:
 protected:
     void onChanged(const App::Property* prop) override;
 
-    virtual Base::Vector3d getBasePosition() = 0;
-    virtual Base::Vector3d getTextPosition() = 0;
-
+    virtual Base::Vector3d getBasePosition();
+    virtual Base::Vector3d getTextPosition();
     Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = 10e-6) const;
-
 
 private:
     SoCoordinate3    * pCoords;

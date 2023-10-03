@@ -52,10 +52,7 @@ public:
     void updateData(const App::Property* prop) override;
 
 protected:
-    Base::Vector3d getBasePosition();
-    Base::Vector3d getTextPosition();
-    Base::Vector3d getTextDirection(Base::Vector3d elementDirection,
-                                    double tolerance = 10e-6) const;
+    Base::Vector3d getTextPosition() override;
 };
 
 } //namespace MeasureGui

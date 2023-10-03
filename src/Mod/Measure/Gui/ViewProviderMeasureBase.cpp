@@ -306,6 +306,13 @@ void ViewProviderMeasurePropertyBase::redrawAnnotation()
 }
 
 
+Base::Vector3d ViewProviderMeasurePropertyBase::getBasePosition(){
+    auto measureObject = getMeasureObject();
+    Base::Placement placement = measureObject->getPlacement();
+    return placement.getPosition();
+}
+
+
 //! calculate a good direction for the text based on the layout of the elements and its
 //! relationship with the cardinal axes.  elementDirection should be normalized.
 //! original is in VPMeasureDistance.
@@ -330,3 +337,12 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getTextDirection(Base::Vector3d 
     return textDirection.Normalize();
 }
 
+
+Base::Vector3d ViewProviderMeasurePropertyBase::getTextPosition(){
+    auto basePoint = getBasePosition();
+    Base::Vector3d textDirection(1.0, 1.0, 1.0);
+    textDirection.Normalize();
+    double length = 10;
+
+    return basePoint + textDirection * length;
+}

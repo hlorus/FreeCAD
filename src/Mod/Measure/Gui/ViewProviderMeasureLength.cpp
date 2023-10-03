@@ -77,13 +77,6 @@ void ViewProviderMeasureLength::updateData(const App::Property* prop)
 }
 
 
-Base::Vector3d ViewProviderMeasureLength::getBasePosition(){
-    auto measureObject = dynamic_cast<Measure::MeasureLength*>(getMeasureObject());
-    Base::Placement placement = measureObject->getPlacement();
-    return placement.getPosition();
-}
-
-
 Base::Vector3d ViewProviderMeasureLength::getTextPosition(){
     auto measureObject = dynamic_cast<Measure::MeasureLength*>(getMeasureObject());
 
@@ -98,27 +91,3 @@ Base::Vector3d ViewProviderMeasureLength::getTextPosition(){
     return basePoint + textDirection * length * fudgeFactor;
 }
 
-
-//! calculate a good direction for the text based on the layout of the elements and its
-//! relationship with the cardinal axes.  elementDirection should be normalized.
-//! original is in VPMeasureDistance.
-Base::Vector3d ViewProviderMeasureLength::getTextDirection(Base::Vector3d elementDirection, double tolerance) const
-{
-    const Base::Vector3d stdX(1.0, 0.0, 0.0);
-    const Base::Vector3d stdY(0.0, 1.0, 0.0);
-    const Base::Vector3d stdZ(0.0, 0.0, 1.0);
-
-    Base::Vector3d textDirection = elementDirection.Cross(stdX);
-    if (textDirection.Length() < tolerance) {
-        textDirection = elementDirection.Cross(stdY);
-    }
-    if (textDirection.Length() < tolerance) {
-        textDirection = elementDirection.Cross(stdZ);
-    }
-    textDirection.Normalize();
-    if (textDirection.Dot(stdZ) < 0.0) {
-        textDirection = textDirection * -1.0;
-    }
-
-    return textDirection.Normalize();
-}
