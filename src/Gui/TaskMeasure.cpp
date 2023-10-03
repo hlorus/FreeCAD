@@ -53,11 +53,6 @@ TaskMeasure::TaskMeasure()
     this->setButtonPosition(TaskMeasure::South);
     auto taskbox = new Gui::TaskView::TaskBox(Gui::BitmapFactory().pixmap("umf-measurement"), tr("Measurement"), true, nullptr);
 
-    labelType = new QLabel();
-    labelPosition = new QLabel();
-    labelLength = new QLabel();
-    labelArea = new QLabel();
-
     // Create mode dropdown and add all registered measuretypes
     modeSwitch = new QComboBox();
     modeSwitch->addItem(QString::fromLatin1("Auto"));
@@ -68,15 +63,6 @@ TaskMeasure::TaskMeasure()
 
     // Connect dropdown's change signal to our onModeChange slot
     connect(modeSwitch, qOverload<int>(&QComboBox::currentIndexChanged), this, &TaskMeasure::onModeChanged);
-
-
-    // Element info layout
-    QVBoxLayout* layoutElement = new QVBoxLayout();
-    layoutElement->addWidget(labelType);
-    layoutElement->addWidget(labelPosition);
-    layoutElement->addWidget(labelLength);
-    layoutElement->addWidget(labelArea);
-
 
     // Result widget
     valueResult = new QLineEdit();
@@ -94,10 +80,6 @@ TaskMeasure::TaskMeasure()
     formLayout->addRow(QString::fromLatin1("Mode:"), modeSwitch);
     formLayout->addRow(QString::fromLatin1("Result:"), valueResult);
     layout->addLayout(formLayout);
-
-    layout->addSpacing(10);
-    layout->addLayout(layoutElement);
-
 
     Content.emplace_back(taskbox);
 
@@ -164,44 +146,9 @@ void TaskMeasure::setMeasureObject(Measure::MeasureBase* obj) {
     _mMeasureObject = obj;
 }
 
-void TaskMeasure::updateInfo() {
-    labelType->hide();
-    labelPosition->hide();
-    labelLength->hide();
-    labelArea->hide();
-
-    if (elementInfo.type.empty()) {
-        return;
-    }
-
-
-    labelType->setText(QString::fromUtf8(elementInfo.type.c_str()));
-    labelType->show();
-
-    if (!elementInfo.pos.IsNull()) {
-        labelPosition->setText(
-            QString::asprintf("Position X: %.3lf Y: %.3lf Z: %.3lf", elementInfo.pos.x, elementInfo.pos.y, elementInfo.pos.z)
-        );
-        labelPosition->show();
-    }
-
-    if (elementInfo.length > 0.0) {
-        labelLength->setText(QString::asprintf("Length: %.3f", elementInfo.length));
-        labelLength->show();
-    }
-
-    if (elementInfo.area > 0.0) {
-        labelArea->setText(QString::asprintf("Area: %.3f", elementInfo.area));
-        labelArea->show();
-    }
-}
-
 
 void TaskMeasure::update() {
     valueResult->setText(QString::asprintf("-"));
-
-    // Update element info display
-    updateInfo();
 
     // Report selection stack
     Base::Console().Message("Selection: ");
@@ -341,15 +288,6 @@ void TaskMeasure::addElement(const char* mod, const char* objectName, const char
     }
 
     selection.emplace_back(std::make_tuple((std::string)objectName, (std::string)subName));
-
-    // Update element info
-    App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod);
-    auto info = handler.infoCb(objectName, subName);
-    elementInfo.type = info.type;
-    elementInfo.pos = info.pos;
-    elementInfo.length = info.length;
-    elementInfo.area = info.area;
-
     update();
 }
 
@@ -390,7 +328,6 @@ bool TaskMeasure::hasSelection(){
 }
 
 void TaskMeasure::clearSelection(){
-    elementInfo.type.clear();
     selection.clear();
 }
 

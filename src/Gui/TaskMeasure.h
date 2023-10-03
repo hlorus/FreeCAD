@@ -68,7 +68,6 @@ protected:
 
 private:
     QColumnView* dialog{nullptr};
-    App::MeasureElementInfo elementInfo;
 
     void onSelectionChanged(const Gui::SelectionChanges& msg) override;
 
@@ -76,14 +75,9 @@ private:
 
     QLineEdit* valueResult{nullptr};
     QLabel* labelResult{nullptr};
-    QLabel *labelType{nullptr};
-    QLabel *labelPosition{nullptr};
-    QLabel *labelLength{nullptr};
-    QLabel *labelArea{nullptr};
     QComboBox* modeSwitch{nullptr};
 
     void removeObject();
-    void updateInfo();
     void onModeChanged(int index);
     void setModeSilent(App::MeasureType* mode);
     App::MeasureType* getMeasureType();
