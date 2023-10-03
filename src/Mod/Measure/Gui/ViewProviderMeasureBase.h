@@ -25,12 +25,14 @@
 
 #include <Mod/Measure/MeasureGlobal.h>
 
-#include <App/Material.h>
-#include <App/Measure.h>
+#include <App/Application.h>
+#include <App/PropertyStandard.h>
 #include <Base/Parameter.h>
 #include <Gui/ViewProviderDocumentObject.h>
-#include "App/PropertyContainer.h"
+#include <Gui/SoTextLabel.h>
+#include <QString>
 
+#include <Mod/Measure/App/MeasureBase.h>
 
 class SbVec2s;
 class SoFontStyle;
@@ -38,26 +40,27 @@ class SoBaseColor;
 class SoText2;
 class SoTranslation;
 class SoPickStyle;
+class SoCoordinate3;
+class SoIndexedLineSet;
 
-namespace Gui {
-class View3DInventorViewer;
-}
+
 
 namespace MeasureGui {
 
-class MeasureGuiExport ViewProviderMeasurementBase :public Gui::ViewProviderDocumentObject
+class MeasureGuiExport ViewProviderMeasureBase :public Gui::ViewProviderDocumentObject
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(Gui::ViewProviderMeasurementBase);
+    PROPERTY_HEADER_WITH_OVERRIDE(ViewProviderMeasureBase);
 
 public:
     /// constructor.
-    ViewProviderMeasurementBase();
+    ViewProviderMeasureBase();
 
     /// destructor.
-    ~ViewProviderMeasurementBase() override;
+    ~ViewProviderMeasureBase() override;
 
     // Display properties
     App::PropertyColor          TextColor;
+    App::PropertyColor          TextBackgroundColor;
     App::PropertyColor          LineColor;
     App::PropertyInteger        FontSize;
 
@@ -65,15 +68,19 @@ public:
      * Attaches the document object to this view provider.
      */
     void attach(App::DocumentObject *pcObj) override;
-    void onGuiUpdate(const App::MeasurementBase* measureObject);
+    void onGuiUpdate(const Measure::MeasureBase* measureObject);
 
     bool useNewSelectionModel() const override {return true;}
     std::vector<std::string> getDisplayModes() const override;
     void setDisplayMode(const char* ModeName) override;
 
+    virtual void redrawAnnotation();
+    Measure::MeasureBase* getMeasureObject();
+
 protected:
     void onChanged(const App::Property* prop) override;
     void setLabelValue(const Base::Quantity& value);
+    void setLabelValue(const QString& value);
     void setLabelTranslation(const SbVec3f& position);
 
     SoPickStyle* getSoPickStyle();
@@ -82,17 +89,41 @@ protected:
 
     bool _mShowTree = true;
 
-    SoText2          * pLabel;
+    Gui::SoTextLabel * pLabel;
     SoTranslation    * pTranslation;
     SoFontStyle      * pFont;
     SoBaseColor      * pColor;
     SoBaseColor      * pTextColor;
 
-    // TODO: migrate these routines to Mod/Measure
-    Base::Reference<ParameterGrp> getPreferenceGroup(const char* Name);
-    App::Color defaultLineColor();
-    App::Color defaultTextColor();
-    int defaultFontSize();
+};
+
+
+class MeasureGuiExport ViewProviderMeasurePropertyBase : public MeasureGui::ViewProviderMeasureBase
+{
+    PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasurePropertyBase);
+
+public:
+    /// Constructor
+    ViewProviderMeasurePropertyBase();
+    ~ViewProviderMeasurePropertyBase() override;
+
+    void attach(App::DocumentObject * feature) override;
+    void updateData(const App::Property* prop) override;
+
+    void redrawAnnotation() override;
+
+protected:
+    void onChanged(const App::Property* prop) override;
+
+    virtual Base::Vector3d getBasePosition() = 0;
+    virtual Base::Vector3d getTextPosition() = 0;
+
+    Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = 10e-6) const;
+
+
+private:
+    SoCoordinate3    * pCoords;
+    SoIndexedLineSet * pLines;
 
 };
 

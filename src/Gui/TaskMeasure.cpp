@@ -101,10 +101,15 @@ TaskMeasure::TaskMeasure()
 
     Content.emplace_back(taskbox);
 
-    gatherSelection();
-
     // engage the selectionObserver
     attachSelection();
+
+    if(!App::GetApplication().getActiveTransaction())
+        App::GetApplication().setActiveTransaction("Add Measurement");
+
+
+    // Call invoke method delayed, otherwise the dialog might not be fully initialized
+    QTimer::singleShot(0, this, &TaskMeasure::invoke);
 }
 
 TaskMeasure::~TaskMeasure(){
@@ -121,12 +126,16 @@ void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
 
     // Disable button by default
     btn->setEnabled(false);
-
-    btn = box->button(QDialogButtonBox::Close);
+    btn = box->button(QDialogButtonBox::Abort);
+    btn->setText(QString::fromLatin1("Close"));
     btn->setToolTip(tr("Press the Close button to exit."));
+
+    // Connect reset button
+    btn = box->button(QDialogButtonBox::Reset);
+    connect(btn, &QPushButton::released, this, &TaskMeasure::reset);
 }
 
-bool canAnnotate(App::MeasurementBase* obj) {
+bool canAnnotate(Measure::MeasureBase* obj) {
     if (obj == nullptr) {
         // null object, can't annotate this
         return false;
@@ -151,7 +160,7 @@ void TaskMeasure::enableAnnotateButton(bool state) {
     btn->setEnabled(state);
 }
 
-void TaskMeasure::setMeasureObject(App::MeasurementBase* obj) {
+void TaskMeasure::setMeasureObject(Measure::MeasureBase* obj) {
     _mMeasureObject = obj;
 }
 
@@ -236,7 +245,7 @@ void TaskMeasure::update() {
         // addElement(measureModule.c_str(), get<0>(sel).c_str(), get<1>(sel).c_str());
 
         // Reset measure object
-        setMeasureObject(nullptr);
+        removeObject();
         enableAnnotateButton(false);
         return;
     }
@@ -251,7 +260,7 @@ void TaskMeasure::update() {
         // Create measure object
         App::Document *doc = App::GetApplication().getActiveDocument();
         setMeasureObject(
-            (App::MeasurementBase*)doc->addObject(measureType->measureObject.c_str())
+            (Measure::MeasureBase*)doc->addObject(measureType->measureObject.c_str(), measureType->label.c_str())
         );
     }
 
@@ -270,7 +279,7 @@ void TaskMeasure::close(){
 }
 
 
-void ensureGroup(App::MeasurementBase* measurement) {
+void ensureGroup(Measure::MeasureBase* measurement) {
     // Ensure measurement object is part of the measurements group
 
     const char* measurementGroupName = "Measurements";
@@ -289,16 +298,26 @@ void ensureGroup(App::MeasurementBase* measurement) {
 }
 
 
+// Runs after the dialog is created
+void TaskMeasure::invoke() {
+    gatherSelection();
+}
+
 bool TaskMeasure::accept(){
     ensureGroup(_mMeasureObject);
     close();
+
+    // Commit transaction
+    App::GetApplication().closeActiveTransaction();
     return false;
 }
 
 bool TaskMeasure::reject(){
     removeObject();
-
     close();
+
+    // Abort transaction
+    App::GetApplication().closeActiveTransaction(true);
     return false;
 }
 

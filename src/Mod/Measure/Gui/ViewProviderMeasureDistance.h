@@ -28,7 +28,9 @@
 
 #include <QObject>
 
-#include "ViewProviderMeasurementBase.h"
+#include <Mod/Measure/App/MeasureDistance.h>
+
+#include "ViewProviderMeasureBase.h"
 
 class SoCoordinate3;
 class SoIndexedLineSet;
@@ -37,7 +39,7 @@ namespace MeasureGui
 {
 
 
-class MeasureGuiExport ViewProviderMeasureDistance : public MeasureGui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureDistance : public MeasureGui::ViewProviderMeasureBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureDistance);
 
@@ -52,6 +54,8 @@ public:
 
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;
+
+    Measure::MeasureDistance* getMeasureDistance();
 
 protected:
     void onChanged(const App::Property* prop) override;

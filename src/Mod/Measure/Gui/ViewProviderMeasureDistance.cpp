@@ -57,7 +57,7 @@ using namespace Gui;
 using namespace MeasureGui;
 using namespace Measure;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, MeasureGui::ViewProviderMeasurementBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, MeasureGui::ViewProviderMeasureBase)
 
 
 ViewProviderMeasureDistance::ViewProviderMeasureDistance()
@@ -108,14 +108,14 @@ void ViewProviderMeasureDistance::onChanged(const App::Property* prop)
         updateData(prop);
     }
     else {
-        ViewProviderMeasurementBase::onChanged(prop);
+        ViewProviderMeasureBase::onChanged(prop);
     }
 }
 
 
 void ViewProviderMeasureDistance::attach(App::DocumentObject* pcObject)
 {
-    ViewProviderMeasurementBase::attach(pcObject);
+    ViewProviderMeasureBase::attach(pcObject);
 
     auto ps = getSoPickStyle();
 
@@ -199,5 +199,14 @@ void ViewProviderMeasureDistance::updateData(const App::Property* prop)
     }
 
     ViewProviderDocumentObject::updateData(prop);
+}
+
+Measure::MeasureDistance* ViewProviderMeasureDistance::getMeasureDistance()
+{
+    Measure::MeasureDistance* feature = dynamic_cast<Measure::MeasureDistance*>(pcObject);
+    if (!feature) {
+        throw Base::RuntimeError("Feature not found for ViewProviderMeasureDistance");
+    }
+    return feature;
 }
 

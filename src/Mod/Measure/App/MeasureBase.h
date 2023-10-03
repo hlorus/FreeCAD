@@ -21,36 +21,51 @@
  ***************************************************************************/
 
 
-#ifndef APP_MEASURE_H
-#define APP_MEASURE_H
+#ifndef MEASURE_MEASUREBASE_H
+#define MEASURE_MEASUREBASE_H
 
-#include "DocumentObject.h"
-#include "PropertyContainer.h"
-#include "Application.h"
+#include <Mod/Measure/MeasureGlobal.h>
+
+#include <App/Application.h>
+#include <App/DocumentObject.h>
+#include <App/PropertyStandard.h>
+#include <App/PropertyUnits.h>
 #include <Base/Quantity.h>
+#include <QString>
 
-namespace App
+
+// TODO: this is the base for the MeasureXXXXX classes.  It should be renamed to MeasureBase and moved to Mod/Measure/App
+namespace Measure
 {
 
-class AppExport MeasurementBase : public DocumentObject
+class AppExport MeasureBase : public App::DocumentObject
 {
-    PROPERTY_HEADER_WITH_OVERRIDE(App::MeasurementBase);
+    PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureBase);
 
 public:
+    MeasureBase() = default;
+    ~MeasureBase() override = default;
 
-    boost::signals2::signal<void (const MeasurementBase*)> signalGuiUpdate;
+    boost::signals2::signal<void (const MeasureBase*)> signalGuiUpdate;
 
     // Initalize measurement properties from selection
-    virtual void parseSelection(const MeasureSelection&) = 0;
+    virtual void parseSelection(const App::MeasureSelection&) = 0;
 
     virtual Base::Quantity result() = 0;
+    virtual App::PropertyQuantity* getResultProp() = 0;
+    virtual QString getResultString() {
+        App::PropertyQuantity* prop = this->getResultProp();
+        if (prop == nullptr) {
+            return QString();
+        }
+
+        return prop->getQuantityValue().getUserString();
+    }
 };
 
 
-
-
 template <typename T>
-class AppExport MeasurementBaseExtendable : public MeasurementBase
+class AppExport MeasureBaseExtendable : public MeasureBase
 {
 
     using GeometryHandler = std::function<T (std::string*, std::string*)>;
@@ -90,17 +105,10 @@ private:
 };
 
 template <typename T>
-typename MeasurementBaseExtendable<T>::HandlerMap MeasurementBaseExtendable<T>::_mGeometryHandlers = MeasurementBaseExtendable<T>::HandlerMap();
+typename MeasureBaseExtendable<T>::HandlerMap MeasureBaseExtendable<T>::_mGeometryHandlers = MeasureBaseExtendable<T>::HandlerMap();
 
 
-
-class AppExport Measure {
-
-public:
-    static void initialize();
-};
-
-} //namespace App
+} //namespace Measure
 
 
-#endif // APP_MEASURE_H
+#endif // MEASURE_MEASUREBASE_H

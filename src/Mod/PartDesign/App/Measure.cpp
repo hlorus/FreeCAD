@@ -26,12 +26,11 @@
 #include <App/Application.h>
 #include "Base/Console.h"
 #include "Measure.h"
-#include <App/MeasureLength.h>
-#include <Mod/Measure/App/MeasureAngle.h>
-#include <Mod/Measure/App/MeasureDistance.h>
+//#include <Mod/Measure/App/MeasureAngle.h>
+//#include <Mod/Measure/App/MeasureDistance.h>
 
 
-using namespace Measure;
+//using namespace Measure;
 
 void PartDesign::Measure::initialize() {
     App::Application& app = App::GetApplication();

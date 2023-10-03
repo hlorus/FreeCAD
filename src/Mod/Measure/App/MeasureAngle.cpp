@@ -26,7 +26,6 @@
 #include <App/PropertyContainer.h>
 #include <App/Application.h>
 #include <App/Document.h>
-#include <tuple>
 #include <Base/Tools.h>
 
 #include "MeasureAngle.h"
@@ -34,7 +33,7 @@
 
 using namespace Measure;
 
-PROPERTY_SOURCE(Measure::MeasureAngle, App::MeasurementBase)
+PROPERTY_SOURCE(Measure::MeasureAngle, Measure::MeasureBase)
 
 
 MeasureAngle::MeasureAngle()

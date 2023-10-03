@@ -23,17 +23,18 @@
 #include <tuple>
 #include <string.h>
 
-#include "TaskView/TaskDialog.h"
-#include "TaskView/TaskView.h"
-#include "Application.h"
-#include "App/Measure.h"
-#include "Selection.h"
-
 #include <qcolumnview.h>
 #include <QString>
 #include <QComboBox>
 #include <QLineEdit>
 
+#include <App/Application.h>
+
+#include <Mod/Measure/App/MeasureBase.h>
+
+#include "TaskView/TaskDialog.h"
+#include "TaskView/TaskView.h"
+#include "Selection.h"
 
 namespace Gui {
 
@@ -45,9 +46,10 @@ public:
 
     void modifyStandardButtons(QDialogButtonBox* box) override;
     QDialogButtonBox::StandardButtons getStandardButtons() const override {
-        return QDialogButtonBox::Ok | QDialogButtonBox::Close;
+        return QDialogButtonBox::Ok | QDialogButtonBox::Abort | QDialogButtonBox::Reset;
     }
 
+    void invoke();
     void update();
     void close();
     bool accept() override;
@@ -59,7 +61,7 @@ public:
     void clearSelection();
     void gatherSelection();
     bool eventFilter(QObject* obj, QEvent* event) override;
-    void setMeasureObject(App::MeasurementBase* obj);
+    void setMeasureObject(Measure::MeasureBase* obj);
 
 protected:
 
@@ -70,7 +72,7 @@ private:
 
     void onSelectionChanged(const Gui::SelectionChanges& msg) override;
 
-    App::MeasurementBase *_mMeasureObject = nullptr;
+    Measure::MeasureBase *_mMeasureObject = nullptr;
 
     QLineEdit* valueResult{nullptr};
     QLabel* labelResult{nullptr};

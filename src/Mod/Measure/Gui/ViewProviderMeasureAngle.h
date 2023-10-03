@@ -32,7 +32,9 @@
 #include <Inventor/fields/SoSFMatrix.h>
 #include <Inventor/fields/SoSFVec3f.h>
 
-#include "ViewProviderMeasurementBase.h"
+#include <Mod/Measure/App/MeasureAngle.h>
+
+#include "ViewProviderMeasureBase.h"
 
 
 class SoText2;
@@ -45,7 +47,7 @@ class SoTransform;
 namespace MeasureGui
 {
 
-class MeasureGuiExport ViewProviderMeasureAngle : public MeasureGui::ViewProviderMeasurementBase
+class MeasureGuiExport ViewProviderMeasureAngle : public MeasureGui::ViewProviderMeasureBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureAngle);
 
@@ -62,6 +64,7 @@ public:
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;
     
+    Measure::MeasureAngle* getMeasureAngle();
 
 protected:
     void onChanged(const App::Property* prop) override;

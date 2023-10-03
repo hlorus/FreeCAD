@@ -35,7 +35,7 @@
 
 using namespace Measure;
 
-PROPERTY_SOURCE(Measure::MeasureDistance, App::MeasurementBase)
+PROPERTY_SOURCE(Measure::MeasureDistance, Measure::MeasureBase)
 
 
 MeasureDistance::MeasureDistance()

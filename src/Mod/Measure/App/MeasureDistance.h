@@ -24,20 +24,21 @@
 #ifndef MEASUREAPP_MEASUREDISTANCE_H
 #define MEASUREAPP_MEASUREDISTANCE_H
 
-#include <App/DocumentObject.h>
-#include <App/PropertyGeo.h>
-#include <App/PropertyUnits.h>
-#include <tuple>
-#include <App/Measure.h>
+#include <Mod/Measure/MeasureGlobal.h>
+
 #include <functional>
 #include <string.h>
 #include <map>
+#include <tuple>
+
 #include <TopoDS_Shape.hxx>
-
-#include <Mod/Measure/MeasureGlobal.h>
-
 #include <gp_Pnt.hxx>
 
+#include <App/PropertyGeo.h>
+#include <App/PropertyLinks.h>
+#include <App/PropertyUnits.h>
+
+#include "MeasureBase.h"
 
 namespace Measure
 {
@@ -49,7 +50,7 @@ struct MeasureDistanceInfo {
 };
 
 
-class MeasureExport MeasureDistance : public App::MeasurementBaseExtendable<MeasureDistanceInfo>
+class MeasureExport MeasureDistance : public Measure::MeasureBaseExtendable<MeasureDistanceInfo>
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureDistance);
 
@@ -74,8 +75,10 @@ public:
 
     static bool isValidSelection(const App::MeasureSelection& selection);
     static bool isPrioritizedSelection(const App::MeasureSelection& selection);
-    void parseSelection(const App::MeasureSelection& selection);
-    Base::Quantity result() {return Distance.getQuantityValue();}
+    void parseSelection(const App::MeasureSelection& selection) override;
+
+    App::PropertyQuantity* getResultProp() override {return &this->Distance;}
+    Base::Quantity result() override {return Distance.getQuantityValue();}
 
     bool getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape);
 

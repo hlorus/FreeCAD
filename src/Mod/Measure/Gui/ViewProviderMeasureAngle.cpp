@@ -54,19 +54,6 @@
 
 #endif
 
-
-#include <Gui/ArcEngine.h>
-
-#include <App/Document.h>
-#include <Base/Console.h>
-#include <Base/Quantity.h>
-#include "Gui/Application.h"
-#include <Gui/Command.h>
-#include <Gui/Document.h>
-#include <Gui/ViewParams.h>
-#include <Mod/Measure/App/MeasureAngle.h>
-#include <Mod/Measure/App/Preferences.h>
-
 #include <Precision.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
@@ -75,6 +62,18 @@
 #include <gp_Pnt.hxx>
 # include <GeomAPI_ExtremaCurveCurve.hxx>
 # include <GeomAPI_ProjectPointOnCurve.hxx>
+
+#include <App/Application.h>
+#include <App/Document.h>
+#include <Base/Console.h>
+#include <Base/Exception.h>
+#include <Base/Quantity.h>
+#include <Gui/ArcEngine.h>
+#include <Gui/Command.h>
+#include <Gui/Document.h>
+#include <Gui/ViewParams.h>
+
+#include <Mod/Measure/App/Preferences.h>
 
 #include "ViewProviderMeasureAngle.h"
 
@@ -250,7 +249,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
 
 
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, MeasureGui::ViewProviderMeasurementBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, MeasureGui::ViewProviderMeasureBase)
 
 
 ViewProviderMeasureAngle::ViewProviderMeasureAngle()
@@ -285,7 +284,7 @@ void ViewProviderMeasureAngle::onChanged(const App::Property* prop)
 
 void ViewProviderMeasureAngle::attach(App::DocumentObject* pcObject)
 {
-    ViewProviderMeasurementBase::attach(pcObject);
+    ViewProviderMeasureBase::attach(pcObject);
 
     // Arc Engine
     Gui::ArcEngine *arcEngine = new Gui::ArcEngine();
@@ -344,12 +343,23 @@ void ViewProviderMeasureAngle::updateData(const App::Property* prop)
         getMatrix();
 
         setLabelTranslation(midpoint.getValue());
-        setLabelValue(static_cast<App::MeasurementBase*>(pcObject)->result());
+        setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->result());
 
     } else {
         ViewProviderDocumentObject::updateData(prop);
     }
 
 }
+
+//! return the feature as a MeasureAngle
+Measure::MeasureAngle* ViewProviderMeasureAngle::getMeasureAngle()
+{
+    Measure::MeasureAngle* feature = dynamic_cast<Measure::MeasureAngle*>(pcObject);
+    if (!feature) {
+        throw Base::RuntimeError("Feature not found for ViewProviderMeasureAngle");
+    }
+    return feature;
+}
+
 
 
