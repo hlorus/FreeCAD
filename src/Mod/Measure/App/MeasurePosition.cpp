@@ -33,15 +33,16 @@
 
 using namespace Measure;
 
-PROPERTY_SOURCE(Measure::MeasurePosition, App::MeasurementBase)
+PROPERTY_SOURCE(Measure::MeasurePosition, Measure::MeasureBase)
 
 
 
 MeasurePosition::MeasurePosition()
 {
-    ADD_PROPERTY_TYPE(Elements,(nullptr), "Measurement", App::Prop_None, "Element to get the Position from");
-    Elements.setScope(App::LinkScope::Global);
-    Elements.setAllowExternal(true);
+    ADD_PROPERTY_TYPE(Element,(nullptr), "Measurement", App::Prop_None, "Element to get the position from");
+    Element.setScope(App::LinkScope::Global);
+    Element.setAllowExternal(true);
+
 
     ADD_PROPERTY_TYPE(Position,(0.0, 0.0, 0.0), "Measurement", App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                                             "The absolute position");
@@ -53,7 +54,7 @@ MeasurePosition::~MeasurePosition() = default;
 
 bool MeasurePosition::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.empty()) {
+    if (selection.empty() || selection.size() > 1) {
         return false;
     }
 
@@ -78,8 +79,7 @@ bool MeasurePosition::isValidSelection(const App::MeasureSelection& selection){
             return false;
         }
 
-        if ((type != App::MeasureElementType::LINE && type != App::MeasureElementType::CIRCLE
-              && type != App::MeasureElementType::ARC && type != App::MeasureElementType::CURVE)) {
+        if (type != App::MeasureElementType::POINT) {
             return false;
         }
     }
@@ -96,11 +96,13 @@ void MeasurePosition::parseSelection(const App::MeasureSelection& selection) {
 
     for (const std::tuple<std::string, std::string>& element : selection) {
        App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
-       objects.push_back(ob);
-       subElements.push_back(get<1>(element).c_str());
-    }
 
-    Elements.setValues(objects, subElements);
+        auto sub = std::vector<std::string>();
+        sub.push_back(get<1>(element));
+
+        Element.setValue(ob, sub);
+        return;
+    }
 }
 
 
@@ -112,37 +114,53 @@ App::DocumentObjectExecReturn *MeasurePosition::execute()
 
 void MeasurePosition::recalculatePosition()
 {
-    const std::vector<App::DocumentObject*>& objects = Elements.getValues();
-    const std::vector<std::string>& subElements = Elements.getSubValues();
+    const App::DocumentObject* object = Element.getValue();
+    const std::vector<std::string>& subElements = Element.getSubValues();
 
-    float result(0.0);
+    // Get the position of the first point
+    std::string subElement = subElements.front();
 
-    // Loop through Elements and call the valid geometry handler
-    for (std::vector<App::DocumentObject*>::size_type i=0; i<objects.size(); i++) {
-        App::DocumentObject *object = objects.at(i);
-        std::string subElement = subElements.at(i);
-
-        // Get the Geometry handler based on the module
-        const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
-        const std::string& mod = object->getClassTypeId().getModuleName(className);
-        auto handler = getGeometryHandler(mod);
-        if (!handler) {
-            throw Base::RuntimeError("No geometry handler available for submitted element type");
-        }
-
-        std::string obName = object->getNameInDocument();
-        result += handler(&obName, &subElement);
+    // Get the Geometry handler based on the module
+    const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
+    const std::string& mod = object->getClassTypeId().getModuleName(className);
+    auto handler = getGeometryHandler(mod);
+    if (!handler) {
+        throw Base::RuntimeError("No geometry handler available for submitted element type");
     }
 
-    // Position.setValue(result);
+    std::string obName = object->getNameInDocument();
+    auto result = handler(&obName, &subElement);
+    Position.setValue(result);
+    return;
 }
 
 void MeasurePosition::onChanged(const App::Property* prop)
 {
-    if (prop == &Elements) {
-        if (!isRestoring()) {
-            recalculatePosition();
-        }
+    if (isRestoring() || isRemoving()) {
+        return;
+    }
+
+    if (prop == &Element) {
+        recalculatePosition();
     }
     DocumentObject::onChanged(prop);
+}
+
+
+QString MeasurePosition::getResultString() {
+    App::Property* prop = this->getResultProp();
+    if (prop == nullptr) {
+        return QString();
+    }
+
+    Base::Vector3d value = Position.getValue();
+    QString unit = Position.getUnit().getString();
+    int precision = 2;
+    QString text;
+    QTextStream(&text) 
+        << "X: " << QString::number(value.x, 'f', precision) << unit << " "
+        << "Y: " << QString::number(value.y, 'f', precision) << unit << " "
+        << "Z: " << QString::number(value.z, 'f', precision) << unit;
+
+    return text;
 }

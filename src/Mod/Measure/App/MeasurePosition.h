@@ -28,19 +28,20 @@
 #include <App/PropertyGeo.h>
 #include <App/PropertyUnits.h>
 #include <tuple>
-#include <App/Measure.h>
+// #include <App/Measure.h>
 #include <functional>
 #include <string.h>
 #include <map>
+#include <QTextStream>
 
 #include <Mod/Measure/MeasureGlobal.h>
-
+#include "MeasureBase.h"
 
 namespace Measure
 {
 
 
-class MeasureExport MeasurePosition : public App::MeasurementBaseExtendable<float>
+class MeasureExport MeasurePosition : public Measure::MeasureBaseExtendable<Base::Vector3d>
 {
     PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasurePosition);
 
@@ -49,8 +50,8 @@ public:
     MeasurePosition();
     ~MeasurePosition() override;
 
-    App::PropertyLinkSubList Elements;
-    App::PropertyVector Position;
+    App::PropertyLinkSub Element;
+    App::PropertyPosition Position;
 
     App::DocumentObjectExecReturn *execute() override;
     void recalculatePosition();
@@ -62,10 +63,8 @@ public:
     static bool isValidSelection(const App::MeasureSelection& selection);
     void parseSelection(const App::MeasureSelection& selection);
     
-    // Note: How should we display a vector?
-    // Allow multiple result values along with labels? X, Y, Z
-    // Just return a string?
-    Base::Quantity result() {return Base::Quantity();}
+    App::Property* getResultProp() override {return &this->Position;}
+    QString getResultString() override;
 
 private:
 

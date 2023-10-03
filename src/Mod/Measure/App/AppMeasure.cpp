@@ -106,7 +106,17 @@ PyMOD_INIT_FUNC(Measure)
             "Measure::MeasureLength",
             MeasureLength::isValidSelection,
             nullptr,
-    });    
+    });
+
+    app.addMeasureType(
+    new App::MeasureType {
+        "Position",
+        "Position",
+        "Measure::MeasurePosition",
+        MeasurePosition::isValidSelection,
+        nullptr,
+    });
+
     Base::Console().Log("Loading Measure module... done\n");
     PyMOD_Return(mod);
 }

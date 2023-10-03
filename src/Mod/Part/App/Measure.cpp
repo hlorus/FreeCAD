@@ -50,6 +50,7 @@
 #include <Mod/Measure/App/MeasureAngle.h>
 #include <Mod/Measure/App/MeasureDistance.h>
 #include <Mod/Measure/App/MeasureLength.h>
+#include <Mod/Measure/App/MeasurePosition.h>
 
 #include "VectorAdapter.h"
 #include "PartFeature.h"
@@ -283,6 +284,26 @@ Measure::MeasureLengthInfo MeasureLengthHandler(std::string* objectName, std::st
 }
 
 
+Base::Vector3d MeasurePositionHandler(std::string* objectName, std::string* subName) {
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
+
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    if (shape.IsNull()) {
+        Base::Console().Message("MeasurePositionHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        return Base::Vector3d();
+    }
+    TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    if (sType != TopAbs_VERTEX) {
+        return Base::Vector3d();
+    }
+
+    TopoDS_Vertex vertex = TopoDS::Vertex(shape);    
+    auto point = BRep_Tool::Pnt(vertex);
+    return Base::Vector3d(point.X(), point.Y(), point.Z());
+}
+
+
 Measure::MeasureAngleInfo MeasureAngleHandler(std::string* objectName, std::string* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
@@ -347,6 +368,9 @@ void Part::Measure::initialize() {
     std::vector<std::string> proxyList(  { "Part", "PartDesign" } );
     // Extend MeasureLength
     MeasureLength::addGeometryHandlers(proxyList, MeasureLengthHandler);
+
+    // Extend MeasurePosition
+    MeasurePosition::addGeometryHandlers(proxyList, MeasurePositionHandler);
 
     // Extend MeasureAngle
     MeasureAngle::addGeometryHandlers(proxyList, MeasureAngleHandler);
