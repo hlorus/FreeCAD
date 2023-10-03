@@ -76,7 +76,7 @@ public:
 
     App::Property* getResultProp() override {return &this->Angle;}
 
-    bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
+    static bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
     Base::Vector3d getLoc(App::DocumentObject& ob, std::string& subName);
 
     // Orientation Vectors

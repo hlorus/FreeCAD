@@ -27,6 +27,7 @@
 #include <App/Application.h>
 #include <App/Document.h>
 #include <Base/Tools.h>
+#include <Base/Precision.h>
 
 #include "MeasureAngle.h"
 
@@ -89,11 +90,27 @@ bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection){
 }
 
 bool MeasureAngle::isPrioritizedSelection(const App::MeasureSelection& selection) {
-    if (selection.size() == 2) {
-        return true;
+    if (selection.size() != 2) {
+        return false;
     }
     
-    return false;
+    // Check if the two elements are parallel
+    App::Document* doc = App::GetApplication().getActiveDocument();
+
+    App::DocumentObject* ob1 = doc->getObject(get<0>(selection.at(0)).c_str());
+    std::string sub1 = get<1>(selection.at(0));
+    Base::Vector3d vec1;
+    getVec(*ob1, sub1, vec1);
+
+
+    App::DocumentObject* ob2 = doc->getObject(get<0>(selection.at(1)).c_str());
+    std::string sub2 = get<1>(selection.at(1));
+    Base::Vector3d vec2;
+    getVec(*ob2, sub2, vec2);
+
+    
+    double angle = std::fmod(vec1.GetAngle(vec2), D_PI);
+    return angle > Base::Precision::Angular();
 }
 
 

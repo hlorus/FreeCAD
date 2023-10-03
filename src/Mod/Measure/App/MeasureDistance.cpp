@@ -103,12 +103,10 @@ bool MeasureDistance::isValidSelection(const App::MeasureSelection& selection){
 }
 
 bool MeasureDistance::isPrioritizedSelection(const App::MeasureSelection& selection) {
-
     // TODO: Check if Elements ar parallel
-
-    if (selection.size() == 2) {
-        return true;
-    }
+    // if (selection.size() == 2) {
+    //     return true;
+    // }
     
     return false;
 }
