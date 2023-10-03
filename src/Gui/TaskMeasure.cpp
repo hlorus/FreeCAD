@@ -260,7 +260,7 @@ void TaskMeasure::update() {
         // Create measure object
         App::Document *doc = App::GetApplication().getActiveDocument();
         setMeasureObject(
-            (Measure::MeasureBase*)doc->addObject(measureType->measureObject.c_str())
+            (Measure::MeasureBase*)doc->addObject(measureType->measureObject.c_str(), measureType->label.c_str())
         );
     }
 
