@@ -145,10 +145,12 @@ void MeasureLength::recalculateLength()
 
 void MeasureLength::onChanged(const App::Property* prop)
 {
+    if (isRestoring() || isRemoving()) {
+        return;
+    }
+
     if (prop == &Elements) {
-        if (!isRestoring()) {
-            recalculateLength();
-        }
+        recalculateLength();
     }
     
     MeasureBase::onChanged(prop);
@@ -159,10 +161,8 @@ Base::Placement MeasureLength::getPlacement() {
     const std::vector<App::DocumentObject*>& objects = Elements.getValues();
     const std::vector<std::string>& subElements = Elements.getSubValues();
 
-    Base::Matrix4D transform;
-
     if (!objects.size() || !subElements.size()) {
-        return transform;
+        return Base::Placement();
     }
 
     App::DocumentObject* object = objects.front();
