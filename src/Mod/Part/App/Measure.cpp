@@ -74,52 +74,6 @@ static float getFaceArea(TopoDS_Shape& face){
 }
 
 
-static App::MeasureElementInfo PartMeasureCb(const char* objectName, const char* subName) {
-
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName);
-//    auto sub = ob->getSubObject(subName);
-
-    TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
-    if (shape.IsNull()) {
-        // failure here on loading document with existing measurement.
-        Base::Console().Message("Part::VectorAdapter did not retrieve shape for %s, %s\n", objectName, subName);
-        return App::MeasureElementInfo();
-    }
-
-    TopAbs_ShapeEnum sType = shape.ShapeType();
-
-    std::string type;
-    Base::Vector3d pos;
-    float length = 0.0;
-    float area = 0.0;
-
-    if(sType == TopAbs_VERTEX) {
-        type = "Point";
-
-        TopoDS_Vertex vertex = TopoDS::Vertex(shape);    
-        auto point = BRep_Tool::Pnt(vertex);
-        pos.Set(point.X(), point.Y(), point.Z());
-    
-    }else if (sType == TopAbs_EDGE) {
-
-        type = "Edge";
-        length = getLength(shape);
-    }else if (sType == TopAbs_FACE) {
-        type = "Face";
-        area = getFaceArea(shape);
-    }
-     
-
-    App::MeasureElementInfo info = {
-        type,
-        pos,
-        length,
-        area
-    };
-    
-    return info;
-}
-
 App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* subName) {
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName);
 //    auto sub = ob->getSubObject(subName);
@@ -390,7 +344,7 @@ using namespace Measure;
 void Part::Measure::initialize() {
 
     App::Application& app = App::GetApplication();
-    app.addMeasureHandler("Part", PartMeasureCb, PartMeasureTypeCb);
+    app.addMeasureHandler("Part", PartMeasureTypeCb);
 
 
     std::vector<std::string> proxyList(  { "Part", "PartDesign" } );

@@ -85,17 +85,10 @@ enum MeasureElementType {
     Volume,
 };
 
-struct MeasureElementInfo {
-    std::string type;
-    Base::Vector3d pos;
-    float length;
-    float area;
-};
 
 using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;
 using MeasureValidateMethod = std::function<bool(const MeasureSelection&)>;
 using MeasurePrioritizeMethod = std::function<bool(const MeasureSelection&)>;
-using MeasureInfoMethod = std::function<MeasureElementInfo(const char*, const char*)>;
 using MeasureTypeMethod = std::function<App::MeasureElementType (const char*, const char*)>;
 
 struct MeasureType {
@@ -113,7 +106,6 @@ struct MeasureType {
 
 struct MeasureHandler {
     std::string module;
-    MeasureInfoMethod infoCb;
     MeasureTypeMethod typeCb;
 };
 
@@ -441,7 +433,7 @@ public:
     void addMeasureType(MeasureType* measureType);
     const std::vector<MeasureType*> getMeasureTypes();
 
-    void addMeasureHandler(const char* module, MeasureInfoMethod infoCb, MeasureTypeMethod typeCb);
+    void addMeasureHandler(const char* module, MeasureTypeMethod typeCb);
     bool hasMeasureHandler(const char* module);
     MeasureHandler getMeasureHandler(const char* module);
 
