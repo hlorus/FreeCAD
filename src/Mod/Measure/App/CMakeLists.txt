@@ -35,6 +35,7 @@ SET(MeasureModule_SRCS
     PreCompiled.h
     AppMeasure.cpp
 
+# original service routines
     Measurement.cpp
     Measurement.h
 
@@ -51,6 +52,8 @@ SET(MeasureModule_SRCS
     MeasureLength.h
     MeasureArea.cpp
     MeasureArea.h
+    MeasureRadius.cpp
+    MeasureRadius.h
 #    Measure.cpp
 #    Measure.h
 
