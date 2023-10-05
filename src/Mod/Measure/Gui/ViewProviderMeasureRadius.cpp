@@ -70,12 +70,15 @@ Base::Vector3d ViewProviderMeasureRadius::getTextPosition(){
 
     auto basePoint = getBasePosition();
     double length = measureObject->Radius.getValue();
+    if (Mirror.getValue()) {
+        length = -length;
+    }
     Base::Placement placement = measureObject->getPlacement();
     Base::Vector3d textDirection = getTextDirection(placement.getRotation().multVec(Base::Vector3d(0.0, 0.0, 1.0)));
 
     // without the fudgeFactor, the text is too far away sometimes.  Not a big deal if we can drag the text.
-    double fudgeFactor(0.5);
-    return basePoint + textDirection * length * fudgeFactor;
+//    double fudgeFactor(0.5);
+    return basePoint + textDirection * length * DistFactor.getValue();
 }
 
 

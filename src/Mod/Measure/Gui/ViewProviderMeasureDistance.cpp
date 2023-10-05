@@ -62,11 +62,6 @@ PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureDistance, MeasureGui::ViewProvide
 
 ViewProviderMeasureDistance::ViewProviderMeasureDistance()
 {
-    static const char *agroup = "Appearance";
-    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
-    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
-
-
     const size_t vertexCount(4);
     const size_t lineCount(9);
 

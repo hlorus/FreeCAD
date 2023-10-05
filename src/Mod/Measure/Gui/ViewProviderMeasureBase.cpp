@@ -62,6 +62,8 @@ ViewProviderMeasureBase::ViewProviderMeasureBase()
     ADD_PROPERTY_TYPE(TextBackgroundColor, (Preferences::defaultTextBackgroundColor()), agroup, App::Prop_None, "Color for the measurement text background");
     ADD_PROPERTY_TYPE(LineColor, (Preferences::defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
     ADD_PROPERTY_TYPE(FontSize, (Preferences::defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
+    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
+    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
 
     pFont = new SoFontStyle();
     pFont->ref();
@@ -122,6 +124,8 @@ void ViewProviderMeasureBase::onChanged(const App::Property* prop)
     }
     else if (prop == &FontSize) {
         pFont->size = FontSize.getValue();
+    } else if (prop == &DistFactor || prop == &Mirror) {
+        redrawAnnotation();
     }
 }
 
@@ -315,7 +319,6 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getBasePosition(){
 
 //! calculate a good direction for the text based on the layout of the elements and its
 //! relationship with the cardinal axes.  elementDirection should be normalized.
-//! original is in VPMeasureDistance.
 Base::Vector3d ViewProviderMeasurePropertyBase::getTextDirection(Base::Vector3d elementDirection, double tolerance) const
 {
     const Base::Vector3d stdX(1.0, 0.0, 0.0);
@@ -343,6 +346,9 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getTextPosition(){
     Base::Vector3d textDirection(1.0, 1.0, 1.0);
     textDirection.Normalize();
     double length = 10;
+    if (Mirror.getValue()) {
+        length = -length;
+    }
 
-    return basePoint + textDirection * length;
+    return basePoint + textDirection * length * DistFactor.getValue();
 }

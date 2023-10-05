@@ -56,10 +56,8 @@ public:
     ViewProviderMeasureAngle();
     ~ViewProviderMeasureAngle() override;
 
-    // // Display properties
+    // Display properties
     App::PropertyFloat          Radius;
-    App::PropertyFloat          DistFactor;
-    App::PropertyBool           Mirror;
 
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;

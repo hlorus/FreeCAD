@@ -63,6 +63,8 @@ public:
     App::PropertyColor          TextBackgroundColor;
     App::PropertyColor          LineColor;
     App::PropertyInteger        FontSize;
+    App::PropertyFloat          DistFactor;
+    App::PropertyBool           Mirror;
 
     /**
      * Attaches the document object to this view provider.
