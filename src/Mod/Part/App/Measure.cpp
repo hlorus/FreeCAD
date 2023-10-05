@@ -52,6 +52,7 @@
 #include <Mod/Measure/App/MeasureLength.h>
 #include <Mod/Measure/App/MeasurePosition.h>
 #include <Mod/Measure/App/MeasureArea.h>
+#include <Mod/Measure/App/MeasureRadius.h>
 
 #include "VectorAdapter.h"
 #include "PartFeature.h"
@@ -72,6 +73,21 @@ static float getFaceArea(TopoDS_Shape& face){
     BRepGProp::SurfaceProperties(face, gprops);
     return gprops.Mass();
 }
+
+static float getRadius(TopoDS_Shape& edge){
+    // gprops.Mass() would be the circumference (length) of the circle (arc)
+    if (edge.ShapeType() == TopAbs_EDGE) {
+        BRepAdaptor_Curve adapt(TopoDS::Edge(edge));
+        if (adapt.GetType() != GeomAbs_Circle) {
+            // TODO: not sure what the error handling here should be. nan? 0.0?
+            return 0.0;
+        }
+        gp_Circ circle = adapt.Circle();
+        return circle.Radius();
+    }
+    return 0.0;
+}
+
 
 
 App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* subName) {
@@ -238,6 +254,44 @@ Measure::MeasureLengthInfo MeasureLengthHandler(std::string* objectName, std::st
     return {true, getLength(shape), placement};
 }
 
+Measure::MeasureRadiusInfo MeasureRadiusHandler(std::string* objectName, std::string* subName){
+    Base::Placement placement;      // curve center + orientation
+    Base::Vector3d pointOnCurve;
+
+    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
+
+    // TODO: verify that shape is located and oriented by getShape
+    // if not, we should apply the global placement of the object to the subelement?
+
+    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    if (shape.IsNull()) {
+        return { false, 0.0, pointOnCurve, placement};
+    }
+        TopAbs_ShapeEnum sType = shape.ShapeType();
+
+    if (sType != TopAbs_EDGE) {
+        return { false, 0.0, pointOnCurve, placement};
+    }
+
+    // Get Center of mass as the attachment point of the label
+    GProp_GProps gprops;
+    BRepGProp::LinearProperties(shape, gprops);
+    auto origin = gprops.CentreOfMass();
+
+    TopoDS_Edge edge = TopoDS::Edge(shape);
+    gp_Pnt firstPoint = BRep_Tool::Pnt(TopExp::FirstVertex(edge));
+    pointOnCurve = Base::Vector3d(firstPoint.X(), firstPoint.Y(), firstPoint.Z());
+    // a somewhat arbitrary radius from center -> point on curve
+    auto dir = (firstPoint.XYZ() - origin.XYZ()).Normalized();
+    Base::Vector3d elementDirection(dir.X(), dir.Y(), dir.Z());
+    Base::Vector3d axisUp(0.0, 0.0, 1.0);
+    Base::Rotation rot(axisUp, elementDirection);
+
+    placement = Base::Placement(Base::Vector3d(origin.X(), origin.Y(), origin.Z()), rot);
+
+    return { true, getRadius(shape), pointOnCurve, placement};
+}
+
 
 Measure::MeasureAreaInfo MeasureAreaHandler(std::string* objectName, std::string* subName){
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
@@ -362,4 +416,7 @@ void Part::Measure::initialize() {
 
     // Extend MeasureDistance
     MeasureDistance::addGeometryHandlers(proxyList, MeasureDistanceHandler);
+
+    // Extend MeasureRadius
+    MeasureRadius::addGeometryHandlers(proxyList, MeasureRadiusHandler);
 }
