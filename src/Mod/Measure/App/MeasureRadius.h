@@ -67,7 +67,7 @@ public:
     MeasureRadius();
     ~MeasureRadius() override;
 
-    App::PropertyLinkSubList Elements;
+    App::PropertyLinkSub Element;
     App::PropertyDistance Radius;
 
     App::DocumentObjectExecReturn *execute() override;
@@ -91,6 +91,8 @@ public:
 
 private:
     void onChanged(const App::Property* prop) override;
+    MeasureRadiusInfo getMeasureInfoFirst() const;
+
 
 };
 

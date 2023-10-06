@@ -55,7 +55,7 @@ void ViewProviderMeasureRadius::updateData(const App::Property* prop)
     }
 
     auto obj = dynamic_cast<Measure::MeasureRadius*>(getMeasureObject());
-    if (prop == &(obj->Elements) || prop == &(obj->Radius)){
+    if (prop == &(obj->Element) || prop == &(obj->Radius)){
         {
             redrawAnnotation();
         }
@@ -76,8 +76,6 @@ Base::Vector3d ViewProviderMeasureRadius::getTextPosition(){
     Base::Placement placement = measureObject->getPlacement();
     Base::Vector3d textDirection = getTextDirection(placement.getRotation().multVec(Base::Vector3d(0.0, 0.0, 1.0)));
 
-    // without the fudgeFactor, the text is too far away sometimes.  Not a big deal if we can drag the text.
-//    double fudgeFactor(0.5);
     return basePoint + textDirection * length * DistFactor.getValue();
 }
 

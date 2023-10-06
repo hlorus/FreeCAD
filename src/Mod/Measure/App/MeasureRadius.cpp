@@ -48,9 +48,9 @@ PROPERTY_SOURCE(Measure::MeasureRadius, Measure::MeasureBase)
 
 MeasureRadius::MeasureRadius()
 {
-    ADD_PROPERTY_TYPE(Elements,(nullptr), "Measurement", App::Prop_None, "Elements to get the radius from");
-    Elements.setScope(App::LinkScope::Global);
-    Elements.setAllowExternal(true);
+    ADD_PROPERTY_TYPE(Element,(nullptr), "Measurement", App::Prop_None, "Element to get the radius from");
+    Element.setScope(App::LinkScope::Global);
+    Element.setAllowExternal(true);
 
     ADD_PROPERTY_TYPE(Radius,(0.0)       ,"Measurement",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                                             "Radius of selection");
@@ -60,41 +60,39 @@ MeasureRadius::MeasureRadius()
 MeasureRadius::~MeasureRadius() = default;
 
 //! validate all the object+subelement pairs in the selection. Must be circle or arc
-//! and have a geometry handler available.
-//?? should we validate every entry?  Any entry?
-//?? start with just checking the first entry
+//! and have a geometry handler available.  We only calculate radius if there is a
+//! single valid item in the selection
 bool MeasureRadius::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.empty()) {
+    if (selection.empty() || selection.size() > 1) {
+        // too few or too many selections
         return false;
     }
 
     App::Document* doc = App::GetApplication().getActiveDocument();
+    const std::string& obName = get<0>(selection.front());
+    App::DocumentObject* ob = doc->getObject(obName.c_str());
 
-    for (const std::tuple<std::string, std::string>& element : selection) {
-        const std::string& obName = get<0>(element);
-        App::DocumentObject* ob = doc->getObject(obName.c_str());
-        
-        const std::string& subName = get<1>(element);
-        const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = ob->getClassTypeId().getModuleName(className);
+    const std::string& subName = get<1>(selection.front());
+    const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
+    std::string mod = ob->getClassTypeId().getModuleName(className);
 
-        if (!hasGeometryHandler(mod)) {
-            return false;
-        }
-
-        App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
-        App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
-
-        if (type == App::MeasureElementType::INVALID) {
-            return false;
-        }
-
-        if (type != App::MeasureElementType::CIRCLE
-              && type != App::MeasureElementType::ARC) {
-            return false;
-        }
+    if (!hasGeometryHandler(mod)) {
+        return false;
     }
+
+    App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
+    App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
+
+    if (type == App::MeasureElementType::INVALID) {
+        return false;
+    }
+
+    if (type != App::MeasureElementType::CIRCLE
+        && type != App::MeasureElementType::ARC) {
+        return false;
+    }
+
     return true;
 }
 
@@ -122,7 +120,7 @@ bool MeasureRadius::isPrioritizedSelection(const App::MeasureSelection& selectio
             firstEdge = TopoDS::Edge(edges.Current());
         }
     } else {
-        // TODO: only edge or wire can have radius?
+        // only edge or wire can have radius
         return false;
     }
 
@@ -137,20 +135,19 @@ bool MeasureRadius::isPrioritizedSelection(const App::MeasureSelection& selectio
 }
 
 
-//! Set properties from selection. assumes a valid selection.
+//! Set properties from first item in selection. assumes a valid selection.
 void MeasureRadius::parseSelection(const App::MeasureSelection& selection) {
     App::Document* doc = App::GetApplication().getActiveDocument();
 
     std::vector<App::DocumentObject*> objects;
     std::vector<const char*> subElements;
 
-    for (const std::tuple<std::string, std::string>& element : selection) {
-       App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
-       objects.push_back(ob);
-       subElements.push_back(get<1>(element).c_str());
-    }
+    const std::tuple<std::string, std::string>& element = selection.front();
+    App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
+    std::string subElement = get<1>(element);
+    std::vector<std::string> subElementList { subElement };
 
-    Elements.setValues(objects, subElements);
+    Element.setValue(ob, subElementList);
 }
 
 
@@ -161,28 +158,9 @@ App::DocumentObjectExecReturn *MeasureRadius::execute()
 }
 
 
-// TODO: does it make sense to sum radii here? to average them? to only take the first circular
-// edge in the selection?
 void MeasureRadius::recalculateRadius()
 {
-    const std::vector<App::DocumentObject*>& objects = Elements.getValues();
-    const std::vector<std::string>& subElements = Elements.getSubValues();
-
-    App::DocumentObject *object = objects.front();
-    std::string subElement = subElements.front();
-
-    // Get the Geometry handler based on the module an this type of measurement (radius)
-    const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
-    const std::string& mod = object->getClassTypeId().getModuleName(className);
-    auto handler = getGeometryHandler(mod);
-    if (!handler) {
-       throw Base::RuntimeError("No geometry handler available for submitted element type");
-    }
-
-    std::string objectName = object->getNameInDocument();
-    double result = handler(&objectName, &subElement).radius;
-
-    Radius.setValue(result);
+    Radius.setValue(getMeasureInfoFirst().radius);
 }
 
 void MeasureRadius::onChanged(const App::Property* prop)
@@ -191,48 +169,37 @@ void MeasureRadius::onChanged(const App::Property* prop)
         return;
     }
 
-    if (prop == &Elements) {
+    if (prop == &Element) {
         recalculateRadius();
     }
     
     MeasureBase::onChanged(prop);
 }
 
+
 //! return a placement (location + orientation) for the first element
 Base::Placement MeasureRadius::getPlacement() {
-    const std::vector<App::DocumentObject*>& objects = Elements.getValues();
-    const std::vector<std::string>& subElements = Elements.getSubValues();
-
-    if (objects.empty() || subElements.empty()) {
-        return Base::Placement();
-    }
-
-    App::DocumentObject* object = objects.front();
-    std::string subElement = subElements.front();
-    const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
-    const std::string& mod = object->getClassTypeId().getModuleName(className);
-
-    auto handler = getGeometryHandler(mod);
-    if (!handler) {
-        throw Base::RuntimeError("No geometry handler available for submitted element type");
-    }
-
-    std::string obName = object->getNameInDocument();
-    return handler(&obName, &subElement).placement;
+    return getMeasureInfoFirst().placement;
 }
+
 
 //! return the pointOnCurve element in MeasureRadiusInfo for the first element
 Base::Vector3d MeasureRadius::getPointOnCurve() const
 {
-    // TODO:: GeometryHandler* MeasureRadius::getFirstElementInfoFromHandler() {
-    const std::vector<App::DocumentObject*>& objects = Elements.getValues();
-    const std::vector<std::string>& subElements = Elements.getSubValues();
+    return getMeasureInfoFirst().pointOnCurve;
+}
 
-    if (objects.empty() || subElements.empty()) {
-        return Base::Vector3d();
+//! get the handler's result for the first element
+MeasureRadiusInfo MeasureRadius::getMeasureInfoFirst() const
+{
+   const App::DocumentObject* object = Element.getValue();
+    const std::vector<std::string>& subElements = Element.getSubValues();
+
+    if (!object || subElements.empty()) {
+// NOLINTNEXTLINE(modernize-return-braced-init-list)
+        return MeasureRadiusInfo();
     }
 
-    App::DocumentObject* object = objects.front();
     std::string subElement = subElements.front();
     const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
     const std::string& mod = object->getClassTypeId().getModuleName(className);
@@ -241,9 +208,7 @@ Base::Vector3d MeasureRadius::getPointOnCurve() const
     if (!handler) {
         throw Base::RuntimeError("No geometry handler available for submitted element type");
     }
-    // return handler;
-    // end of getFirstFromHandler
 
     std::string obName = object->getNameInDocument();
-    return handler(&obName, &subElement).pointOnCurve;
+    return handler(&obName, &subElement);
 }
