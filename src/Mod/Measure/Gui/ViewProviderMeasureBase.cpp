@@ -106,6 +106,13 @@ void ViewProviderMeasureBase::setDisplayMode(const char* ModeName)
 }
 
 
+void ViewProviderMeasureBase::finishRestoring() {
+
+    // Force measurment visibility when loading a document
+    show();
+}
+
+
 void ViewProviderMeasureBase::onChanged(const App::Property* prop)
 {
     if (prop == &TextColor) {
