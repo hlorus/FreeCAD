@@ -23,28 +23,22 @@
 #include "PreCompiled.h"
 
 #ifndef _PreComp_
-
 #endif
 
 #include <App/Document.h>
+#include <App/Property.h>
 #include <Base/Console.h>
-#include <Base/Quantity.h>
-#include <Gui/Application.h>
-#include <Gui/Command.h>
-#include <Gui/Document.h>
-#include <Gui/ViewParams.h>
-#include <Gui/Inventor/MarkerBitmaps.h>
 
 #include <Mod/Measure/App/MeasureRadius.h>
-#include <Mod/Measure/App/Preferences.h>
-
 #include "ViewProviderMeasureRadius.h"
 
 using namespace Gui;
 using namespace MeasureGui;
 using namespace Measure;
 
+//NOLINTBEGIN
 PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureRadius, MeasureGui::ViewProviderMeasurePropertyBase)
+//NOLINTEND
 
 
 //! handle changes to the feature's properties

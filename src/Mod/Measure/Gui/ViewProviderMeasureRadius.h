@@ -28,16 +28,10 @@
 
 #include <Base/Vector3D.h>
 
-#include <Mod/Measure/App/MeasureRadius.h>
-
 #include "ViewProviderMeasureBase.h"
-
-class SoCoordinate3;
-class SoIndexedLineSet;
 
 namespace App
 {
-class DocumentObject;
 class Property;
 }
 
@@ -46,7 +40,9 @@ namespace MeasureGui
 
 class MeasureGuiExport ViewProviderMeasureRadius : public MeasureGui::ViewProviderMeasurePropertyBase
 {
+//NOLINTBEGIN
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureRadius);
+//NOLINTEND
 
 public:
     void updateData(const App::Property* prop) override;

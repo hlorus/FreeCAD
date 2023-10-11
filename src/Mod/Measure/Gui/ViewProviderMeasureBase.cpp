@@ -52,18 +52,21 @@ using namespace MeasureGui;
 using namespace Measure;
 namespace bp = boost::placeholders;
 
-
+//NOLINTBEGIN
 PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureBase, Gui::ViewProviderDocumentObject)
+//NOLINTEND
 
 ViewProviderMeasureBase::ViewProviderMeasureBase()
 {
     static const char *agroup = "Appearance";
+//NOLINTBEGIN
     ADD_PROPERTY_TYPE(TextColor, (Preferences::defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
     ADD_PROPERTY_TYPE(TextBackgroundColor, (Preferences::defaultTextBackgroundColor()), agroup, App::Prop_None, "Color for the measurement text background");
     ADD_PROPERTY_TYPE(LineColor, (Preferences::defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
     ADD_PROPERTY_TYPE(FontSize, (Preferences::defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
     ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
     ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
+//NOLINTEND
 
     pFont = new SoFontStyle();
     pFont->ref();
@@ -181,9 +184,11 @@ void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
 {
     ViewProviderDocumentObject::attach(pcObj);
 
+//NOLINTBEGIN
     auto bnd = boost::bind(&ViewProviderMeasureBase::onGuiUpdate, this, bp::_1);
+//NOLINTEND
 
-    Measure::MeasureBase* feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
+    auto feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
     if (feature) {
         feature->signalGuiUpdate.connect(bnd);
     }
@@ -208,8 +213,9 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 }
 
 
-
+//NOLINTBEGIN
 PROPERTY_SOURCE_ABSTRACT(MeasureGui::ViewProviderMeasurePropertyBase, MeasureGui::ViewProviderMeasureBase)
+//NOLINTEND
 
 
 ViewProviderMeasurePropertyBase::ViewProviderMeasurePropertyBase()
@@ -352,7 +358,8 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getTextPosition(){
     auto basePoint = getBasePosition();
     Base::Vector3d textDirection(1.0, 1.0, 1.0);
     textDirection.Normalize();
-    double length = 10;
+    constexpr double defaultLength = 10.0;
+    double length = defaultLength;
     if (Mirror.getValue()) {
         length = -length;
     }

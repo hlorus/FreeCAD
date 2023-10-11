@@ -34,6 +34,7 @@
 
 #include <Mod/Measure/App/MeasureBase.h>
 
+//NOLINTBEGIN
 class SbVec2s;
 class SoFontStyle;
 class SoBaseColor;
@@ -42,11 +43,13 @@ class SoTranslation;
 class SoPickStyle;
 class SoCoordinate3;
 class SoIndexedLineSet;
+//NOLINTEND
 
 
 
 namespace MeasureGui {
 
+//NOLINTBEGIN
 class MeasureGuiExport ViewProviderMeasureBase :public Gui::ViewProviderDocumentObject
 {
     PROPERTY_HEADER_WITH_OVERRIDE(ViewProviderMeasureBase);
@@ -65,6 +68,7 @@ public:
     App::PropertyInteger        FontSize;
     App::PropertyFloat          DistFactor;
     App::PropertyBool           Mirror;
+//NOLINTEND
 
     /**
      * Attaches the document object to this view provider.
@@ -90,6 +94,7 @@ protected:
     SoDrawStyle* getSoLineStylePrimary();
     SoSeparator* getSoSeparatorText();
 
+    // TODO: getters & setters and move variables to private?
     bool _mShowTree = true;
 
     Gui::SoTextLabel * pLabel;
@@ -100,10 +105,11 @@ protected:
 
 };
 
-
+//NOLINTBEGIN
 class MeasureGuiExport ViewProviderMeasurePropertyBase : public MeasureGui::ViewProviderMeasureBase
 {
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasurePropertyBase);
+//NOLINTEND
 
 public:
     /// Constructor
@@ -116,11 +122,14 @@ public:
     void redrawAnnotation() override;
 
 protected:
+    static constexpr double defaultTolerance = 10e-6;
+
     void onChanged(const App::Property* prop) override;
 
     virtual Base::Vector3d getBasePosition();
     virtual Base::Vector3d getTextPosition();
-    Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = 10e-6) const;
+    Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = defaultTolerance) const;
+
 
 private:
     SoCoordinate3    * pCoords;
