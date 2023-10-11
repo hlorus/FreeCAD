@@ -71,6 +71,7 @@ public:
      */
     void attach(App::DocumentObject *pcObj) override;
     void onGuiUpdate(const Measure::MeasureBase* measureObject);
+    void finishRestoring() override;
 
     bool useNewSelectionModel() const override {return true;}
     std::vector<std::string> getDisplayModes() const override;
