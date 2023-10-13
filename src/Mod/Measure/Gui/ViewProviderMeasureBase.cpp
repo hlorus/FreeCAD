@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "Gui/Application.h"
+#include "Gui/MDIView.h"
 #include "PreCompiled.h"
 
 #ifndef _PreComp_
@@ -40,8 +42,12 @@
 
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
+#include <Gui/Document.h>
 #include <Gui/ViewParams.h>
 #include <Gui/Inventor/MarkerBitmaps.h>
+#include <Gui/View3DInventor.h>
+#include <Gui/View3DInventorViewer.h>
+
 
 #include <Mod/Measure/App/Preferences.h>
 
@@ -65,7 +71,7 @@ ViewProviderMeasureBase::ViewProviderMeasureBase()
     ADD_PROPERTY_TYPE(LineColor, (Preferences::defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
     ADD_PROPERTY_TYPE(FontSize, (Preferences::defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
     ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
-    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
+    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text position if true");
 //NOLINTEND
 
     pFont = new SoFontStyle();
@@ -213,6 +219,35 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 }
 
 
+//! calculate a good direction from the elements being measured to the annotation text based on the layout
+//! of the elements and its relationship with the cardinal axes and the view direction.  elementDirection
+//! is expected to be a normalized vector.
+//! an example of an elementDirection would be the vector from the start of a line to the end.
+Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementDirection, double tolerance)
+{
+    const Base::Vector3d stdX(1.0, 0.0, 0.0);
+    const Base::Vector3d stdY(0.0, 1.0, 0.0);
+    const Base::Vector3d stdZ(0.0, 0.0, 1.0);
+
+    auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
+    // if (!view) {
+    //     // Measure doesn't work with this kind of active view.  Might be dependency graph, might be TechDraw, or ????
+    //     // i don't know if this can even happen.
+    //     throw Base::RuntimeError("Measure doesn't work with this kind of active view.");
+    // }
+    Gui::View3DInventorViewer* viewer = view->getViewer();
+    Base::Vector3d viewDirection = toVector3d(viewer->getViewDirection()).Normalize();
+    Base::Vector3d textDirection = elementDirection.Cross(viewDirection);
+    if (textDirection.Length() < tolerance)  {
+        // either elementDirection and viewDirection are parallel or one of them is null.
+        viewDirection = toVector3d(viewer->getUpDirection()).Normalize();
+        textDirection = elementDirection.Cross(viewDirection);
+    }
+
+    return textDirection.Normalize();
+}
+
+
 //NOLINTBEGIN
 PROPERTY_SOURCE_ABSTRACT(MeasureGui::ViewProviderMeasurePropertyBase, MeasureGui::ViewProviderMeasureBase)
 //NOLINTEND
@@ -327,30 +362,6 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getBasePosition(){
     auto measureObject = getMeasureObject();
     Base::Placement placement = measureObject->getPlacement();
     return placement.getPosition();
-}
-
-
-//! calculate a good direction for the text based on the layout of the elements and its
-//! relationship with the cardinal axes.  elementDirection should be normalized.
-Base::Vector3d ViewProviderMeasurePropertyBase::getTextDirection(Base::Vector3d elementDirection, double tolerance) const
-{
-    const Base::Vector3d stdX(1.0, 0.0, 0.0);
-    const Base::Vector3d stdY(0.0, 1.0, 0.0);
-    const Base::Vector3d stdZ(0.0, 0.0, 1.0);
-
-    Base::Vector3d textDirection = elementDirection.Cross(stdX);
-    if (textDirection.Length() < tolerance) {
-        textDirection = elementDirection.Cross(stdY);
-    }
-    if (textDirection.Length() < tolerance) {
-        textDirection = elementDirection.Cross(stdZ);
-    }
-    textDirection.Normalize();
-    if (textDirection.Dot(stdZ) < 0.0) {
-        textDirection = textDirection * -1.0;
-    }
-
-    return textDirection.Normalize();
 }
 
 

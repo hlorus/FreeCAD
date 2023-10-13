@@ -84,6 +84,9 @@ public:
     virtual void redrawAnnotation();
     Measure::MeasureBase* getMeasureObject();
 
+    static Base::Vector3d toVector3d(SbVec3f svec) { return Base::Vector3d(svec[0], svec[1], svec[2]); }
+    static SbVec3f toSbVec3f(Base::Vector3d vec3) { return SbVec3f(vec3.x, vec3.y, vec3.z); }
+
 protected:
     void onChanged(const App::Property* prop) override;
     void setLabelValue(const Base::Quantity& value);
@@ -93,6 +96,10 @@ protected:
     SoPickStyle* getSoPickStyle();
     SoDrawStyle* getSoLineStylePrimary();
     SoSeparator* getSoSeparatorText();
+
+    static constexpr double defaultTolerance = 10e-6;
+    static Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = defaultTolerance);
+
 
     // TODO: getters & setters and move variables to private?
     bool _mShowTree = true;
@@ -122,14 +129,10 @@ public:
     void redrawAnnotation() override;
 
 protected:
-    static constexpr double defaultTolerance = 10e-6;
-
     void onChanged(const App::Property* prop) override;
 
     virtual Base::Vector3d getBasePosition();
     virtual Base::Vector3d getTextPosition();
-    Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = defaultTolerance) const;
-
 
 private:
     SoCoordinate3    * pCoords;

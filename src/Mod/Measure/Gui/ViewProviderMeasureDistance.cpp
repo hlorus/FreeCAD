@@ -65,13 +65,18 @@ ViewProviderMeasureDistance::ViewProviderMeasureDistance()
     const size_t vertexCount(4);
     const size_t lineCount(9);
 
+    // vert[0], vert[1] points on shape (dimension points)
+    // vert[2], vert[3] ends of extension lines/dimension line
     static const SbVec3f verts[vertexCount] =
     {
         SbVec3f(0,0,0), SbVec3f(0,0,0),
         SbVec3f(0,0,0), SbVec3f(0,0,0)
     };
 
-    // indexes used to create the edges
+    // vert indexes used to create the annotation lines
+    // lines[0] extension line 1
+    // lines[1] extension line 2
+    // lines[2] dimension line
     static const int32_t lines[lineCount] =
     {
         0,2,-1,
@@ -100,7 +105,7 @@ ViewProviderMeasureDistance::~ViewProviderMeasureDistance()
 void ViewProviderMeasureDistance::onChanged(const App::Property* prop)
 {
     if (prop == &Mirror || prop == &DistFactor) {
-        updateData(prop);
+        redrawAnnotation();
     }
     else {
         ViewProviderMeasureBase::onChanged(prop);
@@ -142,55 +147,16 @@ void ViewProviderMeasureDistance::updateData(const App::Property* prop)
         return;
     }
 
-    if (prop->getTypeId() == App::PropertyVector::getClassTypeId() ||
-        prop == &Mirror || prop == &DistFactor) {
+    auto object = static_cast<Measure::MeasureDistance*>(getObject());
 
-        auto ob = static_cast<Measure::MeasureDistance*>(getObject());
 
-        if (strcmp(prop->getName(),"Position1") == 0) {
-            auto vec1 = ob->Position1.getValue();
-            pCoords->point.set1Value(0, SbVec3f(vec1.x, vec1.y, vec1.z));
-        }
-        else if (strcmp(prop->getName(),"Position2") == 0) {
-            auto vec2 = ob->Position2.getValue();
-            pCoords->point.set1Value(1, SbVec3f(vec2.x, vec2.y, vec2.z));
-        }
-
-        SbVec3f pt1 = pCoords->point[0];
-        SbVec3f pt2 = pCoords->point[1];
-        SbVec3f dif = pt1-pt2;
-
-        double length = fabs(dif.length())*DistFactor.getValue();
-        if (Mirror.getValue()) {
-            length = -length;
-        }
-
-        const double tolerance(10.0e-6);
-        if (dif.sqrLength() < tolerance) {
-            pCoords->point.set1Value(2, pt1+SbVec3f(0.0, 0.0, length));
-            pCoords->point.set1Value(3, pt2+SbVec3f(0.0, 0.0, length));
-        }
-        else {
-            SbVec3f dir = dif.cross(SbVec3f(1.0, 0.0, 0.0));
-            if (dir.sqrLength() < tolerance) {
-                dir = dif.cross(SbVec3f(0.0, 1.0, 0.0));
-            }
-            if (dir.sqrLength() < tolerance) {
-                dir = dif.cross(SbVec3f(0.0, 0.0, 1.0));
-            }
-            dir.normalize();
-            if (dir.dot(SbVec3f(0.0, 0.0, 1.0)) < 0.0) {
-                length = -length;
-            }
-            pCoords->point.set1Value(2, pt1 + length*dir);
-            pCoords->point.set1Value(3, pt2 + length*dir);
-        }
-
-        SbVec3f pos = (pCoords->point[2]+pCoords->point[3]) / 2.0;
-        setLabelTranslation(pos);
-        setLabelValue(Base::Quantity(dif.length(), Base::Unit::Length));
-
-        updateView();
+    if (prop == &(object->Distance) ||
+        prop == &(object->Element1) ||
+        prop == &(object->Element2) ||
+        prop == &(object->Position1) ||
+        prop == &(object->Position2) ) {
+        redrawAnnotation();
+        return;
     }
 
     ViewProviderDocumentObject::updateData(prop);
@@ -203,5 +169,52 @@ Measure::MeasureDistance* ViewProviderMeasureDistance::getMeasureDistance()
         throw Base::RuntimeError("Feature not found for ViewProviderMeasureDistance");
     }
     return feature;
+}
+
+//! repaint the anotation
+void ViewProviderMeasureDistance::redrawAnnotation()
+{
+    auto object = dynamic_cast<Measure::MeasureDistance*>(getObject());
+    // if (!object) {
+    //      throw Base::RuntimeError("something really bad happened here");
+    // }
+
+    auto vec1 = object->Position1.getValue();
+    pCoords->point.set1Value(0, toSbVec3f(vec1));
+    auto vec2 = object->Position2.getValue();
+    pCoords->point.set1Value(1, toSbVec3f(vec2));
+
+    SbVec3f pt1 = pCoords->point[0];
+    SbVec3f pt2 = pCoords->point[1];
+    SbVec3f dif = pt1-pt2;
+
+
+    double length = fabs(dif.length())*DistFactor.getValue();
+    if (Mirror.getValue()) {
+        length = -length;
+    }
+
+    // without the fudgeFactor, the text is too far away sometimes.  Not a big deal if we can drag the text.
+    constexpr double fudgeFactor = 0.5;
+    length = length * fudgeFactor;
+
+    const double tolerance(10.0e-6);
+    if (dif.sqrLength() < tolerance) {
+        // if the Positionx points are too close together, move them both by the same amount? won't they still be the same distance apart?
+        pCoords->point.set1Value(2, pt1+SbVec3f(0.0, 0.0, length));
+        pCoords->point.set1Value(3, pt2+SbVec3f(0.0, 0.0, length));
+    }
+    else {
+        Base::Vector3d vDif = toVector3d(dif).Normalize();
+        Base::Vector3d textDirection = getTextDirection(vDif, tolerance);
+        pCoords->point.set1Value(2, pt1 + length * toSbVec3f(textDirection));
+        pCoords->point.set1Value(3, pt2 + length * toSbVec3f(textDirection));
+    }
+
+    // put the annotation at the middle of the dimension line
+    SbVec3f pos = (pCoords->point[2]+pCoords->point[3]) / 2.0;
+    setLabelTranslation(pos);
+    setLabelValue(object->Distance.getQuantityValue().getUserString());
+    updateView();
 }
 

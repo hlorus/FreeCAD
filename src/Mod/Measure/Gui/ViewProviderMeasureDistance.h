@@ -52,6 +52,7 @@ public:
     void updateData(const App::Property*) override;
 
     Measure::MeasureDistance* getMeasureDistance();
+    void redrawAnnotation() override;
 
 protected:
     void onChanged(const App::Property* prop) override;
