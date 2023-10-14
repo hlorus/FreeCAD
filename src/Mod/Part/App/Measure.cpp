@@ -38,6 +38,7 @@
 #include <TopExp.hxx>
 #include <GProp_GProps.hxx>
 #include <ShapeAnalysis_Edge.hxx>
+#include <gp_Circ.hxx>
 
 #include <App/Application.h>
 #include <App/Document.h>
