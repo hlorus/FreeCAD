@@ -254,11 +254,11 @@ PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureAngle, MeasureGui::ViewProviderMe
 
 ViewProviderMeasureAngle::ViewProviderMeasureAngle()
 {
-    // TODO: is this a left over property?
-    ADD_PROPERTY(Radius, (10.0f));
     static const char *agroup = "Appearance";
-    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
-    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text if true");
+    ADD_PROPERTY_TYPE(Radius,(10.0), agroup, App::Prop_None, "Adjusts the size of the annotation arc");
+
+    DistFactor.setStatus(App::Property::Hidden, true);
+    Mirror.setStatus(App::Property::Hidden, true);
 
     this->transform = new SoTransform;
     transform->ref();

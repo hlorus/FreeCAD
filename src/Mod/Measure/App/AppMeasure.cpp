@@ -35,6 +35,7 @@
 #include "MeasurePosition.h"
 #include "MeasureLength.h"
 #include "MeasureArea.h"
+#include "MeasureRadius.h"
 
 namespace Measure {
 class Module : public Py::ExtensionModule<Module>
@@ -80,10 +81,12 @@ PyMOD_INIT_FUNC(Measure)
     Measure::MeasurePosition        ::init();
     Measure::MeasureLength          ::init();
     Measure::MeasureArea            ::init();
+    Measure::MeasureRadius          ::init();
 
     // Add fundamental umf Measure Types
     App::Application& app = App::GetApplication();
 
+    // ?? why are some all caps and some lower case?
         app.addMeasureType(
         new App::MeasureType {
             "DISTANCE",
@@ -127,6 +130,15 @@ PyMOD_INIT_FUNC(Measure)
             "Measure::MeasureArea",
             MeasureArea::isValidSelection,
             nullptr,
+        });
+        
+    app.addMeasureType(
+        new App::MeasureType {
+            "RADIUS",
+            "Radius",
+            "Measure::MeasureRadius",
+            MeasureRadius::isValidSelection,
+            MeasureRadius::isPrioritizedSelection,
         });
 
     Base::Console().Log("Loading Measure module... done\n");

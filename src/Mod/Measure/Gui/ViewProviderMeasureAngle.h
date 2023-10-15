@@ -36,13 +36,13 @@
 
 #include "ViewProviderMeasureBase.h"
 
-
+//NOLINTBEGIN
 class SoText2;
 class SoTranslation;
 class SoCoordinate3;
 class SoIndexedLineSet;
 class SoTransform;
-
+//NOLINTEND
 
 namespace MeasureGui
 {
@@ -56,13 +56,11 @@ public:
     ViewProviderMeasureAngle();
     ~ViewProviderMeasureAngle() override;
 
-    // // Display properties
+    // Display properties
     App::PropertyFloat          Radius;
-    App::PropertyFloat          DistFactor;
-    App::PropertyBool           Mirror;
 
-    void attach(App::DocumentObject *) override;
-    void updateData(const App::Property*) override;
+    void attach(App::DocumentObject * pcObject) override;
+    void updateData(const App::Property* prop) override;
     
     Measure::MeasureAngle* getMeasureAngle();
 

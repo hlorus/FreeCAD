@@ -29,32 +29,55 @@
 #include <App/Property.h>
 #include <Base/Console.h>
 
-#include <Mod/Measure/App/MeasureArea.h>
-
-#include "ViewProviderMeasureArea.h"
+#include <Mod/Measure/App/MeasureRadius.h>
+#include "ViewProviderMeasureRadius.h"
 
 using namespace Gui;
 using namespace MeasureGui;
 using namespace Measure;
 
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureArea, MeasureGui::ViewProviderMeasurePropertyBase)
+//NOLINTBEGIN
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureRadius, MeasureGui::ViewProviderMeasurePropertyBase)
+//NOLINTEND
 
 
 //! handle changes to the feature's properties
-void ViewProviderMeasureArea::updateData(const App::Property* prop)
+void ViewProviderMeasureRadius::updateData(const App::Property* prop)
 {
     if (pcObject == nullptr) {
         return;
     }
 
-    auto obj = dynamic_cast<Measure::MeasureArea*>(getMeasureObject());
-    if (prop == &(obj->Elements) || prop == &(obj->Area)){
+    auto obj = dynamic_cast<Measure::MeasureRadius*>(getMeasureObject());
+    if (prop == &(obj->Element) || prop == &(obj->Radius)){
         {
             redrawAnnotation();
         }
     }
 
-
     ViewProviderMeasurePropertyBase::updateData(prop);
 }
+
+
+Base::Vector3d ViewProviderMeasureRadius::getTextPosition(){
+    auto measureObject = dynamic_cast<Measure::MeasureRadius*>(getMeasureObject());
+
+    auto basePoint = getBasePosition();
+    double length = measureObject->Radius.getValue();
+    if (Mirror.getValue()) {
+        length = -length;
+    }
+    Base::Placement placement = measureObject->getPlacement();
+    Base::Vector3d textDirection = getTextDirection(placement.getRotation().multVec(Base::Vector3d(0.0, 0.0, 1.0)));
+
+    return basePoint + textDirection * length * DistFactor.getValue();
+}
+
+
+//! we position radial annotation at a point on the curve, not at placement.position()
+Base::Vector3d ViewProviderMeasureRadius::getBasePosition(){
+    auto measureObject = dynamic_cast<Measure::MeasureRadius*>(getMeasureObject());
+    return measureObject->getPointOnCurve();
+}
+
 

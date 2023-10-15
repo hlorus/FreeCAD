@@ -171,7 +171,7 @@ App::DocumentObjectExecReturn *MeasureDistance::execute()
         return new App::DocumentObjectExecReturn("Submitted object(s) is not valid");
     }
 
-    if (subs1.size() < 1 || subs2.size() < 1) {
+    if (subs1.empty() || subs2.empty()) {
         return new App::DocumentObjectExecReturn("No geometry element picked");
     }
 

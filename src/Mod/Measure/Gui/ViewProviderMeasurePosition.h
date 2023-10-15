@@ -24,18 +24,11 @@
 #ifndef MEASUREGUI_VIEWPROVIDERMEASUREPOSITION_H
 #define MEASUREGUI_VIEWPROVIDERMEASUREPOSITION_H
 
-#include <Base/Vector3D.h>    
-
 #include <Mod/Measure/MeasureGlobal.h>
-#include <Mod/Measure/App/MeasurePosition.h>
 #include "ViewProviderMeasureBase.h"
-
-class SoCoordinate3;
-class SoIndexedLineSet;
 
 namespace App
 {
-class DocumentObject;
 class Property;
 }
 
@@ -44,7 +37,9 @@ namespace MeasureGui
 
 class MeasureGuiExport ViewProviderMeasurePosition : public MeasureGui::ViewProviderMeasurePropertyBase
 {
+//NOLINTBEGIN
     PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasurePosition);
+//NOLINTEND
 
 public:
     void updateData(const App::Property* prop) override;

@@ -48,14 +48,11 @@ public:
     ViewProviderMeasureDistance();
     ~ViewProviderMeasureDistance() override;
 
-    // // Display properties
-    App::PropertyFloat          DistFactor;
-    App::PropertyBool           Mirror;
-
     void attach(App::DocumentObject *) override;
     void updateData(const App::Property*) override;
 
     Measure::MeasureDistance* getMeasureDistance();
+    void redrawAnnotation() override;
 
 protected:
     void onChanged(const App::Property* prop) override;

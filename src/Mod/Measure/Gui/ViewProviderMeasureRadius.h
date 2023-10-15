@@ -20,41 +20,41 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "PreCompiled.h"
 
-#ifndef _PreComp_
-#endif
+#ifndef MEASUREGUI_VIEWPROVIDERMEASURERADIUS_H
+#define MEASUREGUI_VIEWPROVIDERMEASURERADIUS_H
 
-#include <App/Document.h>
-#include <App/Property.h>
-#include <Base/Console.h>
+#include <Mod/Measure/MeasureGlobal.h>
 
-#include <Mod/Measure/App/MeasureArea.h>
+#include <Base/Vector3D.h>
 
-#include "ViewProviderMeasureArea.h"
+#include "ViewProviderMeasureBase.h"
 
-using namespace Gui;
-using namespace MeasureGui;
-using namespace Measure;
-
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureArea, MeasureGui::ViewProviderMeasurePropertyBase)
-
-
-//! handle changes to the feature's properties
-void ViewProviderMeasureArea::updateData(const App::Property* prop)
+namespace App
 {
-    if (pcObject == nullptr) {
-        return;
-    }
-
-    auto obj = dynamic_cast<Measure::MeasureArea*>(getMeasureObject());
-    if (prop == &(obj->Elements) || prop == &(obj->Area)){
-        {
-            redrawAnnotation();
-        }
-    }
-
-
-    ViewProviderMeasurePropertyBase::updateData(prop);
+class Property;
 }
+
+namespace MeasureGui
+{
+
+class MeasureGuiExport ViewProviderMeasureRadius : public MeasureGui::ViewProviderMeasurePropertyBase
+{
+//NOLINTBEGIN
+    PROPERTY_HEADER_WITH_OVERRIDE(MeasureGui::ViewProviderMeasureRadius);
+//NOLINTEND
+
+public:
+    void updateData(const App::Property* prop) override;
+
+protected:
+    Base::Vector3d getTextPosition() override;
+    Base::Vector3d getBasePosition() override;
+};
+
+} //namespace MeasureGui
+
+
+#endif // MEASUREGUI_VIEWPROVIDERMEASURERADIUS_H
+
 
