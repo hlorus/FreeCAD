@@ -86,7 +86,6 @@ PyMOD_INIT_FUNC(Measure)
     // Add fundamental umf Measure Types
     App::Application& app = App::GetApplication();
 
-    // ?? why are some all caps and some lower case?
         app.addMeasureType(
         new App::MeasureType {
             "DISTANCE",
@@ -116,7 +115,7 @@ PyMOD_INIT_FUNC(Measure)
 
     app.addMeasureType(
         new App::MeasureType {
-            "Position",
+            "POSITION",
             "Position",
             "Measure::MeasurePosition",
             MeasurePosition::isValidSelection,
@@ -125,7 +124,7 @@ PyMOD_INIT_FUNC(Measure)
 
     app.addMeasureType(
         new App::MeasureType {
-            "Area",
+            "AREA",
             "Area",
             "Measure::MeasureArea",
             MeasureArea::isValidSelection,
