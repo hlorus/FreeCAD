@@ -401,8 +401,7 @@ void Part::Measure::initialize() {
     App::Application& app = App::GetApplication();
     app.addMeasureHandler("Part", PartMeasureTypeCb);
 
-
-    std::vector<std::string> proxyList(  { "Part", "PartDesign" } );
+    std::vector<std::string> proxyList(  { "Part", "PartDesign", "Sketcher" } );
     // Extend MeasureLength
     MeasureLength::addGeometryHandlers(proxyList, MeasureLengthHandler);
 
