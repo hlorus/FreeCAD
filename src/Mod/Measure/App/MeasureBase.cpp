@@ -43,3 +43,9 @@ QString MeasureBase::getResultString() {
 
     return QString();
 }
+
+
+void MeasureBase::onDocumentRestored() {
+    // Force recompute the measurement
+    recompute();
+}
