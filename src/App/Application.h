@@ -102,6 +102,9 @@ struct MeasureType {
     // Allows to prioritize this over other measurement types when the measurement type is picked implicitly from the selection.
     // Gets called only when validatorCb returned true for the given selection
     MeasurePrioritizeMethod prioritizeCb;
+
+    bool isPython;
+    PyObject* pythonClass;
 };
 
 struct MeasureHandler {
@@ -431,7 +434,10 @@ public:
     // Callback for measurements
 
     void addMeasureType(MeasureType* measureType);
+    void addMeasureType(std::string id, std::string label, std::string measureObj, MeasureValidateMethod validatorCb, MeasurePrioritizeMethod prioritizeCb);
+    void addMeasureType(const char* id, const char* label, const char* measureObj, MeasureValidateMethod validatorCb, MeasurePrioritizeMethod prioritizeCb);
     const std::vector<MeasureType*> getMeasureTypes();
+    std::vector<MeasureType*> getValidMeasureTypes(App::MeasureSelection selection, std::string mode = "");
 
     void addMeasureHandler(const char* module, MeasureTypeMethod typeCb);
     bool hasMeasureHandler(const char* module);
@@ -591,7 +597,6 @@ private:
     static PyObject* sGetUserMacroPath  (PyObject *self, PyObject *args);
     static PyObject* sGetHelpPath       (PyObject *self, PyObject *args);
     static PyObject* sGetHomePath       (PyObject *self, PyObject *args);
-    // static PyObject* sAddMeasureType    (PyObject *self, PyObject *args);
 
     static PyObject* sLoadFile          (PyObject *self,PyObject *args);
     static PyObject* sOpenDocument      (PyObject *self,PyObject *args, PyObject *kwd);
@@ -619,6 +624,10 @@ private:
     static PyObject *sGetActiveTransaction  (PyObject *self,PyObject *args);
     static PyObject *sCloseActiveTransaction(PyObject *self,PyObject *args);
     static PyObject *sCheckAbort(PyObject *self,PyObject *args);
+
+    static PyObject* sAddMeasureType    (PyObject *self, PyObject *args);
+    static PyObject* sGetMeasureTypes    (PyObject *self, PyObject *args);
+
     static PyMethodDef    Methods[];
 
     friend class ApplicationObserver;

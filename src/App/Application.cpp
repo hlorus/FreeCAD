@@ -1571,6 +1571,15 @@ void Application::addMeasureType(MeasureType* measureType) {
     _mMeasureTypes.push_back(measureType);
 }
 
+void Application::addMeasureType(std::string id, std::string label, std::string measureObj, MeasureValidateMethod validatorCb, MeasurePrioritizeMethod prioritizeCb) {
+    MeasureType* mType = new MeasureType{id, label, measureObj, validatorCb, prioritizeCb, false, nullptr};
+    _mMeasureTypes.push_back(mType);
+}
+
+void Application::addMeasureType(const char* id, const char* label, const char* measureObj, MeasureValidateMethod validatorCb, MeasurePrioritizeMethod prioritizeCb) {
+    addMeasureType(std::string(id), std::string(label), std::string(measureObj), validatorCb, prioritizeCb);
+}
+
 const std::vector<MeasureType*> Application::getMeasureTypes() {
     return _mMeasureTypes;
 }
