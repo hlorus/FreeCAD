@@ -141,22 +141,27 @@ void ViewProviderMeasureDistance::attach(App::DocumentObject* pcObject)
 }
 
 
+//! handle changes to the feature's properties
 void ViewProviderMeasureDistance::updateData(const App::Property* prop)
 {
     if (pcObject == nullptr) {
         return;
     }
 
-    auto object = static_cast<Measure::MeasureDistance*>(getObject());
+    auto obj = dynamic_cast<Measure::MeasureDistance*>(getObject());
 
-
-    if (prop == &(object->Distance) ||
-        prop == &(object->Element1) ||
-        prop == &(object->Element2) ||
-        prop == &(object->Position1) ||
-        prop == &(object->Position2) ) {
+    if (obj &&
+        (prop == &(obj->Element1)  ||
+         prop == &(obj->Element2)) ) {
+        connectToSubject(obj->getSubject());
         redrawAnnotation();
-        return;
+    }
+
+    if (obj &&
+        (prop == &(obj->Distance) ||
+         prop == &(obj->Position1) ||
+         prop == &(obj->Position2)) ) {
+        redrawAnnotation();
     }
 
     ViewProviderDocumentObject::updateData(prop);
@@ -215,6 +220,8 @@ void ViewProviderMeasureDistance::redrawAnnotation()
     SbVec3f pos = (pCoords->point[2]+pCoords->point[3]) / 2.0;
     setLabelTranslation(pos);
     setLabelValue(object->Distance.getQuantityValue().getUserString());
+
+    ViewProviderMeasureBase::redrawAnnotation();
     updateView();
 }
 

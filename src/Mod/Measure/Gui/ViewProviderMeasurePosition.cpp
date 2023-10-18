@@ -47,12 +47,15 @@ void ViewProviderMeasurePosition::updateData(const App::Property* prop)
     }
 
     auto obj = dynamic_cast<Measure::MeasurePosition*>(getMeasureObject());
-    if (prop == &(obj->Element) || prop == &(obj->Position)){
-        {
-            redrawAnnotation();
-        }
+
+    if (obj && prop == &(obj->Element)) {
+        connectToSubject(obj->getSubject());
+        redrawAnnotation();
     }
 
+    if (obj && prop == &(obj->Position)){
+            redrawAnnotation();
+    }
 
     ViewProviderMeasurePropertyBase::updateData(prop);
 }

@@ -71,15 +71,14 @@ public:
     App::PropertyDistance Radius;
 
     App::DocumentObjectExecReturn *execute() override;
-    void recalculateRadius();
-
     const char* getViewProviderName() const override {
         return "MeasureGui::ViewProviderMeasureRadius";
     }
 
+    void recalculateRadius();
+
     static bool isValidSelection(const App::MeasureSelection& selection);
     static bool isPrioritizedSelection(const App::MeasureSelection& selection);
-
     void parseSelection(const App::MeasureSelection& selection) override;
 
     App::Property* getResultProp() override {return &this->Radius;}
@@ -88,6 +87,10 @@ public:
     Base::Placement getPlacement() override;
     // Return a point on curve for the viewprovider
     Base::Vector3d getPointOnCurve() const;
+
+    // Return the object we are measuring
+    App::DocumentObject* getSubject() const override;
+
 
 private:
     void onChanged(const App::Property* prop) override;

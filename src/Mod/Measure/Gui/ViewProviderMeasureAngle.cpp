@@ -334,22 +334,34 @@ void ViewProviderMeasureAngle::updateData(const App::Property* prop)
         return;
     }
 
-    auto measurement = static_cast<Measure::MeasureAngle*>(pcObject);
-
-    if (strcmp(prop->getName(), "Element1") == 0 || strcmp(prop->getName(), "Element2") == 0 || strcmp(prop->getName(), "Angle") == 0) {
-        double angle = measurement->Angle.getValue();
-        this->fieldAngle = M_PI * angle / 180.0f;
-
-        getMatrix();
-
-        setLabelTranslation(midpoint.getValue());
-        setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->getResultString());
-
-    } else {
-        ViewProviderDocumentObject::updateData(prop);
+    auto obj = dynamic_cast<Measure::MeasureAngle*>(pcObject);
+    if (obj &&
+        (prop == &(obj->Element1)  ||
+         prop == &(obj->Element2)) ) {
+        connectToSubject(obj->getSubject());
+        redrawAnnotation();
     }
 
+    if (obj &&
+        prop == &(obj->Angle) ) {
+        redrawAnnotation();
+    }
+
+    ViewProviderDocumentObject::updateData(prop);
 }
+
+
+void ViewProviderMeasureAngle::redrawAnnotation()
+{
+    auto obj = dynamic_cast<Measure::MeasureAngle*>(getMeasureObject());
+    double angleDeg = obj->Angle.getValue();
+    constexpr double radiansPerDegree = M_PI / 180.0;
+    this->fieldAngle =  angleDeg * radiansPerDegree;
+    getMatrix();
+    setLabelTranslation(midpoint.getValue());
+    setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->getResultString());
+}
+
 
 //! return the feature as a MeasureAngle
 Measure::MeasureAngle* ViewProviderMeasureAngle::getMeasureAngle()

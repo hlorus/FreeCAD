@@ -50,11 +50,12 @@ public:
     boost::signals2::signal<void (const MeasureBase*)> signalGuiUpdate;
 
     // Initalize measurement properties from selection
-    virtual void parseSelection(const App::MeasureSelection&) = 0;
+    virtual void parseSelection(const App::MeasureSelection&) = 0;  // pure abstract, implement in derived classes
 
     virtual App::Property* getResultProp() = 0;
     virtual QString getResultString();
     virtual Base::Placement getPlacement() {return Base::Placement();}
+    virtual App::DocumentObject* getSubject() const = 0;
 };
 
 
