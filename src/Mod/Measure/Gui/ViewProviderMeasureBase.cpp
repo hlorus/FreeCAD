@@ -138,7 +138,14 @@ void ViewProviderMeasureBase::setLabelValue(const Base::Quantity& value) {
 }
 
 void ViewProviderMeasureBase::setLabelValue(const QString& value) {
-    pLabel->string.setValue(value.toUtf8().constData());
+
+    auto lines = value.split(QString::fromLatin1("\n"));
+
+    int i = 0;
+    for (auto it : lines) {
+        pLabel->string.set1Value(i, it.toUtf8().constData());
+        i++;
+    }
 }
 
 void ViewProviderMeasureBase::setLabelTranslation(const SbVec3f& position) {
