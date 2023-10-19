@@ -158,9 +158,9 @@ QString MeasurePosition::getResultString() {
     int precision = 2;
     QString text;
     QTextStream(&text) 
-        << "X: " << QString::number(value.x, 'f', precision) << unit << " "
-        << "Y: " << QString::number(value.y, 'f', precision) << unit << " "
-        << "Z: " << QString::number(value.z, 'f', precision) << unit;
+        << "X: " << QString::number(value.x, 'f', precision) << " " << unit << Qt::endl
+        << "Y: " << QString::number(value.y, 'f', precision) << " " << unit << Qt::endl
+        << "Z: " << QString::number(value.z, 'f', precision) << " " << unit;
 
     return text;
 }
