@@ -212,7 +212,7 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 
 
 
-PROPERTY_SOURCE_ABSTRACT(MeasureGui::ViewProviderMeasurePropertyBase, MeasureGui::ViewProviderMeasureBase)
+PROPERTY_SOURCE(MeasureGui::ViewProviderMeasurePropertyBase, MeasureGui::ViewProviderMeasureBase)
 
 
 ViewProviderMeasurePropertyBase::ViewProviderMeasurePropertyBase()
@@ -269,6 +269,9 @@ void ViewProviderMeasurePropertyBase::updateData(const App::Property* prop)
     if (pcObject == nullptr) {
         return;
     }
+
+    // Always update VP if properties of measure feature changes
+    redrawAnnotation();
 
     ViewProviderMeasureBase::updateData(prop);
 }
