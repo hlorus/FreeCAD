@@ -28,7 +28,6 @@
 #include <Mod/Sketcher/SketcherGlobal.h>
 
 
-
 namespace Sketcher
 {
 
@@ -36,13 +35,10 @@ namespace Sketcher
 class SketcherExport Measure
 {
 public:
-
     static void initialize();
-
 };
 
 
-} //namespace Sketcher
+}  // namespace Sketcher
 
 #endif
-

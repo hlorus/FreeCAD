@@ -30,11 +30,10 @@
 #include "Measure.h"
 
 
-void Sketcher::Measure::initialize() {
+void Sketcher::Measure::initialize()
+{
     App::Application& app = App::GetApplication();
     const App::MeasureHandler& handler = app.getMeasureHandler("Part");
 
     app.addMeasureHandler("Sketcher", handler.typeCb);
 }
-
-
