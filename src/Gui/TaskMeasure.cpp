@@ -159,30 +159,19 @@ void TaskMeasure::update() {
 
 
     // Get valid measure type
-    bool isValid = false;
     App::MeasureType *measureType(nullptr);
 
-    for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
-        // If the measure mode is explicitly set we only check matching measure types
-        if (explicitMode && mType->label.c_str() != modeSwitch->currentText().toLatin1()) {
-            continue;
-        }
-        
-        if (!mType->validatorCb(selection)) {
-            continue;
-        }
 
-        // Check if the measurement type prioritizes the given selection
-        bool isPriority = (mType->prioritizeCb != nullptr && mType->prioritizeCb(selection));
+    std::string mode = explicitMode ? modeSwitch->currentText().toStdString() : "";
 
-        if (!isValid || isPriority) {
-            isValid = true;
-            measureType = mType;
 
-        }
+    auto measureTypes = App::GetApplication().getValidMeasureTypes(selection, mode);
+    if (measureTypes.size() > 0) {
+        measureType = measureTypes.front();
     }
+    
 
-    if (!isValid) {
+    if (!measureType) {
 
         // Note: If there's no valid measure type we might just restart the selection,
         // however this requiers enogh coverage of measuretypes that we can access all of them
@@ -204,11 +193,26 @@ void TaskMeasure::update() {
         // we don't already have a measureobject or it isn't the same type as the new one
         removeObject();
 
-        // Create measure object
         App::Document *doc = App::GetApplication().getActiveDocument();
-        setMeasureObject(
-            (Measure::MeasureBase*)doc->addObject(measureType->measureObject.c_str(), measureType->label.c_str())
-        );
+        if (measureType->isPython) {
+            Base::PyGILStateLocker lock;
+            auto pyMeasureClass = measureType->pythonClass;
+            
+            // Create a MeasurePython instance
+            auto featurePython = doc->addObject("Measure::MeasurePython", measureType->label.c_str());
+            setMeasureObject((Measure::MeasureBase*)featurePython);
+
+            // Create an instance of the pyMeasureClass, the classe's initializer sets the object as proxy
+            Py::Tuple args(1);
+            args.setItem(0, Py::asObject(featurePython->getPyObject()));
+            PyObject_CallObject(pyMeasureClass, args.ptr());
+        }
+        else {
+            // Create measure object
+            setMeasureObject(
+                (Measure::MeasureBase*)doc->addObject(measureType->measureObject.c_str(), measureType->label.c_str())
+            );
+        }
     }
 
     // we have a valid measure object so we can enable the annotate button
@@ -397,6 +401,7 @@ void TaskMeasure::setModeSilent(App::MeasureType* mode) {
     modeSwitch->blockSignals(false);
 }
 
+// Get explicitly set measure type from the mode switch
 App::MeasureType* TaskMeasure::getMeasureType() {
     for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()) {
         if (mType->label.c_str() == modeSwitch->currentText().toLatin1()) {
