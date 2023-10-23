@@ -3,6 +3,7 @@ add_subdirectory(App)
 
 set(Measure_Scripts
     Init.py
+    UtilsMeasure.py
 )
 
 if(BUILD_GUI)
