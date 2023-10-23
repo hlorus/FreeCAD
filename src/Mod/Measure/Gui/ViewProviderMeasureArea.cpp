@@ -48,12 +48,17 @@ void ViewProviderMeasureArea::updateData(const App::Property* prop)
     }
 
     auto obj = dynamic_cast<Measure::MeasureArea*>(getMeasureObject());
-    if (prop == &(obj->Elements) || prop == &(obj->Area)){
-        {
-            redrawAnnotation();
-        }
+
+    if (obj &&
+        prop == &(obj->Elements) ) {
+        connectToSubject(obj->getSubject());
+        redrawAnnotation();
     }
 
+    if (obj &&
+        prop == &(obj->Area)){
+        redrawAnnotation();
+    }
 
     ViewProviderMeasurePropertyBase::updateData(prop);
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (c) 2023 Wanderer Fan <wandererfan@gmail.com>               *
+ *   Copyright (c) 2023 Wandererfan <wandererfan@gmail.com>                *
  *                                                                         *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
@@ -20,42 +20,29 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "PreCompiled.h"
+//! a class for establishing our connection with the unified measurement facility
 
-#ifndef _PreComp_
+#ifndef SKETCHER_MEASURE_H
+#define SKETCHER_MEASURE_H
+
+#include <Mod/Sketcher/SketcherGlobal.h>
+
+
+
+namespace Sketcher
+{
+
+
+class SketcherExport Measure
+{
+public:
+
+    static void initialize();
+
+};
+
+
+} //namespace Sketcher
+
 #endif
 
-#include <App/Document.h>
-#include <App/Property.h>
-#include <Base/Console.h>
-
-#include <Mod/Measure/App/MeasurePosition.h>
-
-#include "ViewProviderMeasurePosition.h"
-
-using namespace MeasureGui;
-using namespace Measure;
-
-PROPERTY_SOURCE(MeasureGui::ViewProviderMeasurePosition, MeasureGui::ViewProviderMeasurePropertyBase)
-
-
-//! handle changes to the feature's properties
-void ViewProviderMeasurePosition::updateData(const App::Property* prop)
-{
-    if (pcObject == nullptr) {
-        return;
-    }
-
-    auto obj = dynamic_cast<Measure::MeasurePosition*>(getMeasureObject());
-
-    if (obj && prop == &(obj->Element)) {
-        connectToSubject(obj->getSubject());
-        redrawAnnotation();
-    }
-
-    if (obj && prop == &(obj->Position)){
-            redrawAnnotation();
-    }
-
-    ViewProviderMeasurePropertyBase::updateData(prop);
-}

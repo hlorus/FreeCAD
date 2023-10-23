@@ -188,10 +188,12 @@ SoSeparator* ViewProviderMeasureBase::getSoSeparatorText() {
 }
 
 
+//! the App side has requested a redraw
 void ViewProviderMeasureBase::onGuiUpdate(const Measure::MeasureBase* measureObject) {
     (void) measureObject;
     updateView();
 }
+
 
 void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
 {
@@ -207,16 +209,30 @@ void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
     }
 }
 
+
+// TODO: should this be pure virtual in vpMeasureBase?
 void ViewProviderMeasureBase::redrawAnnotation()
 {
 //    Base::Console().Message("VPMB::redrawAnnotation()\n");
+}
+
+//! connect to the subject to receive visibility updates
+void ViewProviderMeasureBase::connectToSubject(App::DocumentObject* subject)
+{
+    if (!subject) {
+        return;
+    }
+
+    //NOLINTBEGIN
+    auto bndVisibility = boost::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, bp::_1, bp::_2);
+    //NOLINTEND
+    subject->signalChanged.connect(bndVisibility);
 }
 
 
 //! retrive the feature
 Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 {
-
     // Note: Cast to MeasurePropertyBase once we use it to provide the needed values e.g. basePosition textPosition etc.
     auto feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
     if (!feature) {
@@ -227,15 +243,11 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 
 
 //! calculate a good direction from the elements being measured to the annotation text based on the layout
-//! of the elements and its relationship with the cardinal axes and the view direction.  elementDirection
+//! of the elements and relationship with the cardinal axes and the view direction.  elementDirection
 //! is expected to be a normalized vector.
 //! an example of an elementDirection would be the vector from the start of a line to the end.
 Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementDirection, double tolerance)
 {
-    const Base::Vector3d stdX(1.0, 0.0, 0.0);
-    const Base::Vector3d stdY(0.0, 1.0, 0.0);
-    const Base::Vector3d stdZ(0.0, 0.0, 1.0);
-
     auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
     // if (!view) {
     //     // Measure doesn't work with this kind of active view.  Might be dependency graph, might be TechDraw, or ????
@@ -252,6 +264,41 @@ Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementD
     }
 
     return textDirection.Normalize();
+}
+
+//! true if the subject of this measurement is visible
+bool ViewProviderMeasureBase::isSubjectVisible()
+{
+    // we need these things to proceed
+    if (!getMeasureObject() ||
+        !getMeasureObject()->getSubject() ||
+        !Gui::Application::Instance->getDocument(getMeasureObject()->getDocument()) ) {
+        return false;
+    }
+
+    auto guiDoc = Gui::Application::Instance->getDocument(getMeasureObject()->getDocument());
+    Gui::ViewProvider* vp = guiDoc->getViewProvider(getMeasureObject()->getSubject());
+    if (vp) {
+        return vp->isVisible();
+    }
+
+    return false;
+}
+
+
+//! gets called when the subject object issues a signalChanged (ie a property change).  We are only interested in the subject's
+//! Visibility property
+void ViewProviderMeasureBase::onSubjectVisibilityChanged(const App::DocumentObject& docObj, const App::Property& prop)
+{
+    std::string propName = prop.getName();
+    if (propName == "Visibility") {
+        if (docObj.Visibility.getValue()) {
+            // show only if subject is visible
+            setVisible(true);
+        } else {
+            setVisible(false);
+        }
+    }
 }
 
 
@@ -361,7 +408,9 @@ void ViewProviderMeasurePropertyBase::redrawAnnotation()
     setLabelTranslation(pCoords->point[1]);
     setLabelValue(getMeasureObject()->getResultString());
 
-    updateView();
+    ViewProviderMeasureBase::redrawAnnotation();
+
+    ViewProviderDocumentObject::updateView();
 }
 
 
@@ -383,4 +432,14 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getTextPosition(){
     }
 
     return basePoint + textDirection * length * DistFactor.getValue();
+}
+
+//! called by the system when it is time to display this measure
+void ViewProviderMeasureBase::show()
+{
+    if (isSubjectVisible()) {
+        // only show the annotation if the subject is visible.
+        // this avoids disconnected annotations floating in space.
+        ViewProviderDocumentObject::show();
+    }
 }

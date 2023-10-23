@@ -25,12 +25,14 @@
 
 #include <Mod/Measure/MeasureGlobal.h>
 
+#include <boost_signals2.hpp>
+#include <QString>
+
 #include <App/Application.h>
 #include <App/PropertyStandard.h>
 #include <Base/Parameter.h>
 #include <Gui/ViewProviderDocumentObject.h>
 #include <Gui/SoTextLabel.h>
-#include <QString>
 
 #include <Mod/Measure/App/MeasureBase.h>
 
@@ -44,7 +46,6 @@ class SoPickStyle;
 class SoCoordinate3;
 class SoIndexedLineSet;
 //NOLINTEND
-
 
 
 namespace MeasureGui {
@@ -80,12 +81,21 @@ public:
     bool useNewSelectionModel() const override {return true;}
     std::vector<std::string> getDisplayModes() const override;
     void setDisplayMode(const char* ModeName) override;
+    /// Show the annotation in the 3d window
+    void show() override;
 
     virtual void redrawAnnotation();
     Measure::MeasureBase* getMeasureObject();
 
+    virtual bool isSubjectVisible();
+
     static Base::Vector3d toVector3d(SbVec3f svec) { return Base::Vector3d(svec[0], svec[1], svec[2]); }
     static SbVec3f toSbVec3f(Base::Vector3d vec3) { return SbVec3f(vec3.x, vec3.y, vec3.z); }
+
+    using Connection = boost::signals2::scoped_connection;
+    Connection connectVisibilityChanged;
+    void onSubjectVisibilityChanged(const App::DocumentObject& docObj, const App::Property& prop);
+    void connectToSubject(App::DocumentObject* subject);
 
 protected:
     void onChanged(const App::Property* prop) override;

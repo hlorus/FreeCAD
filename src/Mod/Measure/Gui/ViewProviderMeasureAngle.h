@@ -63,6 +63,7 @@ public:
     void updateData(const App::Property* prop) override;
     
     Measure::MeasureAngle* getMeasureAngle();
+    void redrawAnnotation() override;
 
 protected:
     void onChanged(const App::Property* prop) override;
