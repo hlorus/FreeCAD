@@ -84,50 +84,44 @@ PyMOD_INIT_FUNC(Measure)
     // Add fundamental umf Measure Types
     App::Application& app = App::GetApplication();
 
-        app.addMeasureType(
-        new App::MeasureType {
-            "DISTANCE",
-            "Distance",
-            "Measure::MeasureDistance",
-            MeasureDistance::isValidSelection,
-            MeasureDistance::isPrioritizedSelection,
-        });
+    app.addMeasureType("DISTANCE",
+                       "Distance",
+                       "Measure::MeasureDistance",
+                       MeasureDistance::isValidSelection,
+                       MeasureDistance::isPrioritizedSelection
+        );
 
     app.addMeasureType(
-        new App::MeasureType {
             "ANGLE",
             "Angle",
             "Measure::MeasureAngle",
             MeasureAngle::isValidSelection,
-            MeasureAngle::isPrioritizedSelection,
-        });
+            MeasureAngle::isPrioritizedSelection
+        );
         
     app.addMeasureType(
-        new App::MeasureType {
             "LENGTH",
             "Length",
             "Measure::MeasureLength",
             MeasureLength::isValidSelection,
-            nullptr,
-        });
+            nullptr
+        );
 
     app.addMeasureType(
-        new App::MeasureType {
             "Position",
             "Position",
             "Measure::MeasurePosition",
             MeasurePosition::isValidSelection,
-            nullptr,
-        });
+            nullptr
+        );
 
     app.addMeasureType(
-        new App::MeasureType {
             "Area",
             "Area",
             "Measure::MeasureArea",
             MeasureArea::isValidSelection,
-            nullptr,
-        });
+            nullptr
+        );
 
     Base::Console().Log("Loading Measure module... done\n");
     PyMOD_Return(mod);
