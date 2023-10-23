@@ -162,7 +162,7 @@ private:
 
 public:
 
-    int m_CubeWidgetSize = 132;
+    static int m_CubeWidgetSize;
     QColor m_BaseColor;
     QColor m_EmphaseColor;
     QColor m_HiliteColor;
@@ -200,6 +200,13 @@ private:
 
     QMenu* m_Menu;
 };
+
+int NaviCubeImplementation::m_CubeWidgetSize = 132;
+
+int NaviCube::getNaviCubeSize()
+{
+    return NaviCubeImplementation::m_CubeWidgetSize;
+}
 
 NaviCube::NaviCube(Gui::View3DInventorViewer* viewer) {
     m_NaviCubeImplementation = new NaviCubeImplementation(viewer);
@@ -969,16 +976,22 @@ SbRotation NaviCubeImplementation::getNearestOrientation(PickId pickId) {
         angle *= -1;
     }
 
+    static const float pi = boost::math::constants::pi<float>();
+    static const float pi2 = boost::math::constants::two_pi<float>();
+    static const float pi1_2 = boost::math::constants::half_pi<float>();
+    static const float pi1_3 = boost::math::constants::third_pi<float>();
+    static const float pi2_3 = boost::math::constants::two_thirds_pi<float>();
+
     // Make angle positive
     if (angle < 0) {
-        angle += 2 * M_PI;
+        angle += pi2;
     }
 
     // f is a small value used to control orientation priority when the camera is almost exactly between two
     // orientations (e.g. +45 and -45 degrees). The standard orientation is preferred compared to
     // +90 and -90 degree orientations and the +90 and -90 degree orientations are preferred compared to an
     // upside down standard orientation
-    float f = 0.00001;
+    float f = 0.00001F;
 
     // Find the angle to rotate to the nearest orientation
     if (m_Faces[pickId].type == ShapeId::Corner) {
@@ -987,19 +1000,19 @@ SbRotation NaviCubeImplementation::getNearestOrientation(PickId pickId) {
             angle = 0;
         }
         else if (angle <= (M_PI_2 + f)) {
-            angle = M_PI / 3;
+            angle = pi1_3;
         }
         else if (angle < (5 * M_PI / 6 - f)) {
-            angle = 2 * M_PI / 3;
+            angle = pi2_3;
         }
         else if (angle <= (M_PI + M_PI / 6 + f)) {
-            angle = M_PI;
+            angle = pi;
         }
         else if (angle < (M_PI + M_PI_2 - f)) {
-            angle = M_PI + M_PI / 3;
+            angle = pi + pi1_3;
         }
         else if (angle < (M_PI + 5 * M_PI / 6 - f)) {
-            angle = M_PI + 2 * M_PI / 3;
+            angle = pi + pi2_3;
         }
         else {
             angle = 0;
@@ -1011,13 +1024,13 @@ SbRotation NaviCubeImplementation::getNearestOrientation(PickId pickId) {
             angle = 0;
         }
         else if (angle <= (3 * M_PI_4 + f)) {
-            angle = M_PI_2;
+            angle = pi1_2;
         }
         else if (angle < (M_PI + M_PI_4 - f)) {
-            angle = M_PI;
+            angle = pi;
         }
         else if (angle < (M_PI + 3 * M_PI_4 - f)) {
-            angle = M_PI + M_PI_2;
+            angle = pi + pi1_2;
         }
         else {
             angle = 0;

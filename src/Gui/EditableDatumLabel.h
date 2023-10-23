@@ -53,8 +53,9 @@ public:
 
     void startEdit(double val, QObject* eventFilteringObj = nullptr);
     void stopEdit();
+    bool isInEdit();
     double getValue();
-    void setSpinboxValue(double val);
+    void setSpinboxValue(double val, const Base::Unit& unit = Base::Unit::Length);
     void setPlacement(const Base::Placement& plc);
     void setColor(SbColor color);
     void setFocus();
@@ -62,9 +63,12 @@ public:
     void setPoints(Base::Vector3d p1, Base::Vector3d p2);
     void setFocusToSpinbox();
     void setLabelType(SoDatumLabel::Type type);
-    void setLabelDistance(double distance);
+    void setLabelDistance(double val);
+    void setLabelStartAngle(double val);
+    void setLabelRange(double val);
     void setLabelRecommendedDistance();
     void setLabelAutoDistanceReverse(bool val);
+    void setSpinboxInvisibleToMouse(bool val);
 
     // NOLINTBEGIN
     SoDatumLabel* label;

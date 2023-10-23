@@ -377,6 +377,53 @@ void ViewProviderSketch::ParameterObserver::OnChange(Base::Subject<const char*>&
     }
 }
 
+
+/************** ViewProviderSketch::ToolManager *********************/
+ViewProviderSketch::ToolManager::ToolManager(ViewProviderSketch * vp): vp(vp)
+{}
+
+std::unique_ptr<QWidget> ViewProviderSketch::ToolManager::createToolWidget() const
+{
+    if(vp && vp->sketchHandler) {
+        return vp->sketchHandler->createToolWidget();
+    }
+    else {
+        return nullptr;
+    }
+}
+
+bool ViewProviderSketch::ToolManager::isWidgetVisible() const
+{
+    if(vp && vp->sketchHandler) {
+        return vp->sketchHandler->isWidgetVisible();
+    }
+    else {
+        return false;
+    }
+}
+
+QPixmap ViewProviderSketch::ToolManager::getToolIcon() const
+{
+    if(vp && vp->sketchHandler) {
+        return vp->sketchHandler->getToolIcon();
+    }
+    else {
+        return QPixmap();
+    }
+}
+
+QString ViewProviderSketch::ToolManager::getToolWidgetText() const
+{
+    if(vp && vp->sketchHandler) {
+        return vp->sketchHandler->getToolWidgetText();
+    }
+    else {
+        return QString();
+    }
+}
+
+
+
 /*************************** ViewProviderSketch **************************/
 
 // Struct for holding previous click information
@@ -395,6 +442,7 @@ PROPERTY_SOURCE_WITH_EXTENSIONS(SketcherGui::ViewProviderSketch, PartGui::ViewPr
 
 ViewProviderSketch::ViewProviderSketch()
     : SelectionObserver(false)
+    , toolManager(this)
     , Mode(STATUS_NONE)
     , listener(nullptr)
     , editCoinManager(nullptr)
@@ -495,7 +543,9 @@ ViewProviderSketch::ViewProviderSketch()
 }
 
 ViewProviderSketch::~ViewProviderSketch()
-{}
+{
+    connectionToolWidget.disconnect();
+}
 
 void ViewProviderSketch::slotUndoDocument(const Gui::Document& /*doc*/)
 {
@@ -562,10 +612,13 @@ void ViewProviderSketch::purgeHandler()
     Gui::Selection().clearSelection();
 
     // ensure that we are in sketch only selection mode
-    Gui::MDIView* mdi = Gui::Application::Instance->editDocument()->getActiveView();
-    Gui::View3DInventorViewer* viewer;
-    viewer = static_cast<Gui::View3DInventor*>(mdi)->getViewer();
-    viewer->setSelectionEnabled(false);
+    auto* view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->editDocument()->getActiveView());
+
+    if(view) {
+        Gui::View3DInventorViewer* viewer;
+        viewer = static_cast<Gui::View3DInventor*>(view)->getViewer();
+        viewer->setSelectionEnabled(false);
+    }
 }
 
 void ViewProviderSketch::setAxisPickStyle(bool on)
@@ -3239,10 +3292,12 @@ bool ViewProviderSketch::setEdit(int ModNum)
     }
 
     // start the edit dialog
-    if (sketchDlg)
-        Gui::Control().showDialog(sketchDlg);
-    else
-        Gui::Control().showDialog(new TaskDlgEditSketch(this));
+    if (!sketchDlg)
+        sketchDlg = new TaskDlgEditSketch(this);
+
+    connectionToolWidget = sketchDlg->registerToolWidgetChanged(std::bind(&SketcherGui::ViewProviderSketch::slotToolWidgetChanged, this, sp::_1));
+
+    Gui::Control().showDialog(sketchDlg);
 
     // This call to the solver is needed to initialize the DoF and solve time controls
     // The false parameter indicates that the geometry of the SketchObject shall not be updateData
@@ -3874,6 +3929,12 @@ QIcon ViewProviderSketch::mergeColorfulOverlayIcons(const QIcon& orig) const
     }
 
     return Gui::ViewProvider::mergeColorfulOverlayIcons(mergedicon);
+}
+
+void ViewProviderSketch::slotToolWidgetChanged(QWidget* newwidget)
+{
+    if (sketchHandler)
+        sketchHandler->toolWidgetChanged(newwidget);
 }
 
 /*************************** functions ViewProviderSketch offers to friends such as

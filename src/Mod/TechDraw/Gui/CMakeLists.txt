@@ -1,8 +1,5 @@
 if(MSVC)
-    add_definitions(-DHAVE_ATANH -DHAVE_ASINH -DHAVE_ACOSH)
     add_compile_options(/utf-8)
-else(MSVC)
-    add_definitions(-DHAVE_LIMITS_H -DHAVE_CONFIG_H)
 endif(MSVC)
 
 # In previous versions this target copied mtextedit.h to the binary directory that causes
@@ -238,6 +235,8 @@ SET(TechDrawGui_SRCS
     Widgets/CompassWidget.h
     Widgets/VectorEditWidget.cpp
     Widgets/VectorEditWidget.h
+    PATPathMaker.cpp
+    PATPathMaker.h
 )
 
 SET(TechDrawGuiView_SRCS

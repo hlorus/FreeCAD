@@ -74,8 +74,9 @@ App::Property* PropertyContainer::addDynamicProperty(
 Property *PropertyContainer::getPropertyByName(const char* name) const
 {
     auto prop = dynamicProps.getDynamicPropertyByName(name);
-    if(prop)
+    if (prop) {
         return prop;
+    }
     return getPropertyData().getPropertyByName(this,name);
 }
 
@@ -357,8 +358,9 @@ void PropertyContainer::Restore(Base::XMLReader &reader)
         // type and the behaviour would be undefined.
         try {
             auto prop = getPropertyByName(PropName.c_str());
-            if(!prop || prop->getContainer() != this)
+            if (!prop || prop->getContainer() != this) {
                 prop = dynamicProps.restore(*this,PropName.c_str(),TypeName.c_str(),reader);
+            }
 
             decltype(Property::StatusBits) status;
             if(reader.hasAttribute("status")) {
