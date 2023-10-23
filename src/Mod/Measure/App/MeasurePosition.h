@@ -67,6 +67,10 @@ public:
     QString getResultString() override;
 
     Base::Placement getPlacement();
+
+    // Return the object we are measuring
+    App::DocumentObject* getSubject() const override;
+
 private:
 
     void onChanged(const App::Property* prop) override;

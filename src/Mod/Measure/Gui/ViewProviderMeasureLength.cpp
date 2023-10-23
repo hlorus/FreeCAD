@@ -49,12 +49,17 @@ void ViewProviderMeasureLength::updateData(const App::Property* prop)
     }
 
     auto obj = dynamic_cast<Measure::MeasureLength*>(getMeasureObject());
-    if (prop == &(obj->Elements) || prop == &(obj->Length)){
-        {
-            redrawAnnotation();
-        }
+
+    if (obj &&
+        prop == &(obj->Elements) ) {
+        connectToSubject(obj->getSubject());
+        redrawAnnotation();
     }
 
+    if (obj &&
+        prop == &(obj->Length)){
+            redrawAnnotation();
+    }
 
     ViewProviderMeasurePropertyBase::updateData(prop);
 }

@@ -126,12 +126,7 @@ bool MeasureRadius::isPrioritizedSelection(const App::MeasureSelection& selectio
 
     BRepAdaptor_Curve adapt(firstEdge);
 
-    if (selection.size() == 1  &&
-        adapt.GetType() == GeomAbs_Circle) {
-        return true;
-    }
-
-    return false;
+    return selection.size() == 1  && adapt.GetType() == GeomAbs_Circle;
 }
 
 
@@ -211,4 +206,11 @@ MeasureRadiusInfo MeasureRadius::getMeasureInfoFirst() const
 
     std::string obName = object->getNameInDocument();
     return handler(&obName, &subElement);
+}
+
+//! Return the object we are measuring
+//! used by the viewprovider in determining visibility
+App::DocumentObject* MeasureRadius::getSubject() const
+{
+    return Element.getValue();
 }
