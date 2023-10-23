@@ -56,9 +56,9 @@ public:
     virtual QString getResultString();
     virtual Base::Placement getPlacement() {return Base::Placement();}
 
+    virtual App::DocumentObject* getSubject() const = 0;
 protected:
     void onDocumentRestored() override;
-    virtual App::DocumentObject* getSubject() const = 0;
 };
 
 
