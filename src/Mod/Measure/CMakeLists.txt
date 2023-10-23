@@ -4,6 +4,7 @@ add_subdirectory(App)
 set(Measure_Scripts
     Init.py
     UtilsMeasure.py
+    MeasureCOM.py
 )
 
 if(BUILD_GUI)
