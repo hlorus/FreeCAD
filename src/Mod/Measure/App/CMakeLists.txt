@@ -23,10 +23,13 @@ set(Measure_LIBS
 )
 
 generate_from_xml(MeasurementPy)
+generate_from_xml(MeasureBasePy)
 
 SET(Python_SRCS
     MeasurementPy.xml
     MeasurementPyImp.cpp
+    MeasureBasePy.xml
+    MeasureBasePyImp.cpp
 )
 SOURCE_GROUP("Python" FILES ${Python_SRCS})
 

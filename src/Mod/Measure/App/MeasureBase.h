@@ -30,9 +30,12 @@
 #include <App/DocumentObject.h>
 #include <App/PropertyStandard.h>
 #include <App/PropertyUnits.h>
+#include <App/FeaturePython.h>
 #include <Base/Quantity.h>
 #include <Base/Placement.h>
 #include <QString>
+#include <Base/Interpreter.h>
+#include <App/FeaturePython.h>
 
 
 // TODO: this is the base for the MeasureXXXXX classes.  It should be renamed to MeasureBase and moved to Mod/Measure/App
@@ -44,19 +47,33 @@ class AppExport MeasureBase : public App::DocumentObject
     PROPERTY_HEADER_WITH_OVERRIDE(Measure::MeasureBase);
 
 public:
-    MeasureBase() = default;
+    MeasureBase();
     ~MeasureBase() override = default;
+
+    App::PropertyPlacement Placement;
+    App::PropertyPosition Position;
 
     boost::signals2::signal<void (const MeasureBase*)> signalGuiUpdate;
 
-    // Initalize measurement properties from selection
-    virtual void parseSelection(const App::MeasureSelection&) = 0;
+    //return PyObject as MeasureBasePy
+    PyObject *getPyObject() override;
+    void onDocumentRestored() override;
 
-    virtual App::Property* getResultProp() = 0;
+    // Initalize measurement properties from selection
+    virtual void parseSelection(const App::MeasureSelection& selection);
+
+
     virtual QString getResultString();
-    virtual Base::Placement getPlacement() {return Base::Placement();}
+
+    virtual App::Property* getResultProp() {return {};};
+    virtual Base::Placement getPlacement();
+
+private:
+    Py::Object getProxyObject();
 };
 
+// Create a scriptable object based on MeasureBase
+using MeasurePython = App::FeaturePythonT<MeasureBase>;
 
 template <typename T>
 class AppExport MeasureBaseExtendable : public MeasureBase

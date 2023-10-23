@@ -30,6 +30,8 @@
 
 // unified measurement facility
 #include "MeasureBase.h"
+#include "MeasureBasePy.h"
+
 #include "MeasureAngle.h"
 #include "MeasureDistance.h"
 #include "MeasurePosition.h"
@@ -70,11 +72,14 @@ PyMOD_INIT_FUNC(Measure)
     }
     PyObject* mod = Measure::initModule();
     // Add Types to module
-    Base::Interpreter().addType(&Measure::MeasurementPy      ::Type,mod,"Measurement");
+    Base::Interpreter().addType(&Measure::MeasurementPy::Type, mod, "Measurement");
+    Base::Interpreter().addType(&Measure::MeasureBasePy::Type, mod, "MeasureBase");
+
     Measure::Measurement            ::init();
 
     // umf classes
     Measure::MeasureBase            ::init();
+    Measure::MeasurePython          ::init();
     Measure::MeasureAngle           ::init();
     Measure::MeasureDistance        ::init();
     Measure::MeasurePosition        ::init();
