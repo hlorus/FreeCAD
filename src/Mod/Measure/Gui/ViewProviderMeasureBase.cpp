@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "Gui/Application.h"
+#include "Gui/MDIView.h"
 #include "PreCompiled.h"
 
 #ifndef _PreComp_
@@ -40,8 +42,12 @@
 
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
+#include <Gui/Document.h>
 #include <Gui/ViewParams.h>
 #include <Gui/Inventor/MarkerBitmaps.h>
+#include <Gui/View3DInventor.h>
+#include <Gui/View3DInventorViewer.h>
+
 
 #include <Mod/Measure/App/Preferences.h>
 
@@ -52,16 +58,21 @@ using namespace MeasureGui;
 using namespace Measure;
 namespace bp = boost::placeholders;
 
-
+//NOLINTBEGIN
 PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureBase, Gui::ViewProviderDocumentObject)
+//NOLINTEND
 
 ViewProviderMeasureBase::ViewProviderMeasureBase()
 {
     static const char *agroup = "Appearance";
+//NOLINTBEGIN
     ADD_PROPERTY_TYPE(TextColor, (Preferences::defaultTextColor()), agroup, App::Prop_None, "Color for the measurement text");
     ADD_PROPERTY_TYPE(TextBackgroundColor, (Preferences::defaultTextBackgroundColor()), agroup, App::Prop_None, "Color for the measurement text background");
     ADD_PROPERTY_TYPE(LineColor, (Preferences::defaultLineColor()), agroup, App::Prop_None, "Color for the measurement lines");
     ADD_PROPERTY_TYPE(FontSize, (Preferences::defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
+    ADD_PROPERTY_TYPE(DistFactor,(Preferences::defaultDistFactor()), agroup, App::Prop_None, "Adjusts the distance between measurement text and geometry");
+    ADD_PROPERTY_TYPE(Mirror,(Preferences::defaultMirror()), agroup, App::Prop_None, "Reverses measurement text position if true");
+//NOLINTEND
 
     pFont = new SoFontStyle();
     pFont->ref();
@@ -129,6 +140,8 @@ void ViewProviderMeasureBase::onChanged(const App::Property* prop)
     }
     else if (prop == &FontSize) {
         pFont->size = FontSize.getValue();
+    } else if (prop == &DistFactor || prop == &Mirror) {
+        redrawAnnotation();
     }
 }
 
@@ -175,33 +188,51 @@ SoSeparator* ViewProviderMeasureBase::getSoSeparatorText() {
 }
 
 
+//! the App side has requested a redraw
 void ViewProviderMeasureBase::onGuiUpdate(const Measure::MeasureBase* measureObject) {
     (void) measureObject;
     updateView();
 }
 
+
 void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
 {
     ViewProviderDocumentObject::attach(pcObj);
 
+//NOLINTBEGIN
     auto bnd = boost::bind(&ViewProviderMeasureBase::onGuiUpdate, this, bp::_1);
+//NOLINTEND
 
-    Measure::MeasureBase* feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
+    auto feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
     if (feature) {
         feature->signalGuiUpdate.connect(bnd);
     }
 }
 
+
+// TODO: should this be pure virtual in vpMeasureBase?
 void ViewProviderMeasureBase::redrawAnnotation()
 {
 //    Base::Console().Message("VPMB::redrawAnnotation()\n");
+}
+
+//! connect to the subject to receive visibility updates
+void ViewProviderMeasureBase::connectToSubject(App::DocumentObject* subject)
+{
+    if (!subject) {
+        return;
+    }
+
+    //NOLINTBEGIN
+    auto bndVisibility = boost::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, bp::_1, bp::_2);
+    //NOLINTEND
+    subject->signalChanged.connect(bndVisibility);
 }
 
 
 //! retrive the feature
 Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 {
-
     // Note: Cast to MeasurePropertyBase once we use it to provide the needed values e.g. basePosition textPosition etc.
     auto feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
     if (!feature) {
@@ -211,8 +242,69 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 }
 
 
+//! calculate a good direction from the elements being measured to the annotation text based on the layout
+//! of the elements and relationship with the cardinal axes and the view direction.  elementDirection
+//! is expected to be a normalized vector.
+//! an example of an elementDirection would be the vector from the start of a line to the end.
+Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementDirection, double tolerance)
+{
+    auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
+    // if (!view) {
+    //     // Measure doesn't work with this kind of active view.  Might be dependency graph, might be TechDraw, or ????
+    //     // i don't know if this can even happen.
+    //     throw Base::RuntimeError("Measure doesn't work with this kind of active view.");
+    // }
+    Gui::View3DInventorViewer* viewer = view->getViewer();
+    Base::Vector3d viewDirection = toVector3d(viewer->getViewDirection()).Normalize();
+    Base::Vector3d textDirection = elementDirection.Cross(viewDirection);
+    if (textDirection.Length() < tolerance)  {
+        // either elementDirection and viewDirection are parallel or one of them is null.
+        viewDirection = toVector3d(viewer->getUpDirection()).Normalize();
+        textDirection = elementDirection.Cross(viewDirection);
+    }
 
+    return textDirection.Normalize();
+}
+
+//! true if the subject of this measurement is visible
+bool ViewProviderMeasureBase::isSubjectVisible()
+{
+    // we need these things to proceed
+    if (!getMeasureObject() ||
+        !getMeasureObject()->getSubject() ||
+        !Gui::Application::Instance->getDocument(getMeasureObject()->getDocument()) ) {
+        return false;
+    }
+
+    auto guiDoc = Gui::Application::Instance->getDocument(getMeasureObject()->getDocument());
+    Gui::ViewProvider* vp = guiDoc->getViewProvider(getMeasureObject()->getSubject());
+    if (vp) {
+        return vp->isVisible();
+    }
+
+    return false;
+}
+
+
+//! gets called when the subject object issues a signalChanged (ie a property change).  We are only interested in the subject's
+//! Visibility property
+void ViewProviderMeasureBase::onSubjectVisibilityChanged(const App::DocumentObject& docObj, const App::Property& prop)
+{
+    std::string propName = prop.getName();
+    if (propName == "Visibility") {
+        if (docObj.Visibility.getValue()) {
+            // show only if subject is visible
+            setVisible(true);
+        } else {
+            setVisible(false);
+        }
+    }
+}
+
+
+//NOLINTBEGIN
 PROPERTY_SOURCE(MeasureGui::ViewProviderMeasurePropertyBase, MeasureGui::ViewProviderMeasureBase)
+//NOLINTEND
 
 
 ViewProviderMeasurePropertyBase::ViewProviderMeasurePropertyBase()
@@ -319,7 +411,9 @@ void ViewProviderMeasurePropertyBase::redrawAnnotation()
     setLabelTranslation(pCoords->point[1]);
     setLabelValue(getMeasureObject()->getResultString());
 
-    updateView();
+    ViewProviderMeasureBase::redrawAnnotation();
+
+    ViewProviderDocumentObject::updateView();
 }
 
 
@@ -330,36 +424,25 @@ Base::Vector3d ViewProviderMeasurePropertyBase::getBasePosition(){
 }
 
 
-//! calculate a good direction for the text based on the layout of the elements and its
-//! relationship with the cardinal axes.  elementDirection should be normalized.
-//! original is in VPMeasureDistance.
-Base::Vector3d ViewProviderMeasurePropertyBase::getTextDirection(Base::Vector3d elementDirection, double tolerance) const
-{
-    const Base::Vector3d stdX(1.0, 0.0, 0.0);
-    const Base::Vector3d stdY(0.0, 1.0, 0.0);
-    const Base::Vector3d stdZ(0.0, 0.0, 1.0);
-
-    Base::Vector3d textDirection = elementDirection.Cross(stdX);
-    if (textDirection.Length() < tolerance) {
-        textDirection = elementDirection.Cross(stdY);
-    }
-    if (textDirection.Length() < tolerance) {
-        textDirection = elementDirection.Cross(stdZ);
-    }
-    textDirection.Normalize();
-    if (textDirection.Dot(stdZ) < 0.0) {
-        textDirection = textDirection * -1.0;
-    }
-
-    return textDirection.Normalize();
-}
-
-
 Base::Vector3d ViewProviderMeasurePropertyBase::getTextPosition(){
     auto basePoint = getBasePosition();
     Base::Vector3d textDirection(1.0, 1.0, 1.0);
     textDirection.Normalize();
-    double length = 10;
+    constexpr double defaultLength = 10.0;
+    double length = defaultLength;
+    if (Mirror.getValue()) {
+        length = -length;
+    }
 
-    return basePoint + textDirection * length;
+    return basePoint + textDirection * length * DistFactor.getValue();
+}
+
+//! called by the system when it is time to display this measure
+void ViewProviderMeasureBase::show()
+{
+    if (isSubjectVisible()) {
+        // only show the annotation if the subject is visible.
+        // this avoids disconnected annotations floating in space.
+        ViewProviderDocumentObject::show();
+    }
 }

@@ -161,7 +161,7 @@ Base::Placement MeasureArea::getPlacement() {
     const std::vector<App::DocumentObject*>& objects = Elements.getValues();
     const std::vector<std::string>& subElements = Elements.getSubValues();
 
-    if (!objects.size() || !subElements.size()) {
+    if (objects.empty() || subElements.empty()) {
         return Base::Placement();
     }
 
@@ -177,4 +177,16 @@ Base::Placement MeasureArea::getPlacement() {
 
     std::string obName = object->getNameInDocument();
     return handler(&obName, &subElement).placement;
+}
+
+
+//! Return the object we are measuring
+//! used by the viewprovider in determining visibility
+App::DocumentObject* MeasureArea::getSubject() const
+{
+    auto elements = Elements.getValues();
+    if (elements.empty()) {
+        return nullptr;
+    }
+    return Elements.getValues().front();
 }

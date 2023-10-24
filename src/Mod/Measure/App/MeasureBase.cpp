@@ -23,6 +23,7 @@
 #include "PreCompiled.h"
 #include <App/PropertyGeo.h>
 #include <Base/PlacementPy.h>
+#include <App/FeaturePythonPyImp.h>
 
 #include "MeasureBase.h"
 // Generated from MeasureBasePy.xml
@@ -36,11 +37,6 @@ PROPERTY_SOURCE(Measure::MeasureBase, App::DocumentObject)
 MeasureBase::MeasureBase() {
     ADD_PROPERTY_TYPE(Placement, (Base::Placement()), nullptr, App::PropertyType(App::Prop_ReadOnly|App::Prop_Output|App::Prop_NoRecompute), "Visual placement of the measurement");
 
-}
-
-void MeasureBase::onDocumentRestored() {
-    // Refresh the viewprovider
-    signalGuiUpdate(this);
 }
 
 
@@ -109,13 +105,20 @@ QString MeasureBase::getResultString() {
 
     return QString();
 }
+
+
+void MeasureBase::onDocumentRestored() {
+    // Force recompute the measurement
+    recompute();
+}
+
+
 Base::Placement MeasureBase::getPlacement() {
     return this->Placement.getValue();
 }
+
+
 // Python Drawing feature ---------------------------------------------------------
-
-
-#include <App/FeaturePythonPyImp.h>
 
 namespace App {
 /// @cond DOXERR
@@ -135,3 +138,5 @@ template<> PyObject* Measure::MeasurePython::getPyObject() {
 // explicit template instantiation
 template class MeasureExport FeaturePythonT<Measure::MeasureBase>;
 }
+
+

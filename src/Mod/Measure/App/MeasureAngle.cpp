@@ -251,3 +251,10 @@ void MeasureAngle::onChanged(const App::Property* prop)
     }
     DocumentObject::onChanged(prop);
 }
+
+//! Return the object we are measuring
+//! used by the viewprovider in determining visibility
+App::DocumentObject* MeasureAngle::getSubject() const
+{
+    return Element1.getValue();
+}

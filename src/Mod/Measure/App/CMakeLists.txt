@@ -1,9 +1,3 @@
-if(MSVC)
-    add_definitions(-DFCAppMeasure -DHAVE_ACOSH -DHAVE_ASINH -DHAVE_ATANH)
-else(MSVC)
-    add_definitions(-DHAVE_LIMITS_H -DHAVE_CONFIG_H -DHAVE_ACOSH -DHAVE_ATANH -DHAVE_ASINH)
-endif(MSVC)
-
 include_directories(
     ${CMAKE_BINARY_DIR}
     ${CMAKE_BINARY_DIR}/src
@@ -38,6 +32,7 @@ SET(MeasureModule_SRCS
     PreCompiled.h
     AppMeasure.cpp
 
+# original service routines
     Measurement.cpp
     Measurement.h
 
@@ -54,8 +49,8 @@ SET(MeasureModule_SRCS
     MeasureLength.h
     MeasureArea.cpp
     MeasureArea.h
-#    Measure.cpp
-#    Measure.h
+    MeasureRadius.cpp
+    MeasureRadius.h
 
     Preferences.cpp
     Preferences.h

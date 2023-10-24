@@ -168,7 +168,7 @@ DrawViewPart::~DrawViewPart()
 //!  XSource property lists
 TopoDS_Shape DrawViewPart::getSourceShape(bool fuse) const
 {
-    //    Base::Console().Message("DVP::getSourceShape()\n");
+//    Base::Console().Message("DVP::getSourceShape()\n");
     const std::vector<App::DocumentObject*>& links = getAllSources();
     if (links.empty()) {
         return TopoDS_Shape();
@@ -203,11 +203,15 @@ std::vector<App::DocumentObject*> DrawViewPart::getAllSources() const
 
 //! pick supported 2d shapes out of the Source properties and
 //! add them directly to the geometry without going through HLR
+//! NOTE: this is for loose 2d shapes such as Part line or circle and is
+//! not meant to include complex 2d shapes such as Sketches.
 void DrawViewPart::addShapes2d(void)
 {
+//    Base::Console().Message("DVP::addShapes2d()\n");
+    // get all the 2d shapes in the sources, then pick through them for loose edges
+    // or vertices.
     std::vector<TopoDS_Shape> shapes = ShapeExtractor::getShapes2d(getAllSources());
     for (auto& s : shapes) {
-        //just vertices for now
         if (s.ShapeType() == TopAbs_VERTEX) {
             gp_Pnt gp = BRep_Tool::Pnt(TopoDS::Vertex(s));
             Base::Vector3d vp(gp.X(), gp.Y(), gp.Z());
@@ -218,8 +222,7 @@ void DrawViewPart::addShapes2d(void)
             geometryObject->addVertex(v1);
         }
         else if (s.ShapeType() == TopAbs_EDGE) {
-            //not supporting edges yet.  Why?
-            //Base::Console().Message("DVP::add2dShapes - found loose edge - isNull: %d\n", s.IsNull());
+            Base::Console().Message("DVP::add2dShapes - found loose edge - isNull: %d\n", s.IsNull());
             TopoDS_Shape sTrans = ShapeUtils::moveShape(s,
                                                       m_saveCentroid * -1.0);
             TopoDS_Shape sScale = ShapeUtils::scaleShape(sTrans,
@@ -229,7 +232,10 @@ void DrawViewPart::addShapes2d(void)
             BaseGeomPtr bg = projectEdge(edge);
 
             geometryObject->addEdge(bg);
-            //save connection between source feat and this edge
+
+        } else {
+            // message for developers.
+            //Base::Console().Message("DEVEL: DVP::addShapes2d - shape is not a vertex or edge\n");
         }
     }
 }
@@ -783,6 +789,8 @@ const std::vector<TechDraw::VertexPtr> DrawViewPart::getVertexGeometry() const
     return std::vector<TechDraw::VertexPtr>();
 }
 
+
+//! TechDraw vertex names run from 0 to n-1
 TechDraw::VertexPtr DrawViewPart::getVertex(std::string vertexName) const
 {
     const std::vector<TechDraw::VertexPtr> allVertex(DrawViewPart::getVertexGeometry());
@@ -791,7 +799,7 @@ TechDraw::VertexPtr DrawViewPart::getVertex(std::string vertexName) const
         //should not happen
         throw Base::IndexError("DVP::getVertex - No vertices found.");
     }
-    if (iTarget > allVertex.size()) {
+    if (iTarget >= allVertex.size()) {
         //should not happen
         throw Base::IndexError("DVP::getVertex - Vertex not found.");
     }
@@ -800,6 +808,7 @@ TechDraw::VertexPtr DrawViewPart::getVertex(std::string vertexName) const
 }
 
 //! returns existing BaseGeom of 2D Edge
+//! TechDraw edge names run from 0 to n-1
 TechDraw::BaseGeomPtr DrawViewPart::getEdge(std::string edgeName) const
 {
     const std::vector<TechDraw::BaseGeomPtr>& geoms = getEdgeGeometry();
@@ -814,7 +823,9 @@ TechDraw::BaseGeomPtr DrawViewPart::getEdge(std::string edgeName) const
     return geoms.at(iEdge);
 }
 
+
 //! returns existing 2d Face
+//! TechDraw face names run from 0 to n-1
 TechDraw::FacePtr DrawViewPart::getFace(std::string faceName) const
 {
     const std::vector<TechDraw::FacePtr>& faces = getFaceGeometry();

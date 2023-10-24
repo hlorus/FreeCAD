@@ -37,6 +37,7 @@
 #include "MeasurePosition.h"
 #include "MeasureLength.h"
 #include "MeasureArea.h"
+#include "MeasureRadius.h"
 
 namespace Measure {
 class Module : public Py::ExtensionModule<Module>
@@ -85,6 +86,7 @@ PyMOD_INIT_FUNC(Measure)
     Measure::MeasurePosition        ::init();
     Measure::MeasureLength          ::init();
     Measure::MeasureArea            ::init();
+    Measure::MeasureRadius          ::init();
 
     // Add fundamental umf Measure Types
     App::Application& app = App::GetApplication();
@@ -113,7 +115,7 @@ PyMOD_INIT_FUNC(Measure)
         );
 
     app.addMeasureType(
-            "Position",
+            "POSITION",
             "Position",
             "Measure::MeasurePosition",
             MeasurePosition::isValidSelection,
@@ -121,11 +123,19 @@ PyMOD_INIT_FUNC(Measure)
         );
 
     app.addMeasureType(
-            "Area",
+            "AREA",
             "Area",
             "Measure::MeasureArea",
             MeasureArea::isValidSelection,
             nullptr
+        );
+        
+    app.addMeasureType(
+            "RADIUS",
+            "Radius",
+            "Measure::MeasureRadius",
+            MeasureRadius::isValidSelection,
+            MeasureRadius::isPrioritizedSelection
         );
 
     Base::Console().Log("Loading Measure module... done\n");

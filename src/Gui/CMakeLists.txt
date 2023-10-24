@@ -319,6 +319,7 @@ SET(Gui_UIC_SRCS
     PreferencePages/DlgSettingsEditor.ui
     PreferencePages/DlgSettingsGeneral.ui
     DlgSettingsImage.ui
+    PreferencePages/DlgSettingsLightSources.ui
     PreferencePages/DlgSettingsMacro.ui
     PreferencePages/DlgSettingsNavigation.ui
     PreferencePages/DlgSettingsNotificationArea.ui
@@ -567,6 +568,7 @@ SET(Dialog_Settings_CPP_SRCS
     PreferencePages/DlgSettingsEditor.cpp
     PreferencePages/DlgSettingsGeneral.cpp
     DlgSettingsImageImp.cpp
+    PreferencePages/DlgSettingsLightSources.cpp
     PreferencePages/DlgSettingsMacroImp.cpp
     PreferencePages/DlgSettingsNavigation.cpp
     PreferencePages/DlgSettingsNotificationArea.cpp
@@ -576,6 +578,7 @@ SET(Dialog_Settings_CPP_SRCS
     PreferencePages/DlgSettingsTheme.cpp
     PreferencePages/DlgSettingsViewColor.cpp
     PreferencePages/DlgSettingsWorkbenchesImp.cpp
+    PreferencePages/DlgSettingsUI.cpp
 )
 SET(Dialog_Settings_HPP_SRCS
     DlgOnlineHelpImp.h
@@ -587,6 +590,7 @@ SET(Dialog_Settings_HPP_SRCS
     PreferencePages/DlgSettingsEditor.h
     PreferencePages/DlgSettingsGeneral.h
     DlgSettingsImageImp.h
+    PreferencePages/DlgSettingsLightSources.h
     PreferencePages/DlgSettingsMacroImp.h
     PreferencePages/DlgSettingsNavigation.h
     PreferencePages/DlgSettingsNotificationArea.h
@@ -596,6 +600,7 @@ SET(Dialog_Settings_HPP_SRCS
     PreferencePages/DlgSettingsTheme.h
     PreferencePages/DlgSettingsViewColor.h
     PreferencePages/DlgSettingsWorkbenchesImp.h
+    PreferencePages/DlgSettingsUI.h
 )
 SET(Dialog_Settings_SRCS
     ${Dialog_Settings_CPP_SRCS}
@@ -609,6 +614,7 @@ SET(Dialog_Settings_SRCS
     PreferencePages/DlgSettingsEditor.ui
     PreferencePages/DlgSettingsGeneral.ui
     DlgSettingsImage.ui
+    PreferencePages/DlgSettingsLightSources.ui
     PreferencePages/DlgSettingsMacro.ui
     PreferencePages/DlgSettingsNavigation.ui
     PreferencePages/DlgSettingsNotificationArea.ui
@@ -1039,7 +1045,6 @@ SET(Widget_CPP_SRCS
     WidgetFactory.cpp
     Widgets.cpp
     Window.cpp
-    ViewParams.cpp
 )
 SET(Widget_HPP_SRCS
     FileDialog.h
@@ -1060,7 +1065,6 @@ SET(Widget_HPP_SRCS
     WidgetFactory.h
     Widgets.h
     Window.h
-    ViewParams.h
 )
 SET(Widget_SRCS
     ${Widget_CPP_SRCS}
@@ -1070,10 +1074,16 @@ SOURCE_GROUP("Widget" FILES ${Widget_SRCS})
 
 SET(Params_CPP_SRCS
     TreeParams.cpp
+    OverlayParams.cpp
+    ParamHandler.cpp
+    ViewParams.cpp
 )
 
 SET(Params_HPP_SRCS
     TreeParams.h
+    OverlayParams.h
+    ParamHandler.cpp
+    ViewParams.h
 )
 
 SET(Params_SRCS
@@ -1107,6 +1117,8 @@ SOURCE_GROUP("View" FILES ${View_SRCS})
 # The workbench sources
 SET(Workbench_CPP_SRCS
     DockWindowManager.cpp
+    OverlayManager.cpp
+    OverlayWidgets.cpp
     MenuManager.cpp
     PythonWorkbenchPyImp.cpp
     ToolBarManager.cpp
@@ -1114,17 +1126,23 @@ SET(Workbench_CPP_SRCS
     Workbench.cpp
     WorkbenchFactory.cpp
     WorkbenchManager.cpp
+    WorkbenchManipulator.cpp
+    WorkbenchManipulatorPython.cpp
     WorkbenchPyImp.cpp
 )
 SET(Workbench_SRCS
     ${Workbench_CPP_SRCS}
     DockWindowManager.h
+    OverlayManager.h
+    OverlayWidgets.h
     MenuManager.h
     ToolBarManager.h
     ToolBoxManager.h
     Workbench.h
     WorkbenchFactory.h
     WorkbenchManager.h
+    WorkbenchManipulator.h
+    WorkbenchManipulatorPython.h
 )
 SOURCE_GROUP("Workbench" FILES ${Workbench_SRCS})
 

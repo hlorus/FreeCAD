@@ -76,6 +76,10 @@ public:
 
     App::Property* getResultProp() override {return &this->Angle;}
 
+   // Return the object we are measuring
+    App::DocumentObject* getSubject() const override;
+
+
     static bool getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut);
     Base::Vector3d getLoc(App::DocumentObject& ob, std::string& subName);
 

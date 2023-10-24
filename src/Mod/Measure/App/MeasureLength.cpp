@@ -178,3 +178,16 @@ Base::Placement MeasureLength::getPlacement() {
     std::string obName = object->getNameInDocument();
     return handler(&obName, &subElement).placement;
 }
+
+
+//! Return the object we are measuring
+//! used by the viewprovider in determining visibility
+App::DocumentObject* MeasureLength::getSubject() const
+{
+    auto elements = Elements.getValues();
+    if (elements.empty()) {
+        return nullptr;
+    }
+    return Elements.getValues().front();
+}
+

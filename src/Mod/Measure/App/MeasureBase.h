@@ -57,7 +57,6 @@ public:
 
     //return PyObject as MeasureBasePy
     PyObject *getPyObject() override;
-    void onDocumentRestored() override;
 
     // Initalize measurement properties from selection
     virtual void parseSelection(const App::MeasureSelection& selection);
@@ -67,9 +66,15 @@ public:
 
     virtual App::Property* getResultProp() {return {};};
     virtual Base::Placement getPlacement();
+    virtual App::DocumentObject* getSubject() const {
+        return {};
+    };
 
 private:
     Py::Object getProxyObject();
+
+protected:
+    void onDocumentRestored() override;
 };
 
 // Create a scriptable object based on MeasureBase

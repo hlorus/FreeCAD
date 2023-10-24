@@ -38,6 +38,7 @@
 #include "ViewProviderMeasureLength.h"
 #include "ViewProviderMeasurePosition.h"
 #include "ViewProviderMeasureArea.h"
+#include "ViewProviderMeasureRadius.h"
 
 
 // use a different name to CreateCommand()
@@ -55,8 +56,7 @@ public:
         initialize("This module is the MeasureGui module.");// register with Python
     }
 
-    ~Module() override
-    {}
+    ~Module() override = default;
 
 private:
 };
@@ -98,6 +98,7 @@ PyMOD_INIT_FUNC(MeasureGui)
     MeasureGui::ViewProviderMeasureLength              ::init();
     MeasureGui::ViewProviderMeasurePosition            ::init();
     MeasureGui::ViewProviderMeasureArea                ::init();
+    MeasureGui::ViewProviderMeasureRadius              ::init();
 
     // register preferences pages
     new Gui::PrefPageProducer<MeasureGui::DlgPrefsMeasureAppearanceImp>(QT_TRANSLATE_NOOP("QObject", "Measure"));

@@ -171,3 +171,11 @@ Base::Placement MeasurePosition::getPlacement() {
     placement.setPosition(Position.getValue());
     return placement;
 }
+
+
+//! Return the object we are measuring
+//! used by the viewprovider in determining visibility
+App::DocumentObject* MeasurePosition::getSubject() const
+{
+    return Element.getValue();
+}

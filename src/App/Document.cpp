@@ -833,10 +833,14 @@ Document::Document(const char* documentName)
     auto paramGrp {App::GetApplication().GetParameterGroupByPath(
         "User parameter:BaseApp/Preferences/Document")};
     auto index = static_cast<int>(paramGrp->GetInt("prefLicenseType", 0));
-    const char* name = App::licenseItems.at(index).at(App::posnOfFullName);
-    const char* url = App::licenseItems.at(index).at(App::posnOfUrl);
-    std::string licenseUrl = (paramGrp->GetASCII("prefLicenseUrl", url));
-
+    const char* name = "";
+    const char* url = "";
+    std::string licenseUrl = "";
+    if (index >= 0 && index < App::countOfLicenses) {
+        name = App::licenseItems.at(index).at(App::posnOfFullName);
+        url = App::licenseItems.at(index).at(App::posnOfUrl);
+        licenseUrl = (paramGrp->GetASCII("prefLicenseUrl", url));
+    }
     ADD_PROPERTY_TYPE(License, (name), 0, Prop_None, "License string of the Item");
     ADD_PROPERTY_TYPE(
         LicenseURL, (licenseUrl.c_str()), 0, Prop_None, "URL to the license text/contract");
@@ -1895,7 +1899,7 @@ bool Document::saveToFile(const char* filename) const
     signalStartSave(*this, filename);
 
     auto hGrp = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Preferences/Document");
-    int compression = hGrp->GetInt("CompressionLevel",3);
+    int compression = hGrp->GetInt("CompressionLevel",7);
     compression = Base::clamp<int>(compression, Z_NO_COMPRESSION, Z_BEST_COMPRESSION);
 
     bool policy = App::GetApplication().GetParameterGroupByPath

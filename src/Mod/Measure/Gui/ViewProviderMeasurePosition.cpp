@@ -23,35 +23,16 @@
 #include "PreCompiled.h"
 
 #ifndef _PreComp_
-# include <sstream>
-# include <QApplication>
-# include <Inventor/nodes/SoAnnotation.h>
-# include <Inventor/nodes/SoBaseColor.h>
-# include <Inventor/nodes/SoCoordinate3.h>
-# include <Inventor/nodes/SoDrawStyle.h>
-# include <Inventor/nodes/SoFontStyle.h>
-# include <Inventor/nodes/SoIndexedLineSet.h>
-# include <Inventor/nodes/SoMarkerSet.h>
-# include <Inventor/nodes/SoPickStyle.h>
-# include <Inventor/nodes/SoText2.h>
-# include <Inventor/nodes/SoTranslation.h>
 #endif
 
 #include <App/Document.h>
+#include <App/Property.h>
 #include <Base/Console.h>
-#include <Base/Quantity.h>
-#include <Gui/Application.h>
-#include <Gui/Command.h>
-#include <Gui/Document.h>
-#include <Gui/ViewParams.h>
-#include <Gui/Inventor/MarkerBitmaps.h>
 
 #include <Mod/Measure/App/MeasurePosition.h>
-#include <Mod/Measure/App/Preferences.h>
 
 #include "ViewProviderMeasurePosition.h"
 
-using namespace Gui;
 using namespace MeasureGui;
 using namespace Measure;
 
@@ -66,12 +47,15 @@ void ViewProviderMeasurePosition::updateData(const App::Property* prop)
     }
 
     auto obj = dynamic_cast<Measure::MeasurePosition*>(getMeasureObject());
-    if (prop == &(obj->Element) || prop == &(obj->Position)){
-        {
-            redrawAnnotation();
-        }
+
+    if (obj && prop == &(obj->Element)) {
+        connectToSubject(obj->getSubject());
+        redrawAnnotation();
     }
 
+    if (obj && prop == &(obj->Position)){
+            redrawAnnotation();
+    }
 
     ViewProviderMeasurePropertyBase::updateData(prop);
 }

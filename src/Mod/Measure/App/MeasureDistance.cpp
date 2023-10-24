@@ -171,7 +171,7 @@ App::DocumentObjectExecReturn *MeasureDistance::execute()
         return new App::DocumentObjectExecReturn("Submitted object(s) is not valid");
     }
 
-    if (subs1.size() < 1 || subs2.size() < 1) {
+    if (subs1.empty() || subs2.empty()) {
         return new App::DocumentObjectExecReturn("No geometry element picked");
     }
 
@@ -215,3 +215,12 @@ void MeasureDistance::onChanged(const App::Property* prop)
     }
     DocumentObject::onChanged(prop);
 }
+
+
+//! Return the object we are measuring
+//! used by the viewprovider in determining visibility
+App::DocumentObject* MeasureDistance::getSubject() const
+{
+    return Element1.getValue();
+}
+

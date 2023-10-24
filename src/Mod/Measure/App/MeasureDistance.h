@@ -81,6 +81,10 @@ public:
 
     bool getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape);
 
+    // Return the object we are measuring
+    App::DocumentObject* getSubject() const override;
+
+
 private:
 
     void onChanged(const App::Property* prop) override;
