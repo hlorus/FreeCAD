@@ -229,6 +229,22 @@ void ViewProviderMeasureBase::connectToSubject(App::DocumentObject* subject)
     subject->signalChanged.connect(bndVisibility);
 }
 
+//! connect to the subject to receive visibility updates
+void ViewProviderMeasureBase::connectToSubject(std::vector<App::DocumentObject*> subject)
+{
+    if (subject.empty()) {
+        return;
+    }
+
+    //NOLINTBEGIN
+    auto bndVisibility = boost::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, bp::_1, bp::_2);
+    //NOLINTEND
+
+    // TODO: should we connect to all the subject objects when there is >1?
+    auto proxy = subject.front();
+    proxy->signalChanged.connect(bndVisibility);
+}
+
 
 //! retrive the feature
 Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
@@ -266,23 +282,27 @@ Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementD
     return textDirection.Normalize();
 }
 
-//! true if the subject of this measurement is visible
+//! true if the subject of this measurement is visible.  For Measures that have multiple object subject,
+//! all of the subjects must be visible.
 bool ViewProviderMeasureBase::isSubjectVisible()
 {
     // we need these things to proceed
     if (!getMeasureObject() ||
-        !getMeasureObject()->getSubject() ||
+        getMeasureObject()->getSubject().empty() ||
         !Gui::Application::Instance->getDocument(getMeasureObject()->getDocument()) ) {
         return false;
     }
 
     auto guiDoc = Gui::Application::Instance->getDocument(getMeasureObject()->getDocument());
-    Gui::ViewProvider* vp = guiDoc->getViewProvider(getMeasureObject()->getSubject());
-    if (vp) {
-        return vp->isVisible();
+    for (auto & obj : getMeasureObject()->getSubject()) {
+        Gui::ViewProvider* vp = guiDoc->getViewProvider(obj);
+        if (!vp || !vp->isVisible()) {
+            return false;
+        }
     }
 
-    return false;
+    // all of the subject objects are visible
+    return true;
 }
 
 
@@ -292,11 +312,12 @@ void ViewProviderMeasureBase::onSubjectVisibilityChanged(const App::DocumentObje
 {
     std::string propName = prop.getName();
     if (propName == "Visibility") {
-        if (docObj.Visibility.getValue()) {
-            // show only if subject is visible
-            setVisible(true);
-        } else {
+        if (!docObj.Visibility.getValue()) {
+            // show ourselves only if subject is visible
             setVisible(false);
+        } else {
+            // here, we don't know if we should be visible or not, so we have to check the whole subject
+            setVisible(isSubjectVisible());
         }
     }
 }

@@ -210,7 +210,7 @@ MeasureRadiusInfo MeasureRadius::getMeasureInfoFirst() const
 
 //! Return the object we are measuring
 //! used by the viewprovider in determining visibility
-App::DocumentObject* MeasureRadius::getSubject() const
+std::vector<App::DocumentObject*> MeasureRadius::getSubject() const
 {
-    return Element.getValue();
+    return {Element.getValue()};
 }

@@ -182,11 +182,7 @@ Base::Placement MeasureArea::getPlacement() {
 
 //! Return the object we are measuring
 //! used by the viewprovider in determining visibility
-App::DocumentObject* MeasureArea::getSubject() const
+std::vector<App::DocumentObject*> MeasureArea::getSubject() const
 {
-    auto elements = Elements.getValues();
-    if (elements.empty()) {
-        return nullptr;
-    }
-    return Elements.getValues().front();
+    return Elements.getValues();
 }

@@ -69,7 +69,7 @@ public:
     Base::Placement getPlacement();
 
     // Return the object we are measuring
-    App::DocumentObject* getSubject() const override;
+    std::vector<App::DocumentObject*> getSubject() const override;
 
 private:
 

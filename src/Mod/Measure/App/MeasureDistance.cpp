@@ -219,8 +219,8 @@ void MeasureDistance::onChanged(const App::Property* prop)
 
 //! Return the object we are measuring
 //! used by the viewprovider in determining visibility
-App::DocumentObject* MeasureDistance::getSubject() const
+std::vector<App::DocumentObject*> MeasureDistance::getSubject() const
 {
-    return Element1.getValue();
+    return {Element1.getValue()};
 }
 

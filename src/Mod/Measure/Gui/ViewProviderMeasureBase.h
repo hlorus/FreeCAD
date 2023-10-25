@@ -96,6 +96,7 @@ public:
     Connection connectVisibilityChanged;
     void onSubjectVisibilityChanged(const App::DocumentObject& docObj, const App::Property& prop);
     void connectToSubject(App::DocumentObject* subject);
+    void connectToSubject(std::vector<App::DocumentObject*> subject);
 
 protected:
     void onChanged(const App::Property* prop) override;

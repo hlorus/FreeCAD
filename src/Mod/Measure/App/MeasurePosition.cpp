@@ -180,7 +180,7 @@ Base::Placement MeasurePosition::getPlacement() {
 
 //! Return the object we are measuring
 //! used by the viewprovider in determining visibility
-App::DocumentObject* MeasurePosition::getSubject() const
+std::vector<App::DocumentObject*> MeasurePosition::getSubject() const
 {
-    return Element.getValue();
+    return {Element.getValue()};
 }
