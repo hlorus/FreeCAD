@@ -264,23 +264,32 @@ Measure::MeasureBase* ViewProviderMeasureBase::getMeasureObject()
 //! an example of an elementDirection would be the vector from the start of a line to the end.
 Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementDirection, double tolerance)
 {
+    // TODO: this can fail if the active view is not a 3d view (spreadsheet, techdraw page) and something causes a measure to try to update
+    // we need to search throught the mdi views for a 3d view and take the direction from it (or decide that if the active view is not 3d,
+    // assume we are looking from the front).
+    Base::Vector3d viewDirection;
+    Base::Vector3d upDirection;
     auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
-    // if (!view) {
-    //     // Measure doesn't work with this kind of active view.  Might be dependency graph, might be TechDraw, or ????
-    //     // i don't know if this can even happen.
-    //     throw Base::RuntimeError("Measure doesn't work with this kind of active view.");
-    // }
-    Gui::View3DInventorViewer* viewer = view->getViewer();
-    Base::Vector3d viewDirection = toVector3d(viewer->getViewDirection()).Normalize();
+    if (view) {
+        Gui::View3DInventorViewer* viewer = view->getViewer();
+        viewDirection = toVector3d(viewer->getViewDirection()).Normalize();
+        upDirection = toVector3d(viewer->getUpDirection()).Normalize();
+        // Measure doesn't work with this kind of active view.  Might be dependency graph, might be TechDraw, or ????
+        //throw Base::RuntimeError("Measure doesn't work with this kind of active view.");
+    } else {
+        viewDirection = Base::Vector3d(0.0, 1.0, 0.0);
+        upDirection = Base::Vector3d(0.0, 0.0, 1.0);
+    }
+
     Base::Vector3d textDirection = elementDirection.Cross(viewDirection);
     if (textDirection.Length() < tolerance)  {
         // either elementDirection and viewDirection are parallel or one of them is null.
-        viewDirection = toVector3d(viewer->getUpDirection()).Normalize();
-        textDirection = elementDirection.Cross(viewDirection);
+        textDirection = elementDirection.Cross(upDirection);
     }
 
     return textDirection.Normalize();
 }
+
 
 //! true if the subject of this measurement is visible.  For Measures that have multiple object subject,
 //! all of the subjects must be visible.
