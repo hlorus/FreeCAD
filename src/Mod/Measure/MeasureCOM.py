@@ -82,20 +82,33 @@ class MeasureCOM(MeasureBasePython):
         if not element:
             return
 
-        ob, subName = element
-        if not hasattr(ob, "Shape"):
-            return
-        
-        shape = ob.Shape
-        if not hasattr(shape, "CenterOfMass"):
-            return
+        ob = element[0]
+        subElements = element[1]
 
-        com = shape.CenterOfMass
+        if subElements:
+            subName = subElements[0]
+            sub = ob.getSubObject(subName)
+
+            if not sub or not hasattr(sub, "CenterOfMass"):
+                return
+            com = sub.CenterOfMass
+
+        else:
+            # Get Center of Mass of the object
+            if not hasattr(ob, "Shape"):
+                return
+
+            shape = ob.Shape
+            if not hasattr(shape, "CenterOfMass"):
+                return
+
+            com = shape.CenterOfMass
+
         obj.Result = com
-
         placement = Placement()
         placement.Base = com
         obj.Placement = placement
+
 
     def onChanged(self, obj, prop):
         '''Do something when a property has changed'''
