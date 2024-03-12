@@ -143,7 +143,7 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
 
     std::string obName = static_cast<std::string>(ob.getNameInDocument());
     auto info = handler(&obName, &subName);
-    auto angleInfo = dynamic_cast<Part::MeasureAngleInfo*>(info);
+    auto angleInfo = std::dynamic_pointer_cast<Part::MeasureAngleInfo>(info);
     vecOut = angleInfo->orientation;
     return true;
 }
@@ -159,7 +159,7 @@ Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subNam
     auto handler = getGeometryHandler(mod);
     std::string obName = static_cast<std::string>(ob.getNameInDocument());
     auto info = handler(&obName, &subName);
-    auto angleInfo = dynamic_cast<Part::MeasureAngleInfo*>(info);
+    auto angleInfo = std::dynamic_pointer_cast<Part::MeasureAngleInfo>(info);
     return angleInfo->position;
 }
 

@@ -134,7 +134,7 @@ void MeasureLength::recalculateLength()
 
         std::string obName = object->getNameInDocument();
         auto info = handler(&obName, &subElement);
-        auto lengthInfo = dynamic_cast<Part::MeasureLengthInfo*>(info);
+        auto lengthInfo = std::dynamic_pointer_cast<Part::MeasureLengthInfo>(info);
         result += lengthInfo->length;
     }
 
@@ -175,7 +175,7 @@ Base::Placement MeasureLength::getPlacement() {
 
     std::string obName = object->getNameInDocument();
     auto info = handler(&obName, &subElement);
-    auto lengthInfo = dynamic_cast<Part::MeasureLengthInfo*>(info);
+    auto lengthInfo = std::dynamic_pointer_cast<Part::MeasureLengthInfo>(info);
     return lengthInfo->placement;
 }
 
