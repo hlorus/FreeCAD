@@ -189,14 +189,14 @@ Base::Vector3d MeasureRadius::getPointOnCurve() const
 }
 
 //! get the handler's result for the first element
-Part::MeasureRadiusInfo* MeasureRadius::getMeasureInfoFirst() const
+Part::MeasureRadiusInfoPtr MeasureRadius::getMeasureInfoFirst() const
 {
    const App::DocumentObject* object = Element.getValue();
     const std::vector<std::string>& subElements = Element.getSubValues();
 
     if (!object || subElements.empty()) {
 // NOLINTNEXTLINE(modernize-return-braced-init-list)
-        return new Part::MeasureRadiusInfo();
+        return std::make_shared<Part::MeasureRadiusInfo>();
     }
 
     std::string subElement = subElements.front();
@@ -210,7 +210,7 @@ Part::MeasureRadiusInfo* MeasureRadius::getMeasureInfoFirst() const
 
     std::string obName = object->getNameInDocument();
     auto info = handler(&obName, &subElement);
-    auto radiusInfo = dynamic_cast<Part::MeasureRadiusInfo*>(info);
+    auto radiusInfo = std::dynamic_pointer_cast<Part::MeasureRadiusInfo>(info);
     return radiusInfo;
 }
 

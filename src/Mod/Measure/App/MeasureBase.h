@@ -26,6 +26,7 @@
 
 #include <Mod/Measure/MeasureGlobal.h>
 
+#include <memory>
 #include <QString>
 
 #include <App/Application.h>
@@ -89,7 +90,7 @@ template <typename T>
 class MeasureExport MeasureBaseExtendable : public MeasureBase
 {
 
-    using GeometryHandler = std::function<Part::MeasureInfo* (std::string*, std::string*)>;
+    using GeometryHandler = std::function<Part::MeasureInfoPtr (std::string*, std::string*)>;
     using HandlerMap = std::map<std::string, GeometryHandler>;
 
 

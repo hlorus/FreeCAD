@@ -130,7 +130,7 @@ void MeasurePosition::recalculatePosition()
 
     std::string obName = object->getNameInDocument();
     auto info = handler(&obName, &subElement);
-    auto positionInfo = dynamic_cast<Part::MeasurePositionInfo*>(info);
+    auto positionInfo = std::dynamic_pointer_cast<Part::MeasurePositionInfo>(info);
     Position.setValue(positionInfo->position);
 }
 
