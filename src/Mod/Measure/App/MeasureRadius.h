@@ -78,7 +78,7 @@ public:
 
 private:
     void onChanged(const App::Property* prop) override;
-    Part::MeasureRadiusInfo* getMeasureInfoFirst() const;
+    Part::MeasureRadiusInfoPtr getMeasureInfoFirst() const;
 
 
 };

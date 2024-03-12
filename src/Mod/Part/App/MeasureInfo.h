@@ -33,6 +33,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <Base/Vector3D.h>
 #include <Base/Placement.h>
@@ -40,6 +41,22 @@
 class TopoDS_Shape;
 
 namespace Part {
+
+class MeasureInfo;
+using MeasureInfoPtr = std::shared_ptr<MeasureInfo>;
+class MeasureAngleInfo;
+using MeasureAngleInfoPtr = std::shared_ptr<MeasureAngleInfo>;
+class MeasureAreaInfo;
+using MeasureAreaInfoPtr = std::shared_ptr<MeasureAreaInfo>;
+class MeasureDistanceInfo;
+using MeasureDistanceInfoPtr = std::shared_ptr<MeasureDistanceInfo>;
+class MeasureLengthInfo;
+using MeasureLengthInfoPtr = std::shared_ptr<MeasureLengthInfo>;
+class MeasurePositionInfo;
+using MeasurePositionInfoPtr = std::shared_ptr<MeasurePositionInfo>;
+class MeasureRadiusInfo;
+using MeasureRadiusInfoPtr = std::shared_ptr<MeasureRadiusInfo>;
+
 
 class PartExport MeasureInfo {
 public:
@@ -114,7 +131,7 @@ public:
 };
 
 //! callback registrations
-    using GeometryHandler = std::function<Part::MeasureInfo* (std::string*, std::string*)>;
+    using GeometryHandler = std::function<Part::MeasureInfoPtr (std::string*, std::string*)>;
     
 class PartExport CallbackRegistrationRecord
 {

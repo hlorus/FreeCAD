@@ -158,7 +158,7 @@ bool MeasureDistance::getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape)
     if (!info->valid) {
         return false;
     }
-    auto distanceInfo = dynamic_cast<Part::MeasureDistanceInfo*>(info);
+    auto distanceInfo = std::dynamic_pointer_cast<Part::MeasureDistanceInfo>(info);
 
     rShape = *distanceInfo->getShape();
     return true;
