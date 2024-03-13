@@ -333,7 +333,7 @@ Measure::MeasureAngle* ViewProviderMeasureAngle::getMeasureAngle()
 }
 
 
-void ViewProviderMeasureAngle::onGuiInit(const Measure::MeasureBase* measureObject) {
+void ViewProviderMeasureAngle::positionAnno(const Measure::MeasureBase* measureObject) {
     (void)measureObject;
     setLabelTranslation(SbVec3f(0, 10, 0));
 }

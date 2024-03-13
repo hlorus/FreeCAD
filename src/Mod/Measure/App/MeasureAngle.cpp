@@ -126,8 +126,6 @@ void MeasureAngle::parseSelection(const App::MeasureSelection& selection) {
     App::DocumentObject* ob2 = doc->getObject(get<0>(selection.at(1)).c_str());
     const std::vector<std::string> elems2 = {get<1>(selection.at(1))};
     Element2.setValue(ob2, elems2);
-
-    initialize();
 }
 
 

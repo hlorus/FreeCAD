@@ -102,7 +102,6 @@ void MeasurePosition::parseSelection(const App::MeasureSelection& selection) {
         Element.setValue(ob, sub);
         break;
     }
-    initialize();
 }
 
 

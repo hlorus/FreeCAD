@@ -142,8 +142,6 @@ void MeasureRadius::parseSelection(const App::MeasureSelection& selection) {
     std::vector<std::string> subElementList { subElement };
 
     Element.setValue(ob, subElementList);
-
-    initialize();
 }
 
 

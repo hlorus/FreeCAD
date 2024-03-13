@@ -50,7 +50,7 @@ public:
 
     Measure::MeasureDistance* getMeasureDistance();
     void redrawAnnotation() override;
-    void onGuiInit(const Measure::MeasureBase* measureObject) override;
+    void positionAnno(const Measure::MeasureBase* measureObject) override;
 
 protected:
     Base::Vector3d getTextDirection(Base::Vector3d elementDirection, double tolerance = defaultTolerance) override;
