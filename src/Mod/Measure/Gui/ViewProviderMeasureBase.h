@@ -76,8 +76,7 @@ public:
     bool isPartOfPhysicalObject() const override {return false;};
     void attach(App::DocumentObject *pcObj) override;
     void updateData(const App::Property* prop) override;
-    virtual void onGuiInit(const Measure::MeasureBase* measureObject);
-    virtual void onGuiUpdate(const Measure::MeasureBase* measureObject);
+    virtual void positionAnno(const Measure::MeasureBase* measureObject);
     void finishRestoring() override;
 
     bool useNewSelectionModel() const override {return true;}
@@ -144,7 +143,7 @@ public:
 
     void attach(App::DocumentObject * feature) override;
     void redrawAnnotation() override;
-    void onGuiInit(const Measure::MeasureBase* measureObject) override;
+    void positionAnno(const Measure::MeasureBase* measureObject) override;
 
 protected:
     void onChanged(const App::Property* prop) override;

@@ -57,7 +57,7 @@ public:
 
     Measure::MeasureAngle* getMeasureAngle();
     void redrawAnnotation() override;
-    void onGuiInit(const Measure::MeasureBase* measureObject) override;
+    void positionAnno(const Measure::MeasureBase* measureObject) override;
 
 private:
     // Fields

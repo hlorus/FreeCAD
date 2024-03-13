@@ -109,9 +109,6 @@ void MeasureBase::parseSelection(const App::MeasureSelection& selection) {
     // Call the parseSelection method of the proxy object
     proxy.callMemberFunction("parseSelection", args);
     
-    // Initialize the measurement
-    initialize();
-    return;
 }
 
 
@@ -164,15 +161,9 @@ QString MeasureBase::getResultString() {
     return QString();
 }
 
-
 void MeasureBase::onDocumentRestored() {
     // Force recompute the measurement
-    initialize();
     recompute();
-}
-
-void MeasureBase::initialize() {
-    signalGuiInit(this);
 }
 
 Base::Placement MeasureBase::getPlacement() {

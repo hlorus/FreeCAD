@@ -54,10 +54,8 @@ public:
     ~MeasureBase() override = default;
 
     App::PropertyPlacement Placement;
-    // App::PropertyPosition Position;
 
-    boost::signals2::signal<void (const MeasureBase*)> signalGuiInit;
-    boost::signals2::signal<void (const MeasureBase*)> signalGuiUpdate;
+    // boost::signals2::signal<void (const MeasureBase*)> signalGuiInit;
 
     //return PyObject as MeasureBasePy
     PyObject *getPyObject() override;
@@ -80,7 +78,6 @@ private:
 
 protected:
     void onDocumentRestored() override;
-    void initialize();
 };
 
 // Create a scriptable object based on MeasureBase
@@ -126,8 +123,6 @@ private:
     inline static HandlerMap _mGeometryHandlers = MeasureBaseExtendable<T>::HandlerMap();
 };
 
-// template <typename T>
-// typename MeasureBaseExtendable<T>::HandlerMap MeasureBaseExtendable<T>::_mGeometryHandlers = MeasureBaseExtendable<T>::HandlerMap();
 
 
 } //namespace Measure

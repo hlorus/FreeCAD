@@ -73,6 +73,7 @@ ViewProviderMeasureBase::ViewProviderMeasureBase()
     ADD_PROPERTY_TYPE(FontSize, (Preferences::defaultFontSize()), agroup, App::Prop_None, "Size of measurement text");
 //NOLINTEND
 
+    // setupAnnoSceneGraph() - sets up the annotation scene graph
     pLabel = new Gui::SoFrameLabel();
     pLabel->ref();
     pColor = new SoBaseColor();
@@ -126,10 +127,6 @@ ViewProviderMeasureBase::ViewProviderMeasureBase()
     pRootSeparator->addChild(pTextSeparator);
     addDisplayMaskMode(pRootSeparator, "Base");
 
-    TextColor.touch();
-    TextBackgroundColor.touch();
-    FontSize.touch();
-    LineColor.touch();
     pRootSeparator->touch();
     pTextSeparator->touch();
     pLineSeparator->touch();
@@ -154,6 +151,14 @@ ViewProviderMeasureBase::ViewProviderMeasureBase()
     dragger->setPart("translatorActive", NULL);
     dragger->setPart("xAxisFeedback", NULL);
     dragger->setPart("yAxisFeedback", NULL);
+    // end setupSceneGraph
+
+    // these touches cause onChanged to run which then updates pLabel and pColor with the initial values
+    TextColor.touch();
+    TextBackgroundColor.touch();
+    FontSize.touch();
+    LineColor.touch();
+
 }
 
 ViewProviderMeasureBase::~ViewProviderMeasureBase()
@@ -186,7 +191,6 @@ void ViewProviderMeasureBase::setDisplayMode(const char* ModeName)
 
 
 void ViewProviderMeasureBase::finishRestoring() {
-
     // Force measurement visibility when loading a document
     show();
 }
@@ -221,11 +225,10 @@ void ViewProviderMeasureBase::setLabelValue(const Base::Quantity& value) {
 }
 
 void ViewProviderMeasureBase::setLabelValue(const QString& value) {
-
     auto lines = value.split(QString::fromLatin1("\n"));
 
     int i = 0;
-    for (auto it : lines) {
+    for (auto& it : lines) {
         pLabel->string.set1Value(i, it.toUtf8().constData());
         i++;
     }
@@ -260,31 +263,15 @@ SoSeparator* ViewProviderMeasureBase::getSoSeparatorText() {
 }
 
 
-void ViewProviderMeasureBase::onGuiInit(const Measure::MeasureBase* measureObject) {
+void ViewProviderMeasureBase::positionAnno(const Measure::MeasureBase* measureObject) {
     (void)measureObject;
-}
-
-//! the App side has requested a redraw
-void ViewProviderMeasureBase::onGuiUpdate(const Measure::MeasureBase* measureObject) {
-    (void) measureObject;
-    updateView();
 }
 
 
 void ViewProviderMeasureBase::attach(App::DocumentObject *pcObj)
 {
     ViewProviderDocumentObject::attach(pcObj);
-
-//NOLINTBEGIN
-    auto bndInit = boost::bind(&ViewProviderMeasureBase::onGuiInit, this, bp::_1);
-    auto bnd = boost::bind(&ViewProviderMeasureBase::onGuiUpdate, this, bp::_1);
-//NOLINTEND
-
-    auto feature = dynamic_cast<Measure::MeasureBase*>(pcObject);
-    if (feature) {
-        feature->signalGuiInit.connect(bndInit);
-        feature->signalGuiUpdate.connect(bnd);
-    }
+//    positionAnno(static_cast<MeasureBase*>(pcObj));
 }
 
 
@@ -321,10 +308,10 @@ void ViewProviderMeasureBase::updateData(const App::Property* prop)
 }
 
 
-// TODO: should this be pure virtual in vpMeasureBase?
+// TODO: should this be pure virtual?
 void ViewProviderMeasureBase::redrawAnnotation()
 {
-//    Base::Console().Message("VPMB::redrawAnnotation()\n");
+   // Base::Console().Message("VPMB::redrawAnnotation()\n");
 }
 
 //! connect to the subject to receive visibility updates
@@ -450,13 +437,17 @@ void ViewProviderMeasureBase::onSubjectVisibilityChanged(const App::DocumentObje
 PROPERTY_SOURCE(MeasureGui::ViewProviderMeasure, MeasureGui::ViewProviderMeasureBase)
 //NOLINTEND
 
-
+//! the general purpose view provider.  handles area, length, etc - any measure without a specialized VP
 ViewProviderMeasure::ViewProviderMeasure()
 {
+    sPixmap = "umf-measurement";
+
+
+    // setupSceneGraph for leader?
     const size_t lineCount(3);
 
     // indexes used to create the edges
-    // this makes a line from verts[0] to verts[1] above
+    // this makes a line from verts[0] to verts[1]
     static const int32_t lines[lineCount] =
     {
         0,1,-1
@@ -497,7 +488,7 @@ ViewProviderMeasure::ViewProviderMeasure()
         pDraggerOrientation->rotation.connectFrom(&cam->orientation);
     }
 
-    sPixmap = "umf-measurement";
+
 }
 
 ViewProviderMeasure::~ViewProviderMeasure()
@@ -506,8 +497,7 @@ ViewProviderMeasure::~ViewProviderMeasure()
     pLines->unref();
 }
 
-
-void ViewProviderMeasure::onGuiInit(const Measure::MeasureBase* measureObject) {
+void ViewProviderMeasure::positionAnno(const Measure::MeasureBase* measureObject) {
     (void)measureObject;
 
     // Initialize the text position
@@ -541,7 +531,7 @@ void ViewProviderMeasure::onChanged(const App::Property* prop)
 void ViewProviderMeasure::attach(App::DocumentObject* pcObject)
 {
     ViewProviderMeasureBase::attach(pcObject);
-
+    positionAnno(static_cast<MeasureBase*>(pcObject));
 }
 
 
@@ -567,17 +557,18 @@ Base::Vector3d ViewProviderMeasure::getBasePosition(){
 
 
 Base::Vector3d ViewProviderMeasure::getTextPosition(){
+    constexpr float DefaultLeaderLength{20.0};
     auto basePoint = getBasePosition();
     Base::Vector3d textDirection(1.0, 1.0, 1.0);
     textDirection.Normalize();
-    double length = 10.0;
 
-    return basePoint + textDirection * length;
+    return basePoint + textDirection * DefaultLeaderLength;
 }
 
 //! called by the system when it is time to display this measure
 void ViewProviderMeasureBase::show()
 {
+    Base::Console().Message("VPMB::show()\n");
     if (isSubjectVisible()) {
         // only show the annotation if the subject is visible.
         // this avoids disconnected annotations floating in space.

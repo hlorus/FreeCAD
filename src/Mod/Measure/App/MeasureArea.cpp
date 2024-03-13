@@ -99,8 +99,6 @@ void MeasureArea::parseSelection(const App::MeasureSelection& selection) {
     }
 
     Elements.setValues(objects, subElements);
-
-    initialize();
 }
 
 

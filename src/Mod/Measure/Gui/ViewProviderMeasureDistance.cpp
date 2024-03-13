@@ -216,7 +216,7 @@ void ViewProviderMeasureDistance::redrawAnnotation()
 }
 
 
-void ViewProviderMeasureDistance::onGuiInit(const Measure::MeasureBase* measureObject) {
+void ViewProviderMeasureDistance::positionAnno(const Measure::MeasureBase* measureObject) {
     (void)measureObject;
     setLabelTranslation(SbVec3f(0, 10, 0));
 }
