@@ -80,10 +80,10 @@
 using namespace MeasureGui;
 using namespace Measure;
 
-gp_Lin* getLine(gp_Vec& vec, gp_Vec& origin) {
+gp_Lin getLine(gp_Vec& vec, gp_Vec& origin) {
     gp_Pnt tempOrigin;
     tempOrigin.SetXYZ(origin.XYZ());
-    return new gp_Lin(tempOrigin, gp_Dir(vec));
+    return gp_Lin(tempOrigin, gp_Dir(vec));
 }
 
 SbMatrix ViewProviderMeasureAngle::getMatrix() {
@@ -114,8 +114,8 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
         return SbMatrix();
     }
 
-    gp_Lin lin1 = *getLine(vector1, loc1);
-    gp_Lin lin2 = *getLine(vector2, loc2);
+    gp_Lin lin1 = getLine(vector1, loc1);
+    gp_Lin lin2 = getLine(vector2, loc2);
 
     SbMatrix dimSys = SbMatrix();
     double radius;
