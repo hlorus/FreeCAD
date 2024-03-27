@@ -398,11 +398,11 @@ bool ViewProviderMeasureBase::isSubjectVisible()
     // we need these things to proceed
     if (!getMeasureObject() ||
         getMeasureObject()->getSubject().empty() ||
-        !Gui::Application::Instance->getDocument(getMeasureObject()->getDocument()) ) {
+        !this->getDocument() ) {
         return false;
     }
 
-    auto guiDoc = Gui::Application::Instance->getDocument(getMeasureObject()->getDocument());
+    Gui::Document* guiDoc = this->getDocument();
     for (auto & obj : getMeasureObject()->getSubject()) {
         Gui::ViewProvider* vp = guiDoc->getViewProvider(obj);
         if (!vp || !vp->isVisible()) {
