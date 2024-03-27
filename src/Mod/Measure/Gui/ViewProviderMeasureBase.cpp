@@ -507,8 +507,8 @@ void ViewProviderMeasure::positionAnno(const Measure::MeasureBase* measureObject
     auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
     Gui::View3DInventorViewer* viewer = view->getViewer();
     auto gma = SoGetMatrixAction(viewer->getSoRenderManager()->getViewportRegion());
-    gma->apply(pDraggerOrientation);
-    auto mat = gma->getMatrix();
+    gma.apply(pDraggerOrientation);
+    auto mat = gma.getMatrix();
     SbVec3f destVec(0, 0, 0);
     mat.multVecMatrix(srcVec, destVec);
 
