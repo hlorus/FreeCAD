@@ -76,7 +76,6 @@
 #include "SelectionObject.h"
 #include "SoAxisCrossKit.h"
 #include "SoFCOffscreenRenderer.h"
-#include "SoFCUnifiedSelection.h"
 #include "TaskMeasure.h"
 #include "TextureMapping.h"
 #include "Tools.h"
