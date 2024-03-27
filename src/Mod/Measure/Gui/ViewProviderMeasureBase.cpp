@@ -369,7 +369,7 @@ Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementD
     // assume we are looking from the front).
     Base::Vector3d viewDirection;
     Base::Vector3d upDirection;
-    auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
+    auto view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
     if (view) {
         Gui::View3DInventorViewer* viewer = view->getViewer();
         viewDirection = toVector3d(viewer->getViewDirection()).Normalize();
@@ -479,9 +479,9 @@ ViewProviderMeasure::ViewProviderMeasure()
     lineSep->addChild(points);
 
     // Connect dragger local orientation to view orientation
-    auto vp = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
-    if (vp) {
-        Gui::View3DInventorViewer* viewer = vp->getViewer();
+    auto view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+    if (view) {
+        Gui::View3DInventorViewer* viewer = view->getViewer();
         auto renderManager = viewer->getSoRenderManager();
         auto cam = renderManager->getCamera();
         pDraggerOrientation->rotation.connectFrom(&cam->orientation);
@@ -503,8 +503,13 @@ void ViewProviderMeasure::positionAnno(const Measure::MeasureBase* measureObject
     Base::Vector3d textPos = getTextPosition();
     auto srcVec = SbVec3f(textPos.x, textPos.y, textPos.z);
 
-    // Translate the position by the local dragger matrix (pDraggerOrientation) 
-    auto view = dynamic_cast<Gui::View3DInventor*>(Gui::Application::Instance->activeDocument()->getActiveView());
+    // Translate the position by the local dragger matrix (pDraggerOrientation)
+    auto view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+
+    if(!view){
+        return;
+    }
+
     Gui::View3DInventorViewer* viewer = view->getViewer();
     auto gma = SoGetMatrixAction(viewer->getSoRenderManager()->getViewportRegion());
     gma.apply(pDraggerOrientation);
