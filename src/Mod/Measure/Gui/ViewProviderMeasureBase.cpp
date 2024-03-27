@@ -24,9 +24,6 @@
 #include "PreCompiled.h"
 
 #ifndef _PreComp_
-# include <boost_signals2.hpp>
-# include <boost/signals2/connection.hpp>
-
 # include <Inventor/actions/SoGetMatrixAction.h>
 # include <Inventor/nodes/SoAnnotation.h>
 # include <Inventor/nodes/SoBaseColor.h>
@@ -56,7 +53,6 @@
 
 using namespace MeasureGui;
 using namespace Measure;
-namespace bp = boost::placeholders;
 
 //NOLINTBEGIN
 PROPERTY_SOURCE(MeasureGui::ViewProviderMeasureBase, Gui::ViewProviderDocumentObject)
@@ -321,7 +317,7 @@ void ViewProviderMeasureBase::connectToSubject(App::DocumentObject* subject)
     }
 
     //NOLINTBEGIN
-    auto bndVisibility = boost::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, bp::_1, bp::_2);
+    auto bndVisibility = std::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, std::placeholders::_1, std::placeholders::_2);
     //NOLINTEND
     subject->signalChanged.connect(bndVisibility);
 }
@@ -334,7 +330,7 @@ void ViewProviderMeasureBase::connectToSubject(std::vector<App::DocumentObject*>
     }
 
     //NOLINTBEGIN
-    auto bndVisibility = boost::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, bp::_1, bp::_2);
+    auto bndVisibility = std::bind(&ViewProviderMeasureBase::onSubjectVisibilityChanged, this, std::placeholders::_1, std::placeholders::_2);
     //NOLINTEND
 
     // TODO: should we connect to all the subject objects when there is >1?
