@@ -68,7 +68,7 @@ bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection){
         
         const std::string& subName = get<1>(element);
         const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = ob->getClassTypeId().getModuleName(className);
+        std::string mod = Base::Type::getModuleName(className);
 
         if (!hasGeometryHandler(mod)) {
             return false;
@@ -131,7 +131,7 @@ void MeasureAngle::parseSelection(const App::MeasureSelection& selection) {
 
 bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut) {
     const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
-    std::string mod = ob.getClassTypeId().getModuleName(className);
+    std::string mod = Base::Type::getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {
         return false;
@@ -148,7 +148,7 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
 
 Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subName) {
     const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
-    std::string mod = ob.getClassTypeId().getModuleName(className);
+    std::string mod = Base::Type::getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {
         return Base::Vector3d();

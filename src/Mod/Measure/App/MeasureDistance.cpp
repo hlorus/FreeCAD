@@ -73,7 +73,7 @@ bool MeasureDistance::isValidSelection(const App::MeasureSelection& selection){
         
         const std::string& subName = get<1>(element);
         const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = ob->getClassTypeId().getModuleName(className);
+        std::string mod = Base::Type::getModuleName(className);
 
         if (!hasGeometryHandler(mod)) {
             return false;
@@ -143,7 +143,6 @@ bool MeasureDistance::getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape)
     std::string subName = subs.at(0);
     const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
     std::string mod = Base::Type::getModuleName(className);
-    // std::string mod = ob->getClassTypeId().getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {
         return false;

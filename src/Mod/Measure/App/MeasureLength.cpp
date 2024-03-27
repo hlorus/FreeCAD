@@ -65,7 +65,7 @@ bool MeasureLength::isValidSelection(const App::MeasureSelection& selection){
         
         const std::string& subName = get<1>(element);
         const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = ob->getClassTypeId().getModuleName(className);
+        std::string mod = Base::Type::getModuleName(className);
 
         if (!hasGeometryHandler(mod)) {
             return false;
@@ -124,7 +124,7 @@ void MeasureLength::recalculateLength()
 
         // Get the Geometry handler based on the module
         const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
-        const std::string& mod = object->getClassTypeId().getModuleName(className);
+        const std::string& mod = Base::Type::getModuleName(className);
         auto handler = getGeometryHandler(mod);
         if (!handler) {
             throw Base::RuntimeError("No geometry handler available for submitted element type");
@@ -164,7 +164,7 @@ Base::Placement MeasureLength::getPlacement() {
     App::DocumentObject* object = objects.front();
     std::string subElement = subElements.front();
     const char* className = object->getSubObject(subElement.c_str())->getTypeId().getName();
-    const std::string& mod = object->getClassTypeId().getModuleName(className);
+    const std::string& mod = Base::Type::getModuleName(className);
 
     auto handler = getGeometryHandler(mod);
     if (!handler) {
