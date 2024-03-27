@@ -123,7 +123,7 @@ bool canAnnotate(Measure::MeasureBase* obj) {
 
     auto vpName = obj->getViewProviderName();
     // if there is not a vp, return false
-    if ((vpName == NULL) || (vpName[0] == '\0')){
+    if ((vpName == nullptr) || (vpName[0] == '\0')){
         return false;
     }
 
