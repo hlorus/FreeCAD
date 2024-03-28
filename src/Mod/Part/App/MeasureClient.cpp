@@ -1,5 +1,7 @@
 /***************************************************************************
  *   Copyright (c) 2023 Wandererfan <wandererfan@gmail.com>                *
+ *   Copyright (c) 2023 Joel Meijering (EDG5000) <joel@meijering.email>    *
+ *   Copyright (c) 2023 David Friedli <david@friedli-be.ch>                *
  *                                                                         *
  *   This file is part of FreeCAD.                                         *
  *                                                                         *
