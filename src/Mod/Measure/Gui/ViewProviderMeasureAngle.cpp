@@ -259,7 +259,6 @@ ViewProviderMeasureAngle::ViewProviderMeasureAngle()
     coordinates->point.connectFrom(&arcEngine->points);
 
     SoLineSet *lineSet = new SoLineSet();
-    lineSet->ref();
     lineSet->vertexProperty.setValue(coordinates);
     lineSet->numVertices.connectFrom(&arcEngine->pointCount);
     lineSet->startIndex.setValue(0);
@@ -292,7 +291,6 @@ ViewProviderMeasureAngle::ViewProviderMeasureAngle()
     coordinatesSecondary->point.connectFrom(&transformEngine->point);
     
     SoLineSet *lineSetSecondary = new SoLineSet();
-    lineSetSecondary->ref();
     lineSetSecondary->vertexProperty.setValue(coordinatesSecondary);
     lineSetSecondary->numVertices.connectFrom(&arcEngineSecondary->pointCount);
     lineSetSecondary->startIndex.setValue(0);
