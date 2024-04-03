@@ -365,7 +365,14 @@ Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementD
     // assume we are looking from the front).
     Base::Vector3d viewDirection;
     Base::Vector3d upDirection;
-    auto view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+
+Gui::View3DInventor* view = nullptr;
+    try {
+        view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+    } catch (const Base::RuntimeError& e) {
+        Base::Console().Log("ViewProviderMeasureBase::getTextDirection: Could not get active view\n");
+    }
+
     if (view) {
         Gui::View3DInventorViewer* viewer = view->getViewer();
         viewDirection = toVector3d(viewer->getViewDirection()).Normalize();
@@ -391,14 +398,21 @@ Base::Vector3d ViewProviderMeasureBase::getTextDirection(Base::Vector3d elementD
 //! all of the subjects must be visible.
 bool ViewProviderMeasureBase::isSubjectVisible()
 {
-    // we need these things to proceed
-    if (!getMeasureObject() ||
-        getMeasureObject()->getSubject().empty() ||
-        !this->getDocument() ) {
+    Gui::Document* guiDoc = nullptr;
+    try {
+        guiDoc = this->getDocument();
+    } catch (const Base::RuntimeError& e) {
+        Base::Console().Log("ViewProviderMeasureBase::isSubjectVisible: Could not get document\n");
         return false;
     }
 
-    Gui::Document* guiDoc = this->getDocument();
+    // we need these things to proceed
+    if (!getMeasureObject() ||
+        getMeasureObject()->getSubject().empty() ||
+        !guiDoc ) {
+        return false;
+    }
+
     for (auto & obj : getMeasureObject()->getSubject()) {
         Gui::ViewProvider* vp = guiDoc->getViewProvider(obj);
         if (!vp || !vp->isVisible()) {
@@ -475,7 +489,13 @@ ViewProviderMeasure::ViewProviderMeasure()
     lineSep->addChild(points);
 
     // Connect dragger local orientation to view orientation
-    auto view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+    Gui::View3DInventor* view = nullptr;
+    try {
+        view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+    } catch (const Base::RuntimeError& e) {
+        Base::Console().Log("ViewProviderMeasure::ViewProviderMeasure: Could not get active view\n");
+    }
+
     if (view) {
         Gui::View3DInventorViewer* viewer = view->getViewer();
         auto renderManager = viewer->getSoRenderManager();
@@ -500,7 +520,12 @@ void ViewProviderMeasure::positionAnno(const Measure::MeasureBase* measureObject
     auto srcVec = SbVec3f(textPos.x, textPos.y, textPos.z);
 
     // Translate the position by the local dragger matrix (pDraggerOrientation)
-    auto view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+    Gui::View3DInventor* view = nullptr;
+    try {
+        view = dynamic_cast<Gui::View3DInventor*>(this->getActiveView());
+    } catch (const Base::RuntimeError& e) {
+        Base::Console().Log("ViewProviderMeasure::positionAnno: Could not get active view\n");
+    }
 
     if(!view){
         return;
