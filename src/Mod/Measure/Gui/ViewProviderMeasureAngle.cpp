@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright (c) 2023 David Friedli <david[at]friedli-be.ch>             *
+ *   Copyright (c) 2013 Thomas Anderson <blobfish[at]gmx.com>              *
  *                                                                         *
  *   This file is part of FreeCAD.                                         *
  *                                                                         *
