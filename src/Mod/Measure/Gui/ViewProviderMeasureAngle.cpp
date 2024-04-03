@@ -173,9 +173,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
         dimSys = dimSys.transpose();
 
         radius = midPointProjection.Magnitude();
-        }
-        else
-        {
+    } else {
         Handle(Geom_Curve) heapLine1 = new Geom_Line(lin1);
         Handle(Geom_Curve) heapLine2 = new Geom_Line(lin2);
 
