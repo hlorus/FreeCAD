@@ -90,8 +90,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
     // Code ported from src/Mod/Part/Gui/TaskDimension.cpp
 
     if (pcObject == nullptr) {
-        Base::Console().Message(" no DocumentObject\n");
-        return SbMatrix();
+        throw Base::RuntimeError("no DocumentObject");
     }
 
     Measure::MeasureAngle* measurement = static_cast<Measure::MeasureAngle*>(pcObject);
@@ -128,8 +127,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
         GeomAPI_ProjectPointOnCurve projection(tempPoint, heapLine2);
         if (projection.NbPoints() < 1)
         {
-            Base::Console().Message("parallel vectors: couldn't project onto line\n");
-            return dimSys;
+            throw Base::RuntimeError("parallel vectors: couldn't project onto line");
         }
         gp_Vec newPoint2;
         newPoint2.SetXYZ(projection.Point(1).XYZ());
@@ -182,8 +180,7 @@ SbMatrix ViewProviderMeasureAngle::getMatrix() {
 
         if (extrema.NbExtrema() < 1)
         {
-            Base::Console().Message("couldn't get extrema\n");
-            return dimSys;
+            throw Base::RuntimeError("couldn't get extrema");
         }
 
         gp_Pnt extremaPoint1, extremaPoint2, dimensionOriginPoint;
@@ -312,8 +309,14 @@ void ViewProviderMeasureAngle::redrawAnnotation()
     this->fieldAngle =  angleDeg * radiansPerDegree;
 
     // Set matrix
-    SbMatrix matrix = getMatrix();
-    pcTransform->setMatrix(matrix);
+    try {
+        SbMatrix matrix = getMatrix();
+        pcTransform->setMatrix(matrix);
+    
+    } catch (const Base::Exception& e) {
+        Base::Console().Error("Error in ViewProviderMeasureAngle::redrawAnnotation: %s\n", e.what());
+        return;
+    }
 
     // Set Label
     setLabelValue(static_cast<Measure::MeasureBase*>(pcObject)->getResultString());
