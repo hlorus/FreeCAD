@@ -64,9 +64,7 @@ void DlgPrefsMeasureAppearanceImp::loadSettings()
 void DlgPrefsMeasureAppearanceImp::changeEvent(QEvent *e)
 {
     if (e->type() == QEvent::LanguageChange) {
-        saveSettings();
         ui->retranslateUi(this);
-        loadSettings();
     }
     else {
         QWidget::changeEvent(e);
