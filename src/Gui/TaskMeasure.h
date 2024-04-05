@@ -44,13 +44,13 @@ public:
 
     void modifyStandardButtons(QDialogButtonBox* box) override;
     QDialogButtonBox::StandardButtons getStandardButtons() const override {
-        return QDialogButtonBox::Ok | QDialogButtonBox::Abort | QDialogButtonBox::Reset;
+        return QDialogButtonBox::Apply | QDialogButtonBox::Abort | QDialogButtonBox::Reset;
     }
 
     void invoke();
     void update();
     void close();
-    bool accept() override;
+    bool apply();
     bool reject() override;
     void reset();
 
@@ -58,9 +58,6 @@ public:
     void clearSelection();
     bool eventFilter(QObject* obj, QEvent* event) override;
     void setMeasureObject(Measure::MeasureBase* obj);
-
-protected:
-
 
 private:
     QColumnView* dialog{nullptr};

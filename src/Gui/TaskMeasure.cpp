@@ -103,9 +103,10 @@ TaskMeasure::~TaskMeasure(){
 
 void TaskMeasure::modifyStandardButtons(QDialogButtonBox* box) {
 
-    QPushButton* btn = box->button(QDialogButtonBox::Ok);
+    QPushButton* btn = box->button(QDialogButtonBox::Apply);
     btn->setText(tr("Annotate"));
     btn->setToolTip(tr("Press the Annotate button to add measurement to the document."));
+    connect(btn, &QPushButton::released, this, &TaskMeasure::apply);
 
     // Disable button by default
     btn->setEnabled(false);
@@ -139,7 +140,7 @@ void TaskMeasure::enableAnnotateButton(bool state) {
         return;
     }
     // Enable/Disable annotate button
-    auto btn = this->buttonBox->button(QDialogButtonBox::Ok);
+    auto btn = this->buttonBox->button(QDialogButtonBox::Apply);
     btn->setEnabled(state);
 }
 
@@ -265,12 +266,14 @@ void TaskMeasure::invoke() {
     update();
 }
 
-bool TaskMeasure::accept(){
+bool TaskMeasure::apply(){
     ensureGroup(_mMeasureObject);
-    close();
+    _mMeasureObject = nullptr;
+    reset();
 
     // Commit transaction
     App::GetApplication().closeActiveTransaction();
+    App::GetApplication().setActiveTransaction("Add Measurement");
     return false;
 }
 
@@ -343,7 +346,7 @@ bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {
         }
 
         if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
-            this->accept();
+            this->apply();
             return true;
         }
     }
