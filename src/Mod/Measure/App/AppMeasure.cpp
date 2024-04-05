@@ -22,6 +22,7 @@
 
 #include "PreCompiled.h"
 
+#include <App/MeasureManager.h>
 #include <Base/Console.h>
 #include <Base/Interpreter.h>
 
@@ -102,16 +103,15 @@ PyMOD_INIT_FUNC(Measure)
     Measure::MeasureRadius          ::init();
 
     // Add fundamental umf Measure Types
-    App::Application& app = App::GetApplication();
 
-    app.addMeasureType("DISTANCE",
+    App::MeasureManager::addMeasureType("DISTANCE",
                        "Distance",
                        "Measure::MeasureDistance",
                        MeasureDistance::isValidSelection,
                        MeasureDistance::isPrioritizedSelection
         );
 
-    app.addMeasureType(
+    App::MeasureManager::addMeasureType(
             "ANGLE",
             "Angle",
             "Measure::MeasureAngle",
@@ -119,7 +119,7 @@ PyMOD_INIT_FUNC(Measure)
             MeasureAngle::isPrioritizedSelection
         );
         
-    app.addMeasureType(
+    App::MeasureManager::addMeasureType(
             "LENGTH",
             "Length",
             "Measure::MeasureLength",
@@ -127,7 +127,7 @@ PyMOD_INIT_FUNC(Measure)
             nullptr
         );
 
-    app.addMeasureType(
+    App::MeasureManager::addMeasureType(
             "POSITION",
             "Position",
             "Measure::MeasurePosition",
@@ -135,7 +135,7 @@ PyMOD_INIT_FUNC(Measure)
             nullptr
         );
 
-    app.addMeasureType(
+    App::MeasureManager::addMeasureType(
             "AREA",
             "Area",
             "Measure::MeasureArea",
@@ -143,7 +143,7 @@ PyMOD_INIT_FUNC(Measure)
             nullptr
         );
         
-    app.addMeasureType(
+    App::MeasureManager::addMeasureType(
             "RADIUS",
             "Radius",
             "Measure::MeasureRadius",

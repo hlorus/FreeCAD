@@ -46,6 +46,7 @@
 #include <App/Application.h>
 #include <App/Document.h>
 #include <App/DocumentObject.h>
+#include <App/MeasureManager.h>
 #include <Base/Console.h>
 #include <Base/Matrix.h>
 #include <Base/Rotation.h>
@@ -419,9 +420,7 @@ MeasureDistanceInfoPtr MeasureDistanceHandler(std::string* objectName, std::stri
 
 
 void Part::MeasureClient::initialize() {
-
-    App::Application& app = App::GetApplication();
-    app.addMeasureHandler("Part", PartMeasureTypeCb);
+    App::MeasureManager::addMeasureHandler("Part", PartMeasureTypeCb);
 
 }
 

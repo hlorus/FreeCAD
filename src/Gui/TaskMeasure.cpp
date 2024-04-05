@@ -54,7 +54,7 @@ TaskMeasure::TaskMeasure()
     modeSwitch = new QComboBox();
     modeSwitch->addItem(QString::fromLatin1("Auto"));
 
-    for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()){
+    for (App::MeasureType* mType : App::MeasureManager::getMeasureTypes()){
         modeSwitch->addItem(QString::fromLatin1(mType->label.c_str()));
     }
 
@@ -162,7 +162,7 @@ void TaskMeasure::update() {
     std::string mode = explicitMode ? modeSwitch->currentText().toStdString() : "";
 
 
-    auto measureTypes = App::GetApplication().getValidMeasureTypes(selection, mode);
+    auto measureTypes = App::MeasureManager::getValidMeasureTypes(selection, mode);
     if (measureTypes.size() > 0) {
         measureType = measureTypes.front();
     }
@@ -283,7 +283,7 @@ void TaskMeasure::reset() {
 
 void TaskMeasure::addElement(const char* mod, const char* objectName, const char* subName) {
 
-    if (!App::GetApplication().hasMeasureHandler(mod)) {
+    if (!App::MeasureManager::hasMeasureHandler(mod)) {
         Base::Console().Message("No measure handler available for geometry of module: %s\n", mod);
         return;
     }
@@ -400,7 +400,7 @@ void TaskMeasure::setModeSilent(App::MeasureType* mode) {
 
 // Get explicitly set measure type from the mode switch
 App::MeasureType* TaskMeasure::getMeasureType() {
-    for (App::MeasureType* mType : App::GetApplication().getMeasureTypes()) {
+    for (App::MeasureType* mType : App::MeasureManager::getMeasureTypes()) {
         if (mType->label.c_str() == modeSwitch->currentText().toLatin1()) {
             return mType;
         }

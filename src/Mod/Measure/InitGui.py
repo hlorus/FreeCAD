@@ -35,7 +35,7 @@ Measure.makeMeasureCOM = makeMeasureCOM
 
 # Register python measure types
 import FreeCAD
-FreeCAD.addMeasureType(
+FreeCAD.MeasureManager.addMeasureType(
         "CENTEROFMASS",
         "Center of Mass",
         MeasureCOM,

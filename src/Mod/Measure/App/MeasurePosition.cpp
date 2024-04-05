@@ -24,6 +24,7 @@
 
 #include <App/PropertyContainer.h>
 #include <App/Application.h>
+#include <App/MeasureManager.h>
 #include <App/Document.h>
 
 #include "MeasurePosition.h"
@@ -70,7 +71,7 @@ bool MeasurePosition::isValidSelection(const App::MeasureSelection& selection){
             return false;
         }
 
-        App::MeasureHandler handler = App::GetApplication().getMeasureHandler(mod.c_str());
+        App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
         App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
 
         if (type == App::MeasureElementType::INVALID) {

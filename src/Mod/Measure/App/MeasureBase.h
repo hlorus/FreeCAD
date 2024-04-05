@@ -28,8 +28,8 @@
 #include <memory>
 #include <QString>
 
-#include <App/Application.h>
 #include <App/DocumentObject.h>
+#include <App/MeasureManager.h>
 #include <App/PropertyStandard.h>
 #include <App/PropertyUnits.h>
 #include <App/FeaturePython.h>

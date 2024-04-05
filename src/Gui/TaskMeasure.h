@@ -26,6 +26,7 @@
 #include <QLineEdit>
 
 #include <App/Application.h>
+#include <App/MeasureManager.h>
 
 #include <Mod/Measure/App/MeasureBase.h>
 

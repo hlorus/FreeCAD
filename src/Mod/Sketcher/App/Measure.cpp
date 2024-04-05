@@ -25,14 +25,14 @@
 #include "PreCompiled.h"
 
 #include <App/Application.h>
+#include <App/MeasureManager.h>
 #include "Base/Console.h"
 #include "Measure.h"
 
 
 void Sketcher::Measure::initialize()
 {
-    App::Application& app = App::GetApplication();
-    const App::MeasureHandler& handler = app.getMeasureHandler("Part");
+    const App::MeasureHandler& handler = App::MeasureManager::getMeasureHandler("Part");
 
-    app.addMeasureHandler("Sketcher", handler.typeCb);
+    App::MeasureManager::addMeasureHandler("Sketcher", handler.typeCb);
 }
