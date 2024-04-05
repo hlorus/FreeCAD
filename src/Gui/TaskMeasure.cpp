@@ -83,6 +83,9 @@ TaskMeasure::TaskMeasure()
     // engage the selectionObserver
     attachSelection();
 
+    // Set selection style
+    Gui::Selection().setSelectionStyle(Gui::SelectionSingleton::SelectionStyle::GreedySelection);
+
     if(!App::GetApplication().getActiveTransaction())
         App::GetApplication().setActiveTransaction("Add Measurement");
 
@@ -92,6 +95,7 @@ TaskMeasure::TaskMeasure()
 }
 
 TaskMeasure::~TaskMeasure(){
+    Gui::Selection().setSelectionStyle(Gui::SelectionSingleton::SelectionStyle::NormalSelection);
     detachSelection();
     qApp->removeEventFilter(this);
 }
@@ -145,15 +149,21 @@ void TaskMeasure::setMeasureObject(Measure::MeasureBase* obj) {
 
 
 void TaskMeasure::update() {
-    valueResult->setText(QString::asprintf("-"));
 
-    // Report selection stack
-    Base::Console().Message("Selection: ");
-    for (std::tuple<std::string, std::string> elem : selection) {
-        Base::Console().Message("%s ", std::get<1>(elem));
+    // Reset selection if the selected object is not valid
+    for(auto sel : Gui::Selection().getSelection()) {
+        App::DocumentObject* ob = sel.pObject;
+        App::DocumentObject* sub = ob->getSubObject(sel.SubName);
+        std::string mod = Base::Type::getModuleName(sub->getTypeId().getName());
+
+        if (!App::MeasureManager::hasMeasureHandler(mod.c_str())) {
+            Base::Console().Message("No measure handler available for geometry of module: %s\n", mod);
+            clearSelection();
+            return;
+        }
     }
-    Base::Console().Message("\n");
 
+    valueResult->setText(QString::asprintf("-"));
 
     // Get valid measure type
     App::MeasureType *measureType(nullptr);
@@ -161,6 +171,10 @@ void TaskMeasure::update() {
 
     std::string mode = explicitMode ? modeSwitch->currentText().toStdString() : "";
 
+    App::MeasureSelection selection;
+    for (auto s : Gui::Selection().getSelection()) {
+        selection.emplace_back(s.pObject->getNameInDocument(), s.SubName); // Or use FeatName?
+    }
 
     auto measureTypes = App::MeasureManager::getValidMeasureTypes(selection, mode);
     if (measureTypes.size() > 0) {
@@ -248,7 +262,7 @@ void ensureGroup(Measure::MeasureBase* measurement) {
 
 // Runs after the dialog is created
 void TaskMeasure::invoke() {
-    gatherSelection();
+    update();
 }
 
 bool TaskMeasure::accept(){
@@ -281,38 +295,6 @@ void TaskMeasure::reset() {
 }
 
 
-void TaskMeasure::addElement(const char* mod, const char* objectName, const char* subName) {
-
-    if (!App::MeasureManager::hasMeasureHandler(mod)) {
-        Base::Console().Message("No measure handler available for geometry of module: %s\n", mod);
-        return;
-    }
-
-    selection.emplace_back(std::make_tuple((std::string)objectName, (std::string)subName));
-    update();
-}
-
-void TaskMeasure::gatherSelection() {
-    // Fills the selection stack from the global selection and triggers an update
-
-    if (!Gui::Selection().hasSelection()) {
-        return;
-    }
-
-    App::Document* doc = App::GetApplication().getActiveDocument();
-
-    for (auto sel : Gui::Selection().getSelection()) {
-        const char* objectName = sel.pObject->getNameInDocument();
-        App::DocumentObject* ob = doc->getObject(objectName);
-        auto sub = ob->getSubObject(sel.SubName);
-        std::string mod = Base::Type::getModuleName(sub->getTypeId().getName());
-
-        selection.emplace_back(objectName, sel.SubName);
-    }
-
-    update();
-}
-
 void TaskMeasure::removeObject() {
     if (_mMeasureObject == nullptr) {
         return;
@@ -325,35 +307,23 @@ void TaskMeasure::removeObject() {
 }
 
 bool TaskMeasure::hasSelection(){
-    return !selection.empty();
+    return !Gui::Selection().getSelection().empty();
 }
 
 void TaskMeasure::clearSelection(){
-    selection.clear();
+    Gui::Selection().clearSelection();
 }
 
 void TaskMeasure::onSelectionChanged(const Gui::SelectionChanges& msg)
 {
-
+    // Skip non-relevant events
     if (msg.Type != SelectionChanges::AddSelection && msg.Type != SelectionChanges::RmvSelection
         && msg.Type != SelectionChanges::SetSelection && msg.Type != SelectionChanges::ClrSelection) {
 
         return;
         }
 
-
-    // Add Element 
-    if (msg.Type == SelectionChanges::AddSelection || msg.Type == SelectionChanges::SetSelection) {
-
-        App::Document* doc = App::GetApplication().getActiveDocument();
-        App::DocumentObject* ob = doc->getObject(msg.pObjectName);
-        App::DocumentObject* sub = ob->getSubObject(msg.pSubName);
-        std::string mod = Base::Type::getModuleName(sub->getTypeId().getName());
-
-        addElement(mod.c_str(), msg.pObjectName, msg.pSubName);
-    }
-
-    // TODO: should there be an update here to reflect the new selection??
+    update();
 }
 
 bool TaskMeasure::eventFilter(QObject* obj, QEvent* event) {

@@ -54,10 +54,8 @@ public:
     bool reject() override;
     void reset();
 
-    void addElement(const char* mod, const char* obName, const char* subName);
     bool hasSelection();
     void clearSelection();
-    void gatherSelection();
     bool eventFilter(QObject* obj, QEvent* event) override;
     void setMeasureObject(Measure::MeasureBase* obj);
 
