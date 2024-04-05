@@ -74,7 +74,7 @@ struct MeasureHandler {
 };
 
 
-class MeasureManager {
+class AppExport MeasureManager {
 public:
     MeasureManager();
 
