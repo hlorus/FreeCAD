@@ -127,8 +127,8 @@ void MeasurePosition::recalculatePosition()
         throw Base::RuntimeError("No geometry handler available for submitted element type");
     }
 
-    std::string obName = object->getNameInDocument();
-    auto info = handler(&obName, &subElement);
+    App::SubObjectT subject{object, subElement.c_str()};
+    auto info = handler(subject);
     auto positionInfo = std::dynamic_pointer_cast<Part::MeasurePositionInfo>(info);
     Position.setValue(positionInfo->position);
 }

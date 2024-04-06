@@ -128,8 +128,8 @@ void MeasureArea::recalculateArea()
             throw Base::RuntimeError("No geometry handler available for submitted element type");
         }
 
-        std::string obName = object->getNameInDocument();
-        auto info = handler(&obName, &subElement);
+        App::SubObjectT subject{object, subElement.c_str()};
+        auto info = handler(subject);
         auto areaInfo = std::dynamic_pointer_cast<Part::MeasureAreaInfo>(info);
         result += areaInfo->area;
     }
@@ -169,8 +169,8 @@ Base::Placement MeasureArea::getPlacement() {
         throw Base::RuntimeError("No geometry handler available for submitted element type");
     }
 
-    std::string obName = object->getNameInDocument();
-    auto info = handler(&obName, &subElement);
+    App::SubObjectT subject{object, subElement.c_str()};
+    auto info = handler(subject);
     auto areaInfo = std::dynamic_pointer_cast<Part::MeasureAreaInfo>(info);
     return areaInfo->placement;
 }

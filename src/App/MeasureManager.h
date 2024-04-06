@@ -30,6 +30,8 @@
 #include <string>
 #include <Python.h>
 
+#include <FCGlobal.h>
+
 namespace App {
 
 // Add your class methods and member variables here

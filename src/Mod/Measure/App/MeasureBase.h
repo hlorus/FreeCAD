@@ -30,6 +30,7 @@
 
 #include <App/DocumentObject.h>
 #include <App/MeasureManager.h>
+#include <App/DocumentObserver.h>
 #include <App/PropertyStandard.h>
 #include <App/PropertyUnits.h>
 #include <App/FeaturePython.h>
@@ -86,7 +87,7 @@ template <typename T>
 class MeasureExport MeasureBaseExtendable : public MeasureBase
 {
 
-    using GeometryHandler = std::function<Part::MeasureInfoPtr (std::string*, std::string*)>;
+    using GeometryHandler = std::function<Part::MeasureInfoPtr (const App::SubObjectT&)>;
     using HandlerMap = std::map<std::string, GeometryHandler>;
 
 

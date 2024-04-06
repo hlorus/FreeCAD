@@ -54,11 +54,12 @@ MeasureAngle::MeasureAngle()
 MeasureAngle::~MeasureAngle() = default;
 
 
-bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection){
-
+bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection)
+{
     if (selection.size() != 2) {
         return false;
     }
+
 
     App::Document* doc = App::GetApplication().getActiveDocument();
 
@@ -81,14 +82,17 @@ bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection){
             return false;
         }
 
-        if (!(type == App::MeasureElementType::LINE || type == App::MeasureElementType::PLANE)) {
+        if (!(type == App::MeasureElementType::LINE ||
+              type == App::MeasureElementType::PLANE ||
+              type == App::MeasureElementType::LINESEGMENT)) {
             return false;
         }
     }
     return true;
 }
 
-bool MeasureAngle::isPrioritizedSelection(const App::MeasureSelection& selection) {
+bool MeasureAngle::isPrioritizedSelection(const App::MeasureSelection& selection)
+{
     if (selection.size() != 2) {
         return false;
     }
@@ -138,15 +142,16 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
     }
 
     auto handler = getGeometryHandler(mod);
+    App::SubObjectT subject{&ob, subName.c_str()};
+    auto info = handler(subject);
 
-    std::string obName = static_cast<std::string>(ob.getNameInDocument());
-    auto info = handler(&obName, &subName);
     auto angleInfo = std::dynamic_pointer_cast<Part::MeasureAngleInfo>(info);
     vecOut = angleInfo->orientation;
     return true;
 }
 
-Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subName) {
+Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subName)
+{
     const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
     std::string mod = Base::Type::getModuleName(className);
 
@@ -155,8 +160,8 @@ Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subNam
     }
 
     auto handler = getGeometryHandler(mod);
-    std::string obName = static_cast<std::string>(ob.getNameInDocument());
-    auto info = handler(&obName, &subName);
+    App::SubObjectT subject{&ob, subName.c_str()};
+    auto info = handler(subject);
     auto angleInfo = std::dynamic_pointer_cast<Part::MeasureAngleInfo>(info);
     return angleInfo->position;
 }
@@ -166,8 +171,8 @@ gp_Vec MeasureAngle::vector1() {
     App::DocumentObject* ob = Element1.getValue();
     std::vector<std::string> subs = Element1.getSubValues();
 
-    if (!ob || !ob->isValid() || subs.size() < 1 ) {
-        return gp_Vec();
+    if (!ob || !ob->isValid() || subs.empty() ) {
+        return {};
     }
 
     Base::Vector3d vec;
@@ -179,7 +184,7 @@ gp_Vec MeasureAngle::vector2() {
     App::DocumentObject* ob = Element2.getValue();
     std::vector<std::string> subs = Element2.getSubValues();
 
-    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+    if (!ob || !ob->isValid() || subs.empty() ) {
         return gp_Vec();
     }
 
@@ -193,7 +198,7 @@ gp_Vec MeasureAngle::location1() {
     App::DocumentObject* ob = Element1.getValue();
     std::vector<std::string> subs = Element1.getSubValues();
 
-    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+    if (!ob || !ob->isValid() || subs.empty() ) {
         return {};
     }
     auto temp = getLoc(*ob, subs.at(0));
@@ -203,7 +208,7 @@ gp_Vec MeasureAngle::location2() {
     App::DocumentObject* ob = Element2.getValue();
     std::vector<std::string> subs = Element2.getSubValues();
 
-    if (!ob || !ob->isValid() || subs.size() < 1 ) {
+    if (!ob || !ob->isValid() || subs.empty() ) {
         return {};
     }
 
@@ -213,7 +218,6 @@ gp_Vec MeasureAngle::location2() {
 
 App::DocumentObjectExecReturn *MeasureAngle::execute()
 {
-
     App::DocumentObject* ob1 = Element1.getValue();
     std::vector<std::string> subs1 = Element1.getSubValues();
 
@@ -224,7 +228,7 @@ App::DocumentObjectExecReturn *MeasureAngle::execute()
         return new App::DocumentObjectExecReturn("Submitted object(s) is not valid");
     }
 
-    if (subs1.size() < 1 || subs2.size() < 1) {
+    if (subs1.empty() || subs2.empty()) {
         return new App::DocumentObjectExecReturn("No geometry element picked");
     }
 
@@ -258,7 +262,3 @@ std::vector<App::DocumentObject*> MeasureAngle::getSubject() const
     return {Element1.getValue()};
 }
 
-// namespace Measure{
-// // explicit template instantiation
-// template class MeasureExport MeasureBaseExtendable<Part::MeasureAngleInfo>;
-// }

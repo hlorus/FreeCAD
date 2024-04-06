@@ -206,7 +206,8 @@ Part::MeasureRadiusInfoPtr MeasureRadius::getMeasureInfoFirst() const
     }
 
     std::string obName = object->getNameInDocument();
-    auto info = handler(&obName, &subElement);
+    App::SubObjectT subject{object, subElement.c_str()};
+    auto info = handler(subject);
     auto radiusInfo = std::dynamic_pointer_cast<Part::MeasureRadiusInfo>(info);
     return radiusInfo;
 }

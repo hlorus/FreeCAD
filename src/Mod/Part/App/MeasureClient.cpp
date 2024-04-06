@@ -47,6 +47,7 @@
 #include <App/Document.h>
 #include <App/DocumentObject.h>
 #include <App/MeasureManager.h>
+#include <App/DocumentObserver.h>
 #include <Base/Console.h>
 #include <Base/Matrix.h>
 #include <Base/Rotation.h>
@@ -95,11 +96,16 @@ static float getRadius(TopoDS_Shape& edge){
     return 0.0;
 }
 
-TopoDS_Shape getLocatedShape(const std::string& objectName, const std::string& subName)
+TopoDS_Shape getLocatedShape(const App::SubObjectT& subject)
 {
-    App::DocumentObject* obj = App::GetApplication().getActiveDocument()->getObject(objectName.c_str());
-    // should this be getTopoShape(obj, subName, true)?
+    App::DocumentObject* obj = subject.getObject();
+    if (!obj) {
+        return {};
+    }
     Part::TopoShape shape = Part::Feature::getTopoShape(obj);
+    if (shape.isNull()) {
+        return {};
+    }
     auto geoFeat = dynamic_cast<App::GeoFeature*>(obj);
     if (geoFeat) {
         shape.setPlacement(geoFeat->globalPlacement());
@@ -110,18 +116,16 @@ TopoDS_Shape getLocatedShape(const std::string& objectName, const std::string& s
         return shape.getShape();
     }
 
-    if (subName.empty())
-    {
+    if (!subject.getElementName()) {
         return shape.getShape();
     }
-    return shape.getSubShape(subName.c_str(), true);
+    return shape.getSubShape(subject.getElementName(), true);
 }
 
 
-App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* subName) {
+App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* subName)
+{
     App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName);
-//    auto sub = ob->getSubObject(subName);
-
     TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
@@ -173,31 +177,29 @@ App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* su
 }
 
 
-
-bool getShapeFromStrings(TopoDS_Shape &shapeOut, const std::string &doc, const std::string &object, const std::string &sub, Base::Matrix4D *mat)
+bool getShapeFromStrings(TopoDS_Shape &shapeOut, const App::SubObjectT& subject, Base::Matrix4D *mat)
 {
-  App::Document *docPointer = App::GetApplication().getDocument(doc.c_str());
-  if (!docPointer) {
-    return false;
-  }
-  App::DocumentObject *objectPointer = docPointer->getObject(object.c_str());
-  if (!objectPointer) {
-    return false;
-  }
-  shapeOut = Part::Feature::getShape(objectPointer,sub.c_str(),true,mat);
-  return !shapeOut.IsNull();
+    App::DocumentObject *obj = subject.getObject();
+    if (!obj) {
+        return {};
+     }
+    shapeOut = Part::Feature::getShape(obj, subject.getElementName(), true, mat);
+    return !shapeOut.IsNull();
 }
 
 
 
-Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* objectName, const std::string* subName)
+Part::VectorAdapter buildAdapter(const App::SubObjectT& subject)
 {
-    (void) objectName;
+    if (!subject.getObject()) {
+        return Part::VectorAdapter();
+    }
     Base::Matrix4D mat;
-    TopoDS_Shape shape = Part::Feature::getShape(ob, subName->c_str(), true);
+    TopoDS_Shape shape = Part::Feature::getShape(subject.getObject(), subject.getElementName(), true);
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
-        Base::Console().Message("Part::buildAdapter did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        Base::Console().Message("Part::buildAdapter did not retrieve shape for %s, %s\n",
+                                subject.getObjectName(), subject.getElementName());
         return Part::VectorAdapter();
     }
 
@@ -207,7 +209,7 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obj
     if (shapeType == TopAbs_EDGE)
     {
       TopoDS_Shape edgeShape;
-      if (!getShapeFromStrings(edgeShape, ob->getDocument()->getName(), ob->getNameInDocument(), *subName, &mat)) {
+      if (!getShapeFromStrings(edgeShape, subject, &mat)) {
         return {};
       }
       TopoDS_Edge edge = TopoDS::Edge(edgeShape);
@@ -238,7 +240,7 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obj
     if (shapeType == TopAbs_FACE)
     {
       TopoDS_Shape faceShape;
-      if (!getShapeFromStrings(faceShape, ob->getDocument()->getName(), ob->getNameInDocument(), *subName, &mat)) {
+      if (!getShapeFromStrings(faceShape, subject, &mat)) {
         return {};
       }
 
@@ -253,12 +255,14 @@ Part::VectorAdapter buildAdapter(const App::DocumentObject* ob, std::string* obj
 }
 
 
-MeasureLengthInfoPtr MeasureLengthHandler(std::string* objectName, std::string* subName){
-    TopoDS_Shape shape = getLocatedShape(*objectName, *subName);
+MeasureLengthInfoPtr MeasureLengthHandler(const App::SubObjectT& subject)
+{
+    TopoDS_Shape shape = getLocatedShape(subject);
 
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
-        Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n",
+                                subject.getObjectName(), subject.getElementName());
         return std::make_shared<MeasureLengthInfo>(false, 0.0, Base::Matrix4D());
     }
     TopAbs_ShapeEnum sType = shape.ShapeType();
@@ -286,11 +290,12 @@ MeasureLengthInfoPtr MeasureLengthHandler(std::string* objectName, std::string* 
     return std::make_shared<MeasureLengthInfo>(true, getLength(shape), placement);
 }
 
-MeasureRadiusInfoPtr MeasureRadiusHandler(std::string* objectName, std::string* subName){
+MeasureRadiusInfoPtr MeasureRadiusHandler(const App::SubObjectT& subject)
+{
     Base::Placement placement;      // curve center + orientation
     Base::Vector3d pointOnCurve;
 
-    TopoDS_Shape shape = getLocatedShape(*objectName, *subName);
+    TopoDS_Shape shape = getLocatedShape(subject);
 
     if (shape.IsNull()) {
         return std::make_shared<MeasureRadiusInfo>( false, 0.0, pointOnCurve, placement);
@@ -321,12 +326,14 @@ MeasureRadiusInfoPtr MeasureRadiusHandler(std::string* objectName, std::string* 
 }
 
 
-MeasureAreaInfoPtr MeasureAreaHandler(std::string* objectName, std::string* subName){
-    TopoDS_Shape shape = getLocatedShape(*objectName, *subName);
+MeasureAreaInfoPtr MeasureAreaHandler(const App::SubObjectT& subject)
+{
+    TopoDS_Shape shape = getLocatedShape(subject);
 
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
-        Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        Base::Console().Message("MeasureLengthHandler did not retrieve shape for %s, %s\n",
+                                subject.getObjectName(), subject.getElementName());
         return std::make_shared<MeasureAreaInfo>(false, 0.0, Base::Matrix4D());
     }
     TopAbs_ShapeEnum sType = shape.ShapeType();
@@ -347,11 +354,13 @@ MeasureAreaInfoPtr MeasureAreaHandler(std::string* objectName, std::string* subN
 }
 
 
-MeasurePositionInfoPtr MeasurePositionHandler(std::string* objectName, std::string* subName) {
-    TopoDS_Shape shape = getLocatedShape(*objectName, *subName);
+MeasurePositionInfoPtr MeasurePositionHandler(const App::SubObjectT& subject)
+{
+    TopoDS_Shape shape = getLocatedShape(subject);
 
     if (shape.IsNull()) {
-        Base::Console().Message("MeasurePositionHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        Base::Console().Message("MeasurePositionHandler did not retrieve shape for %s, %s\n",
+                                subject.getObjectName(), subject.getElementName());
         return std::make_shared<MeasurePositionInfo>(false, Base::Vector3d());
     }
     TopAbs_ShapeEnum sType = shape.ShapeType();
@@ -366,18 +375,20 @@ MeasurePositionInfoPtr MeasurePositionHandler(std::string* objectName, std::stri
 }
 
 
-MeasureAngleInfoPtr MeasureAngleHandler(std::string* objectName, std::string* subName) {
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName->c_str());
-    TopoDS_Shape shape = getLocatedShape(*objectName, *subName);
+MeasureAngleInfoPtr MeasureAngleHandler(const App::SubObjectT& subject)
+{
+    TopoDS_Shape shape = getLocatedShape(subject);
+
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
-        Base::Console().Message("MeasureAngleHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        Base::Console().Message("MeasureAngleHandler did not retrieve shape for %s, %s\n",
+                                subject.getObjectName(), subject.getElementName());
         return std::make_shared<MeasureAngleInfo>();
     }
 
     TopAbs_ShapeEnum sType = shape.ShapeType();
 
-    Part::VectorAdapter vAdapt = buildAdapter(ob, objectName, subName);
+    Part::VectorAdapter vAdapt = buildAdapter(subject);
 
     gp_Pnt vec;
     Base::Vector3d position;
@@ -403,12 +414,14 @@ MeasureAngleInfoPtr MeasureAngleHandler(std::string* objectName, std::string* su
 }
 
 
-MeasureDistanceInfoPtr MeasureDistanceHandler(std::string* objectName, std::string* subName) {
-    TopoDS_Shape shape = getLocatedShape(*objectName, *subName);
+MeasureDistanceInfoPtr MeasureDistanceHandler(const App::SubObjectT& subject)
+{
+    TopoDS_Shape shape = getLocatedShape(subject);
 
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
-        Base::Console().Message("MeasureDistanceHandler did not retrieve shape for %s, %s\n", objectName->c_str(), subName->c_str());
+        Base::Console().Message("MeasureDistanceHandler did not retrieve shape for %s, %s\n",
+                                subject.getObjectName(), subject.getElementName());
         return std::make_shared<MeasureDistanceInfo>();
     }
 
