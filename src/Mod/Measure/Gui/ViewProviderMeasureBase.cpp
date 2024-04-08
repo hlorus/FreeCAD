@@ -208,6 +208,7 @@ void ViewProviderMeasureBase::onChanged(const App::Property* prop)
     else if (prop == &FontSize) {
         pLabel->size = FontSize.getValue();
     }
+    ViewProviderDocumentObject::onChanged(prop);
 }
 
 void ViewProviderMeasureBase::draggerChangedCallback(void *data, SoDragger *) {
@@ -593,7 +594,6 @@ Base::Vector3d ViewProviderMeasure::getTextPosition(){
 //! called by the system when it is time to display this measure
 void ViewProviderMeasureBase::show()
 {
-    Base::Console().Message("VPMB::show()\n");
     if (isSubjectVisible()) {
         // only show the annotation if the subject is visible.
         // this avoids disconnected annotations floating in space.
