@@ -28,13 +28,9 @@
 
 #include <deque>
 #include <vector>
-#include <functional>
-#include <optional>
-#include <string>
 
 #include <Base/Observer.h>
 #include <Base/Parameter.h>
-#include "Base/Vector3D.h"
 
 // forward declarations
 using PyObject = struct _object;
@@ -389,7 +385,6 @@ public:
     std::map<std::string, std::string> getExportFilters() const;
     //@}
 
-
     /** @name Init, Destruct an Access methods */
     //@{
     static void init(int argc, char ** argv);
@@ -567,7 +562,6 @@ private:
     static PyObject *sGetActiveTransaction  (PyObject *self,PyObject *args);
     static PyObject *sCloseActiveTransaction(PyObject *self,PyObject *args);
     static PyObject *sCheckAbort(PyObject *self,PyObject *args);
-
     static PyMethodDef    Methods[];
 
     friend class ApplicationObserver;
@@ -639,7 +633,6 @@ private:
 
     static Base::ConsoleObserverStd  *_pConsoleObserverStd;
     static Base::ConsoleObserverFile *_pConsoleObserverFile;
-
 };
 
 /// Singleton getter of the Application

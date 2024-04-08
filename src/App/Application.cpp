@@ -1545,7 +1545,6 @@ std::map<std::string, std::string> Application::getExportFilters() const
     return filter;
 }
 
-
 //**************************************************************************
 // signaling
 void Application::slotBeforeChangeDocument(const App::Document& doc, const Property& prop)

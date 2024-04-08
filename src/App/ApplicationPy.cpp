@@ -969,4 +969,3 @@ PyObject *Application::sCheckAbort(PyObject * /*self*/, PyObject *args)
         Py_Return;
     }PY_CATCH
 }
-
