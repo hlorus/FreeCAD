@@ -43,6 +43,74 @@
 using namespace Gui;
 
 
+std::vector<App::MeasureType*> getValidMeasureTypes(App::MeasureSelection selection, std::string mode) {
+    Base::PyGILStateLocker lock;
+
+    // Convert selection to python list
+    Py::Tuple selectionPy(selection.size());
+
+    int i = 0;
+    for (auto it : selection) {
+        selectionPy.setItem(i, Py::Object(it.getPyObject()));
+
+        i++;
+    }
+
+    // Store valid measure types
+    std::vector<App::MeasureType*> validTypes;
+    std::pair<int, App::MeasureType>();
+
+
+    // Loop through measure types and check if they work with given selection
+    for (App::MeasureType* mType : App::MeasureManager::getMeasureTypes()){
+
+        if (mode != "" && mType->label != mode) {
+            continue;
+        }
+
+
+        if (mType->isPython) {
+            // Parse Python measure types
+            auto measurePyClass = Py::Object(mType->pythonClass);
+            
+            Py::Tuple args(1);
+            args.setItem(0, selectionPy);
+            Py::Object isValid = measurePyClass.callMemberFunction(std::string("isValidSelection"), args);
+
+            if (isValid.as_bool()) {
+
+                // Check priority
+                Py::Object isPriority = measurePyClass.callMemberFunction("isPrioritySelection", args);
+
+                if (isPriority.as_bool()) {
+                    validTypes.insert(validTypes.begin(), mType);
+                } else {
+                    validTypes.push_back(mType);
+                }
+            }
+        } else {
+            // Parse c++ measure types
+            
+            if (mType->validatorCb && !mType->validatorCb(selection)) {
+                continue;
+            }
+
+            // Check if the measurement type prioritizes the given selection
+            if (mType->prioritizeCb && mType->prioritizeCb(selection)) {
+                validTypes.insert(validTypes.begin(), mType);
+            } else {
+                validTypes.push_back(mType);
+            }
+
+        }
+    }
+
+    return validTypes;
+}
+
+
+
+
 TaskMeasure::TaskMeasure()
 {
     qApp->installEventFilter(this);
@@ -172,12 +240,9 @@ void TaskMeasure::update() {
 
     std::string mode = explicitMode ? modeSwitch->currentText().toStdString() : "";
 
-    App::MeasureSelection selection;
-    for (auto s : Gui::Selection().getSelection()) {
-        selection.emplace_back(s.pObject->getNameInDocument(), s.SubName); // Or use FeatName?
-    }
+    auto selection = Gui::Selection().getSelectionEx();
 
-    auto measureTypes = App::MeasureManager::getValidMeasureTypes(selection, mode);
+    auto measureTypes = getValidMeasureTypes(selection, mode);
     if (measureTypes.size() > 0) {
         measureType = measureTypes.front();
     }

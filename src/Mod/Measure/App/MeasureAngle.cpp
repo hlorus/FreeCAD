@@ -56,28 +56,13 @@ MeasureAngle::~MeasureAngle() = default;
 
 bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection)
 {
-    if (selection.size() != 2) {
+    auto elementTypes = getElementTypes(selection);
+    
+    if (elementTypes.size() != 2) {
         return false;
     }
 
-
-    App::Document* doc = App::GetApplication().getActiveDocument();
-
-    for (const std::tuple<std::string, std::string>& element : selection) {
-        const std::string& obName = get<0>(element);
-        App::DocumentObject* ob = doc->getObject(obName.c_str());
-        
-        const std::string& subName = get<1>(element);
-        const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = Base::Type::getModuleName(className);
-
-        if (!hasGeometryHandler(mod)) {
-            return false;
-        }
-
-        App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
-        App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
-
+    for (auto type : elementTypes) {
         if (type == App::MeasureElementType::INVALID) {
             return false;
         }
@@ -92,25 +77,21 @@ bool MeasureAngle::isValidSelection(const App::MeasureSelection& selection)
 }
 
 bool MeasureAngle::isPrioritizedSelection(const App::MeasureSelection& selection)
-{
-    if (selection.size() != 2) {
-        return false;
-    }
-    
+{   
     // Check if the two elements are parallel
-    App::Document* doc = App::GetApplication().getActiveDocument();
 
-    App::DocumentObject* ob1 = doc->getObject(get<0>(selection.at(0)).c_str());
-    std::string sub1 = get<1>(selection.at(0));
+    auto subElements = getSubElements(selection);
+    auto elem1 = subElements.at(0);
+    auto elem2 = subElements.at(1);
+
+    std::string subName1 = elem1.second;
+    std::string subName2 = elem2.second;
+
     Base::Vector3d vec1;
-    getVec(*ob1, sub1, vec1);
+    getVec(elem1.first, subName1, vec1);
 
-
-    App::DocumentObject* ob2 = doc->getObject(get<0>(selection.at(1)).c_str());
-    std::string sub2 = get<1>(selection.at(1));
     Base::Vector3d vec2;
-    getVec(*ob2, sub2, vec2);
-
+    getVec(elem2.first, subName2, vec2);
     
     double angle = std::fmod(vec1.GetAngle(vec2), D_PI);
     return angle > Base::Precision::Angular();
@@ -119,22 +100,22 @@ bool MeasureAngle::isPrioritizedSelection(const App::MeasureSelection& selection
 
 void MeasureAngle::parseSelection(const App::MeasureSelection& selection) {
 
-    assert(selection.size() >= 2);
+    auto subElements = getSubElements(selection);
+    assert(subElements.size() >= 2);
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
+    auto elem1 = subElements.at(0);
+    auto elem2 = subElements.at(1);
+    
+    const std::vector<std::string> subs1 = {elem1.second};
+    Element1.setValue(&elem1.first, subs1);
 
-    App::DocumentObject* ob1 = doc->getObject(get<0>(selection.at(0)).c_str());
-    const std::vector<std::string> elems1 = {get<1>(selection.at(0))};
-    Element1.setValue(ob1, elems1);
-
-    App::DocumentObject* ob2 = doc->getObject(get<0>(selection.at(1)).c_str());
-    const std::vector<std::string> elems2 = {get<1>(selection.at(1))};
-    Element2.setValue(ob2, elems2);
+    const std::vector<std::string> subs2 = {elem2.second};
+    Element2.setValue(&elem2.first, subs2);
 }
 
 
 bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::Vector3d& vecOut) {
-    const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
+    const char* className = ob.getTypeId().getName();
     std::string mod = Base::Type::getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {
@@ -152,7 +133,7 @@ bool MeasureAngle::getVec(App::DocumentObject& ob, std::string& subName, Base::V
 
 Base::Vector3d MeasureAngle::getLoc(App::DocumentObject& ob, std::string& subName)
 {
-    const char* className = ob.getSubObject(subName.c_str())->getTypeId().getName();
+    const char* className = ob.getTypeId().getName();
     std::string mod = Base::Type::getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {

@@ -55,23 +55,9 @@ bool MeasureArea::isValidSelection(const App::MeasureSelection& selection){
         return false;
     }
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
+    auto elementTypes = getElementTypes(selection);
 
-    for (const std::tuple<std::string, std::string>& element : selection) {
-        const std::string& obName = get<0>(element);
-        App::DocumentObject* ob = doc->getObject(obName.c_str());
-        
-        const std::string& subName = get<1>(element);
-        const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = Base::Type::getModuleName(className);
-
-        if (!hasGeometryHandler(mod)) {
-            return false;
-        }
-
-        App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
-        App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
-
+    for (auto type : elementTypes) {
         if (type == App::MeasureElementType::INVALID) {
             return false;
         }
@@ -87,15 +73,16 @@ bool MeasureArea::isValidSelection(const App::MeasureSelection& selection){
 void MeasureArea::parseSelection(const App::MeasureSelection& selection) {
     // Set properties from selection, method is only invoked when isValid Selection returns true
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
-
     std::vector<App::DocumentObject*> objects;
     std::vector<const char*> subElements;
 
-    for (const std::tuple<std::string, std::string>& element : selection) {
-       App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
-       objects.push_back(ob);
-       subElements.push_back(get<1>(element).c_str());
+    for (auto element : selection) {
+       App::DocumentObject* ob = element.getObject();
+
+        for (auto subName : element.getSubNames()) {
+            objects.push_back(ob);
+            subElements.push_back(subName.c_str());
+       }
     }
 
     Elements.setValues(objects, subElements);

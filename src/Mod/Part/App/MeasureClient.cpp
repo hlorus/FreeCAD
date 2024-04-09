@@ -123,14 +123,12 @@ TopoDS_Shape getLocatedShape(const App::SubObjectT& subject)
 }
 
 
-App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* subName)
-{
-    App::DocumentObject* ob = App::GetApplication().getActiveDocument()->getObject(objectName);
-    TopoDS_Shape shape = Part::Feature::getShape(ob, subName, true);
+App::MeasureElementType getElementType(const App::DocumentObject& ob, const std::string& subName) {
+    TopoDS_Shape shape = Part::Feature::getShape(&ob, subName.c_str(), true);
     if (shape.IsNull()) {
         // failure here on loading document with existing measurement.
-        Base::Console().Message("Part::PartMeasureTypeCb did not retrieve shape for %s, %s\n", objectName, subName);
-        return App::MeasureElementType();
+        Base::Console().Message("Part::PartMeasureTypeCb did not retrieve shape for %s, %s\n", ob.getNameInDocument(), subName);
+        return App::MeasureElementType::INVALID;
     }
     TopAbs_ShapeEnum shapeType = shape.ShapeType();
 
@@ -144,7 +142,7 @@ App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* su
 
             switch (curve.GetType()) {
                 case GeomAbs_Line: {
-                    if (ob->getTypeId().isDerivedFrom(Base::Type::fromName("Part::Datum"))) {
+                    if (ob.getTypeId().isDerivedFrom(Base::Type::fromName("Part::Datum"))) {
                         return App::MeasureElementType::LINE;
                     }
                     return App::MeasureElementType::LINESEGMENT;
@@ -174,6 +172,16 @@ App::MeasureElementType PartMeasureTypeCb(const char* objectName, const char* su
             return App::MeasureElementType::INVALID;
         }
     }
+}
+
+std::vector<App::MeasureElementType> PartMeasureTypeCb(const App::DocumentObject& ob, const std::vector<std::string>& subNames)
+{
+
+    std::vector<App::MeasureElementType> elementTypes;
+    for (auto subName : subNames) {
+        elementTypes.push_back(getElementType(ob, subName));
+    }
+    return elementTypes;
 }
 
 

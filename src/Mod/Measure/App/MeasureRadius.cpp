@@ -62,33 +62,22 @@ MeasureRadius::~MeasureRadius() = default;
 //! single valid item in the selection
 bool MeasureRadius::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.empty() || selection.size() > 1) {
+    auto elementTypes = getElementTypes(selection);
+    if (elementTypes.empty() || selection.size() > 1) {
         // too few or too many selections
         return false;
     }
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
-    const std::string& obName = get<0>(selection.front());
-    App::DocumentObject* ob = doc->getObject(obName.c_str());
+    for (auto type : elementTypes) {
 
-    const std::string& subName = get<1>(selection.front());
-    const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-    std::string mod = Base::Type::getModuleName(className);
+        if (type == App::MeasureElementType::INVALID) {
+            return false;
+        }
 
-    if (!hasGeometryHandler(mod)) {
-        return false;
-    }
-
-    App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
-    App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
-
-    if (type == App::MeasureElementType::INVALID) {
-        return false;
-    }
-
-    if (type != App::MeasureElementType::CIRCLE
-        && type != App::MeasureElementType::ARC) {
-        return false;
+        if (type != App::MeasureElementType::CIRCLE
+            && type != App::MeasureElementType::ARC) {
+            return false;
+        }
     }
 
     return true;
@@ -100,10 +89,11 @@ bool MeasureRadius::isPrioritizedSelection(const App::MeasureSelection& selectio
     if (selection.empty()) {
         return false;
     }
-    App::Document* doc = App::GetApplication().getActiveDocument();
-    std::string firstObjectName = get<0>(selection.front());
-    App::DocumentObject* firstObject = doc->getObject(firstObjectName.c_str());
-    std::string firstSubName = get<1>(selection.front());
+
+    auto element = selection.front();
+
+    App::DocumentObject* firstObject = element.getObject();
+    std::string firstSubName = element.getSubNames().front();
     if (!firstObject) {
         return false;
     }
@@ -130,14 +120,13 @@ bool MeasureRadius::isPrioritizedSelection(const App::MeasureSelection& selectio
 
 //! Set properties from first item in selection. assumes a valid selection.
 void MeasureRadius::parseSelection(const App::MeasureSelection& selection) {
-    App::Document* doc = App::GetApplication().getActiveDocument();
 
     std::vector<App::DocumentObject*> objects;
     std::vector<const char*> subElements;
 
-    const std::tuple<std::string, std::string>& element = selection.front();
-    App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
-    std::string subElement = get<1>(element);
+    auto element = selection.front();
+    App::DocumentObject* ob = element.getObject();
+    std::string subElement = element.getSubNames().front();
     std::vector<std::string> subElementList { subElement };
 
     Element.setValue(ob, subElementList);

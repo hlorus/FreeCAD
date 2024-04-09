@@ -78,6 +78,18 @@ private:
 
 protected:
     void onDocumentRestored() override;
+    inline static std::vector<std::pair<App::DocumentObject&, std::string>> getSubElements(const App::MeasureSelection& selection) {
+    std::vector<std::pair<App::DocumentObject&, std::string>> subElements;
+    
+    for (auto element : selection) {
+        App::DocumentObject* ob = element.getObject();
+
+        for (auto subName : element.getSubNames()) {
+            subElements.push_back({*ob, subName});
+        }
+    }
+    return subElements;
+}
 };
 
 // Create a scriptable object based on MeasureBase
@@ -118,6 +130,27 @@ public:
     static bool hasGeometryHandler(const std::string& module) {
         return (_mGeometryHandlers.count(module) > 0);
     }
+
+protected:
+    inline static std::vector<App::MeasureElementType> getElementTypes(const App::MeasureSelection& selection) {
+        std::vector<App::MeasureElementType> elementTypes;
+        
+        for (auto element : selection) {
+            App::DocumentObject* ob = element.getObject();
+            const char* className = ob->getTypeId().getName();
+            std::string mod = Base::Type::getModuleName(className);
+
+            if (!hasGeometryHandler(mod)) {
+                return {};
+            }
+
+            App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
+            auto types = handler.typeCb(*ob, element.getSubNames());
+            elementTypes.insert(elementTypes.end(), types.begin(), types.end());
+        }
+        return elementTypes;
+    }
+
 
 private:
     inline static HandlerMap _mGeometryHandlers = MeasureBaseExtendable<T>::HandlerMap();

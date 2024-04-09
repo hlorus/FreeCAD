@@ -53,26 +53,12 @@ MeasurePosition::~MeasurePosition() = default;
 
 bool MeasurePosition::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.empty() || selection.size() > 1) {
+    auto elementTypes = getElementTypes(selection);
+    if (elementTypes.empty() || selection.size() > 1) {
         return false;
     }
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
-
-    for (const std::tuple<std::string, std::string>& element : selection) {
-        const std::string& obName = get<0>(element);
-        App::DocumentObject* ob = doc->getObject(obName.c_str());
-        
-        const std::string& subName = get<1>(element);
-        const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = Base::Type::getModuleName(className);
-
-        if (!hasGeometryHandler(mod)) {
-            return false;
-        }
-
-        App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
-        App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
+    for (auto type : elementTypes) {
 
         if (type == App::MeasureElementType::INVALID) {
             return false;
@@ -88,19 +74,14 @@ bool MeasurePosition::isValidSelection(const App::MeasureSelection& selection){
 void MeasurePosition::parseSelection(const App::MeasureSelection& selection) {
     // Set properties from selection, method is only invoked when isValid Selection returns true
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
+    for (auto element : selection) {
+       App::DocumentObject* ob = element.getObject();
 
-    std::vector<App::DocumentObject*> objects;
-    std::vector<const char*> subElements;
-
-    for (const std::tuple<std::string, std::string>& element : selection) {
-       App::DocumentObject* ob = doc->getObject(get<0>(element).c_str());
-
-        auto sub = std::vector<std::string>();
-        sub.push_back(get<1>(element));
-
-        Element.setValue(ob, sub);
-        break;
+        for (auto subName : element.getSubNames()) {
+            std::vector<std::string> subNames{subName};
+            Element.setValue(ob, subNames);
+            break;
+        }
     }
 }
 

@@ -29,6 +29,8 @@
 #include <functional>
 #include <string>
 #include <Python.h>
+#include <App/DocumentObject.h>
+#include <Gui/SelectionObject.h>
 
 #include <FCGlobal.h>
 
@@ -49,10 +51,11 @@ enum class MeasureElementType {
 };
 
 
-using MeasureSelection = std::vector<std::tuple<std::string, std::string>>;
+using MeasureSelection = std::vector<Gui::SelectionObject>;
 using MeasureValidateMethod = std::function<bool(const MeasureSelection&)>;
 using MeasurePrioritizeMethod = std::function<bool(const MeasureSelection&)>;
-using MeasureTypeMethod = std::function<MeasureElementType (const char*, const char*)>;
+using MeasureTypeMethod = std::function<std::vector<MeasureElementType> (const App::DocumentObject&, const std::vector<std::string>&)>;
+
 
 struct MeasureType {
     std::string identifier;
@@ -87,7 +90,6 @@ public:
     static void addMeasureType(std::string id, std::string label, std::string measureObj, MeasureValidateMethod validatorCb, MeasurePrioritizeMethod prioritizeCb);
     static void addMeasureType(const char* id, const char* label, const char* measureObj, MeasureValidateMethod validatorCb, MeasurePrioritizeMethod prioritizeCb);
     static const std::vector<MeasureType*> getMeasureTypes();
-    static std::vector<MeasureType*> getValidMeasureTypes(App::MeasureSelection selection, std::string mode);
 
 private:
     static std::vector<MeasureHandler> _mMeasureHandlers;

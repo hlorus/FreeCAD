@@ -61,27 +61,13 @@ MeasureDistance::~MeasureDistance() = default;
 
 bool MeasureDistance::isValidSelection(const App::MeasureSelection& selection){
 
-    if (selection.size() != 2) {
+    auto elementTypes = getElementTypes(selection);
+
+    if (elementTypes.size() != 2) {
         return false;
     }
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
-
-    for (const std::tuple<std::string, std::string>& element : selection) {
-        const std::string& obName = get<0>(element);
-        App::DocumentObject* ob = doc->getObject(obName.c_str());
-        
-        const std::string& subName = get<1>(element);
-        const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
-        std::string mod = Base::Type::getModuleName(className);
-
-        if (!hasGeometryHandler(mod)) {
-            return false;
-        }
-
-        App::MeasureHandler handler = App::MeasureManager::getMeasureHandler(mod.c_str());
-        App::MeasureElementType type = handler.typeCb(obName.c_str(), subName.c_str());
-
+    for (auto type : elementTypes) {
         if (type == App::MeasureElementType::INVALID) {
             return false;
         }
@@ -117,17 +103,17 @@ bool MeasureDistance::isPrioritizedSelection(const App::MeasureSelection& select
 
 void MeasureDistance::parseSelection(const App::MeasureSelection& selection) {
 
-    assert(selection.size() >= 2);
+    auto subElements = getSubElements(selection);
+    assert(subElements.size() >= 2);
 
-    App::Document* doc = App::GetApplication().getActiveDocument();
+    auto elem1 = subElements.at(0);
+    auto elem2 = subElements.at(1);
 
-    App::DocumentObject* ob1 = doc->getObject(get<0>(selection.at(0)).c_str());
-    const std::vector<std::string> elems1 = {get<1>(selection.at(0))};
-    Element1.setValue(ob1, elems1);
+    const std::vector<std::string> subs1 = {elem1.second};
+    Element1.setValue(&elem1.first, subs1);
 
-    App::DocumentObject* ob2 = doc->getObject(get<0>(selection.at(1)).c_str());
-    const std::vector<std::string> elems2 = {get<1>(selection.at(1))};
-    Element2.setValue(ob2, elems2);
+    const std::vector<std::string> subs2 = {elem2.second};
+    Element2.setValue(&elem2.first, subs2);
 }
 
 
@@ -141,7 +127,7 @@ bool MeasureDistance::getShape(App::PropertyLinkSub* prop, TopoDS_Shape& rShape)
     }
 
     std::string subName = subs.at(0);
-    const char* className = ob->getSubObject(subName.c_str())->getTypeId().getName();
+    const char* className = ob->getTypeId().getName();
     std::string mod = Base::Type::getModuleName(className);
 
     if (!hasGeometryHandler(mod)) {

@@ -87,8 +87,7 @@ class MeasureCOM(MeasureBasePython):
 
     def parseSelection(self, obj, selection):
         sel = selection[0]
-        o = FreeCAD.ActiveDocument.getObject(sel[0])
-        obj.Element = (o, sel[1])
+        obj.Element = (sel.Object, sel.SubElementNames)
 
 
     def getResultString(self, obj):

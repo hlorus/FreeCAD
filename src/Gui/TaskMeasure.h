@@ -32,7 +32,7 @@
 
 #include "TaskView/TaskDialog.h"
 #include "TaskView/TaskView.h"
-#include "Selection.h"
+#include <Gui/SelectionObject.h>
 
 namespace Gui {
 
@@ -75,9 +75,6 @@ private:
     void setModeSilent(App::MeasureType* mode);
     App::MeasureType* getMeasureType();
     void enableAnnotateButton(bool state);
-
-    // Store a list of picked elements and subelements
-    App::MeasureSelection selection;
 
     // List of measure types
     std::vector<App::DocumentObject> measureObjects;
