@@ -383,7 +383,7 @@ void SoFrameLabel::drawImage()
     QFont font(QString::fromLatin1(QByteArray(name.getValue())), size.getValue());
     QFontMetrics fm(font);
     int w = 0;
-    int h = fm.height() * num;
+
     const SbColor& b = backgroundColor.getValue();
     QColor backgroundBrush;
     backgroundBrush.setRgbF(b[0],b[1],b[2]);
@@ -399,6 +399,7 @@ void SoFrameLabel::drawImage()
         lines << line;
     }
 
+    int h = fm.height() * static_cast<int>(lines.length());
     int padding = 5;
 
     bool drawIcon = false;
@@ -435,7 +436,7 @@ void SoFrameLabel::drawImage()
     }
 
     if (drawIcon) {
-        painter.drawImage(QPoint(padding, paddingIconV), iconImg); 
+        painter.drawImage(QPoint(padding, paddingIconV), iconImg);
     }
 
     painter.setPen(front);
